@@ -26,7 +26,7 @@ function varargout = MarmoV5(varargin)
 
 % Edit the above text to modify the response to help MarmoV5
 
-% Last Modified by GUIDE v2.5 27-Nov-2018 14:31:54
+% Last Modified by GUIDE v2.5 23-Sep-2019 17:01:59
 
 % Begin initialization code - DO NOT EDIT
 % Added the next two lines to allow the automatic start up.-GB
@@ -1494,3 +1494,55 @@ function CondenseAppendedData(hObject, handles)
       cd(handles.taskPath);            % return to task directory
     end
     
+
+
+% --- Executes on slider movement.
+function slider_P4intensity_Callback(hObject, eventdata, handles)
+% hObject    handle to slider_P4intensity (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+if isa(handles.eyetrack, 'marmoview.eyetrack_ddpi')
+    handles.eyetrack.p4intensity = hObject.Value;
+	ddpiM('setP4Template', [handles.eyetrack.p4intensity, handles.eyetrack.p4radius]);
+    fprintf('Setting P4 intensity to: %f\n',  handles.eyetrack.p4intensity)
+end
+% Hints: get(hObject,'Value') returns position of slider
+%        get(hObject,'Min') and get(hObject,'Max') to determine range of slider
+
+
+% --- Executes during object creation, after setting all properties.
+function slider_P4intensity_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to slider_P4intensity (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: slider controls usually have a light gray background.
+if isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor',[.9 .9 .9]);
+end
+
+% --- Executes on slider movement.
+function slider_P4radius_Callback(hObject, eventdata, handles)
+% hObject    handle to slider_P4radius (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+if isa(handles.eyetrack, 'marmoview.eyetrack_ddpi')
+    handles.eyetrack.p4radius = hObject.Value;
+	ddpiM('setP4Template', [handles.eyetrack.p4intensity, handles.eyetrack.p4radius]);
+    fprintf('Setting P4 radius to: %f\n',  handles.eyetrack.p4radius)
+end
+% Hints: get(hObject,'Value') returns position of slider
+%        get(hObject,'Min') and get(hObject,'Max') to determine range of slider
+
+
+% --- Executes during object creation, after setting all properties.
+function slider_P4radius_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to slider_P4radius (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: slider controls usually have a light gray background.
+if isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor',[.9 .9 .9]);
+end

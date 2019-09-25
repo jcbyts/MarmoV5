@@ -10,12 +10,12 @@ classdef eyetrack_ddpi < handle
         width
         height
         downsamplingRate
-        frameRate
-        filename
+        frameRateD
+        frameRateN
+        p4intensity
+        p4radius
         p1
         p4
-        time
-        tag
         timeLastSample
     end
     
@@ -25,10 +25,11 @@ classdef eyetrack_ddpi < handle
             % initialise input parser
             p = inputParser;
             p.addParameter('EyeDump',true,@islogical); % default 1, do EyeDump
-            p.addParameter('width', 640)
-            p.addParameter('height', 480)
+            p.addParameter('width', 1440)%640)
+            p.addParameter('height', 1080)%480)
             p.addParameter('downsamplingRate', 1)
-            p.addParameter('frameRate', 601)
+            p.addParameter('frameRateD', 2500000)%601)
+            p.addParameter('frameRateN', 10593)%1)
             p.parse(varargin{:});
             
             args = p.Results;
@@ -36,17 +37,19 @@ classdef eyetrack_ddpi < handle
             o.width = args.width;
             o.height = args.height;
             o.downsamplingRate = args.downsamplingRate;
-            o.frameRate = args.frameRate;
-            
+            o.frameRateD = args.frameRateD;
+            o.frameRateN = args.frameRateN;
+            o.p4intensity = 200;
+            o.p4radius = 2.1;
             
             ddpiM('setupTracker', [o.width o.height o.downsamplingRate]);
-            ddpiM('setupStreamer', [o.width o.height o.frameRate o.downsamplingRate]);
+            ddpiM('setupStreamer', [o.width o.height o.frameRateD o.frameRateN]);
             ddpiM('enableDisplay', true);
             ddpiM('enableTrack', true);
-            ddpiM('setP1Threshold', 240);
-            ddpiM('setP1BoundingBoxSize', 64);
-            ddpiM('setP4BoundingBoxSize', 16);
-            ddpiM('setP4Template', [255, 2.1]);
+            ddpiM('setP1Threshold', 250);
+            ddpiM('setP1BoundingBoxSize', 128);
+            ddpiM('setP4BoundingBoxSize', 32);
+            ddpiM('setP4Template', [o.p4intensity, o.p4radius]);
             
             
             ddpiM('start');
