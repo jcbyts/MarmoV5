@@ -178,7 +178,7 @@ classdef newera < marmoview.liquid
       ip.addParameter('address',0,@(x) isreal);
       
       ip.addParameter('diameter',20.0,@isreal); % mm
-      ip.addParameter('volume',0.010,@isreal); % ml
+      ip.addParameter('volume',10,@isreal); % ml
       ip.addParameter('rate',10.0,@isreal); % ml per minute
       ip.addParameter('alarmMode', 0)
       ip.addParameter('lowNoiseMode', 0)

@@ -1080,7 +1080,7 @@ guidata(hObject,handles);
 function JuiceVolumeEdit_CreateFcn(hObject, eventdata, handles) %#ok<*INUSD>
 function JuiceVolumeEdit_Callback(hObject, eventdata, handles)
 vol = get(hObject,'String'); % volume is entered in microliters!!
-volML = str2double(vol)/1e3; % milliliters
+volML = str2double(vol); %/1e3; % milliliters
 % fprintf(handles.A.pump,['0 VOL ' volML]);
 handles.reward.volume = volML; % milliliters
 if handles.S.solenoid

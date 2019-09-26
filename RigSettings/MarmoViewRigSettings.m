@@ -111,7 +111,7 @@ if S.newera % this should be moved into rig specific parameters
     
     S.pumpDiameter = 20;                % internal diameter of the juice syringe (mm)
     S.pumpRate = 20;                     % rate to deliver juice (ml/minute)
-    S.pumpDefVol = 0.01;                % default dispensing volume (ml)
+    S.pumpDefVol = 10;                % default dispensing volume (ml)
 end
 
 if S.DummyScreen
