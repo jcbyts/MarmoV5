@@ -9,15 +9,15 @@ classdef gaussimages < handle
   %
   % 26-08-2018 - Jude Mitchell
   
-  properties (Access = public),
+  properties (Access = public)
     tex;
     texDim;  
-    imagenum@double = 0;   %if set zeros, picks at random which to show
-    position@double = [0.0, 0.0]; % [x,y] (pixels)
-    radius@double = 1;  % size in pixels, must be set
-    bkgd@double = 127;
-    gray@logical = true;
-    transparency@double = 0.5;
+    imagenum double = 0;   %if set zeros, picks at random which to show
+    position double = [0.0, 0.0]; % [x,y] (pixels)
+    radius double = 1;  % size in pixels, must be set
+    bkgd double = 127;
+    gray logical = true;
+    transparency double = 0.5;
   end
         
   properties (Access = private)
@@ -30,7 +30,7 @@ classdef gaussimages < handle
       o.tex = [];
       o.texDim = [];
       
-      if nargin == 1,
+      if nargin == 1
         return
       end
 

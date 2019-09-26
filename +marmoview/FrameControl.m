@@ -44,10 +44,10 @@ classdef FrameControl < handle
 
   % dependent properties, calculated on the fly...
   properties (SetAccess = public, GetAccess = public)
-     showEye@double = 0;
-     eyeIntensity@double = 20;
-     Bkgd@double = 127;       % need to know for screen flip
-     eyeRadius@double = 2.0;  % of screen pointer
+     showEye double = 0;
+     eyeIntensity double = 20;
+     Bkgd double = 127;       % need to know for screen flip
+     eyeRadius double = 2.0;  % of screen pointer
      centerPix = [0,0];
      pixPerDeg = 30; 
      frameRate = 60; 
@@ -77,7 +77,7 @@ classdef FrameControl < handle
 
   methods (Access = public)
   
-     function o = initialize(o,winPtr,P,C,S,varargin), 
+     function o = initialize(o,winPtr,P,C,S,varargin)
            % winPtr is the window point of psych display
            % P is the parameter struct defined by settings
            % C is the eye calibration struct
@@ -101,7 +101,7 @@ classdef FrameControl < handle
         %*************
         
         % initialise input parser
-        args = varargin;
+%         args = varargin;
         p = inputParser;
         p.KeepUnmatched = true;
         p.StructExpand = true;
@@ -263,9 +263,9 @@ classdef FrameControl < handle
         % And it also plots the screen frame flips 
         
         h = handles.EyeTrace;
-        dx = handles.A.dx;
-        dy = handles.A.dy;
-        c = handles.A.c;
+        dx_ = handles.A.dx;
+        dy_ = handles.A.dy;
+        c_ = handles.A.c;
         ppd = handles.S.pixPerDeg;
         eyeRad = handles.eyeTraceRadius;
         
@@ -278,14 +278,14 @@ classdef FrameControl < handle
         if o.FCount
           if (isempty(o.FP))  % default case, plot all traces
             ind = 1:o.FCount;  %any reasonable states
-            x = (o.FData(ind,2)-c(1)) / (dx*ppd);
-            y = (o.FData(ind,3)-c(2)) / (dy*ppd);
+            x = (o.FData(ind,2)-c_(1)) / (dx_*ppd);
+            y = (o.FData(ind,3)-c_(2)) / (dy_*ppd);
             plot(h,x,y,'b.');          
           else
             for k = 1:length(o.FP)
               ind = ismember(o.FData(:,5),o.FP(k).states);
-              x = (o.FData(ind,2)-c(1)) / (dx*ppd);
-              y = (o.FData(ind,3)-c(2)) / (dy*ppd);
+              x = (o.FData(ind,2)-c_(1)) / (dx_*ppd);
+              y = (o.FData(ind,3)-c_(2)) / (dy_*ppd);
               plot(h,x,y,[o.FP(k).col,'.']);
             end
           end

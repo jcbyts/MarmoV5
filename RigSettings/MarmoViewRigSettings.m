@@ -67,9 +67,10 @@ switch RigName
         
     case 'propixx'
         S.newera = true;         % use Newera juice pump
-        S.eyetracker = 'ddpi';
+        S.pumpCom = 'COM3'; 
+        S.eyetracker = 'none'; %'ddpi';
         S.arrington = true;      % use Arrington eye tracker
-        S.DummyEye = false;       % use mouse instead of eye tracker
+        S.DummyEye = true;       % use mouse instead of eye tracker
         S.solenoid = false;      % use solenoid juice delivery
         S.DummyScreen = false;   % don't use a Dummy Display
         S.EyeDump = true;        % store all eye position data
@@ -77,12 +78,12 @@ switch RigName
         
         % setup screen
         S.monitor = 'PROPIXX';         % Monitor used for display window
-        S.screenNumber = 1;                 % Designates the display for task stimuli
+        S.screenNumber = 2;                 % Designates the display for task stimuli
         S.frameRate = 120; % 120;           % Frame rate of screen in Hz
         S.screenRect = [0 0 1920 1080];     % Screen dimensions in pixels
         S.screenWidth = 70;                 % Width of screen (cm)
         S.centerPix =  [960 540];           % Pixels of center of the screen
-        S.guiLocation = [800 100 890 660];
+        S.guiLocation = [500 100 890 660];
         S.bgColour = 127; %127; %186;  % use 127 if gamma corrected
         
         S.screenDistance = 87;              % Distance of eye to screen (cm)
@@ -101,17 +102,20 @@ end
 S.TimeSensitive = [];  % default, allow GUI updating in run func states
 %***************************
 
-if S.newera % this should be moved into rig specific parameters
-    if IsWin
-        S.pumpCom = 'COM9';                 % COM port the New Era syringe pump
-    elseif IsLinux
-%         S.pumpCom = '/dev/ttyS0';
-        S.pumpCom = '/dev/ttyUSB0';
+if S.newera 
+    
+    if ~isfield(S, 'pumpCom') % this should be moved into rig specific parameters
+        if IsWin
+            S.pumpCom = 'COM9';                 % COM port the New Era syringe pump
+        elseif IsLinux
+            %         S.pumpCom = '/dev/ttyS0';
+            S.pumpCom = '/dev/ttyUSB0';
+        end
     end
     
     S.pumpDiameter = 20;                % internal diameter of the juice syringe (mm)
-    S.pumpRate = 20;                     % rate to deliver juice (ml/minute)
-    S.pumpDefVol = 0.01;                % default dispensing volume (ml)
+    S.pumpRate = 20;                    % rate to deliver juice (ml/minute)
+    S.pumpDefVol = 10; %0.01;                % default dispensing volume (ml)
 end
 
 if S.DummyScreen

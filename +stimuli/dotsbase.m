@@ -16,17 +16,17 @@ classdef (Abstract) dotsbase < handle
     
   % 2017-06-04 - Shaun L. Cloherty <s.cloherty@ieee.org>
   
-  properties (Access = public),
-    size@double; % pixels
-    speed@double; % pixels/s
-    direction@double; % deg.
-    numDots@double;
-    lifetime@double; % dot lifetime (frames)
-%     minRadius@double; % minimum radius (pixels)
-    maxRadius@double; % maximum radius (pixels)
-    position@double; % aperture position (x,y; pixels)
-    colour@double;
-    visible@logical = true; % are the dots visible
+  properties (Access = public)
+    size double; % pixels
+    speed double; % pixels/s
+    direction double; % deg.
+    numDots double;
+    lifetime double; % dot lifetime (frames)
+%     minRadius double; % minimum radius (pixels)
+    maxRadius double; % maximum radius (pixels)
+    position double; % aperture position (x,y; pixels)
+    colour double;
+    visible logical = true; % are the dots visible
   end
     
   properties (GetAccess = public, SetAccess = protected)

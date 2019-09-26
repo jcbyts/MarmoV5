@@ -4,22 +4,22 @@ classdef PR_BillFix < handle
   %                 sound as an object from stimulus folder
   %
   
-  properties (Access = public), 
-       Iti@double = 1;            % default Iti duration
-       startTime@double = 0;      % trial start time
-       fixStart@double = 0;       % fix acquired time
-       itiStart@double = 0;       % start of ITI interval
-       fixDur@double = 0;         % fixation duration
-       rewardCount@double = 0;    % counter for reward drops
-       RunFixBreakSound@double = 0;       % variable to initiate fix break sound (only once)
-       NeverBreakSoundTwice@double = 0;   % other variable for fix break sound
-       BlackFixation@double = 6;          % frame to see black fixation, before reward
+  properties (Access = public)
+       Iti double = 1;            % default Iti duration
+       startTime double = 0;      % trial start time
+       fixStart double = 0;       % fix acquired time
+       itiStart double = 0;       % start of ITI interval
+       fixDur double = 0;         % fixation duration
+       rewardCount double = 0;    % counter for reward drops
+       RunFixBreakSound double = 0;       % variable to initiate fix break sound (only once)
+       NeverBreakSoundTwice double = 0;   % other variable for fix break sound
+       BlackFixation double = 6;          % frame to see black fixation, before reward
   end
       
   properties (Access = private)
     winPtr; % ptb window
-    state@double = 0;      % state counter
-    error@double = 0;      % error state in trial
+    state double = 0;      % state counter
+    error double = 0;      % error state in trial
     %*********
     S;      % copy of Settings struct (loaded per trial start)
     P;      % copy of Params struct (loaded per trial)
@@ -257,10 +257,10 @@ classdef PR_BillFix < handle
         y = 0.15*max(ylim);
 
         h = [];
-        for ii = 1:size(errors,2),
-          axes(A.DataPlot1);
-          h(ii) = text(x(ii),y,sprintf('%i',errors(2,ii)),'HorizontalAlignment','Center');
-          if errors(2,ii) > 2*y,
+        for ii = 1:size(errors,2)
+          axes(A.DataPlot1); %#ok<LAXES>
+          h(ii) = text(x(ii),y,sprintf('%i',errors(2,ii)),'HorizontalAlignment','Center'); %#ok<AGROW>
+          if errors(2,ii) > 2*y
             set(h(ii),'Color','w');
           end
         end
@@ -268,7 +268,7 @@ classdef PR_BillFix < handle
 
         % Dataplot 2, wait time histogram
         if any(o.D.error==0)
-            hist(A.DataPlot2,o.D.fixDur(o.D.error==0));
+            hist(A.DataPlot2,o.D.fixDur(o.D.error==0)); %#ok<HIST>
         end
         % title(A.DataPlot2,'Successful Trials');
         % show the numbers - 2016-05-06 - Shaun L. Cloherty <s.cloherty@ieee.org> 

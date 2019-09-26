@@ -21,26 +21,26 @@ classdef dots < handle
   % 14-06-2016 - Shaun L. Cloherty <s.cloherty@ieee.org>
   
   properties (Access = public),
-    size@double; % pixels
-    speed@double; % pixels/s
-    direction@double; % radians (?)
-    numDots@double;
-    coherence@double; % pcnt coherence (0-1)
-    mode@double; % 0 = proportion, 1 = distribution
-    dist@double; % 0 = gaussian, 1 = uniform
-    bandwdth@double; % width of gaussian/uniform noise.
-    lifetime@double; % dot lifetime (frames)
-%     minRadius@double; % minimum radius (pixels)
+    size double; % pixels
+    speed double; % pixels/s
+    direction double; % radians (?)
+    numDots double;
+    coherence double; % pcnt coherence (0-1)
+    mode double; % 0 = proportion, 1 = distribution
+    dist double; % 0 = gaussian, 1 = uniform
+    bandwdth double; % width of gaussian/uniform noise.
+    lifetime double; % dot lifetime (frames)
+%     minRadius double; % minimum radius (pixels)
     truncateGauss = -1;
-    maxRadius@double; % maximum radius (pixels)
-    Xtop@double; % max X (pixels)
-    Xbot@double; % min X (pixels)
-    Ytop@double; % max Y (pixels)
-    Ybot@double; % min Y (pixels)
-    position@double; % aperture position (x,y; pixels)
-    colour@double;
-    visible@logical = true; % are the dots visible
-    gaussian@logical = false;
+    maxRadius double; % maximum radius (pixels)
+    Xtop double; % max X (pixels)
+    Xbot double; % min X (pixels)
+    Ytop double; % max Y (pixels)
+    Ybot double; % min Y (pixels)
+    position double; % aperture position (x,y; pixels)
+    colour double;
+    visible logical = true; % are the dots visible
+    gaussian logical = false;
   end
     
   properties (Access = public) %private)
@@ -77,27 +77,27 @@ classdef dots < handle
       p = inputParser;
 %       p.KeepUnmatched = true;
       p.StructExpand = true;
-      p.addParamValue('size',10.0,@double); % pixels?
-      p.addParamValue('speed',0.2,@double); % deg./s
-      p.addParamValue('direction',0.0,@(x) isscalar(x) && isreal(x)); % deg.
-      p.addParamValue('numDots',200,@(x) ceil(x));
+      p.addParameter('size',10.0,@double); % pixels?
+      p.addParameter('speed',0.2,@double); % deg./s
+      p.addParameter('direction',0.0,@(x) isscalar(x) && isreal(x)); % deg.
+      p.addParameter('numDots',200,@(x) ceil(x));
 
-      p.addParamValue('mode',0,@(x) any(ismember(x,[0, 1]))); % 0 = proportion, 1 = distribution      
+      p.addParameter('mode',0,@(x) any(ismember(x,[0, 1]))); % 0 = proportion, 1 = distribution      
 
       % mode = 0
-      p.addParamValue('coherence',1.0,@(x) isscalar(x) && isreal(x)); % 0..1
+      p.addParameter('coherence',1.0,@(x) isscalar(x) && isreal(x)); % 0..1
       
       % mode = 1
-      p.addParamValue('dist',0,@(x) any(ismember(x,[0, 1]))); % 0 = gaussian, 1 = uniform
-      p.addParamValue('bandwdth',20.0,@(x) isscalar(x) && isreal(x)); % bandwidth (deg.)
+      p.addParameter('dist',0,@(x) any(ismember(x,[0, 1]))); % 0 = gaussian, 1 = uniform
+      p.addParameter('bandwdth',20.0,@(x) isscalar(x) && isreal(x)); % bandwidth (deg.)
 
       
-      p.addParamValue('lifetime',Inf,@double);
+      p.addParameter('lifetime',Inf,@double);
 
 %       p.addParamValue('minRadius',0.0,@double); % deg.?
-      p.addParamValue('maxRadius',10.0,@double);
+      p.addParameter('maxRadius',10.0,@double);
 
-      p.addParamValue('position',[0.0,0.0],@(x) isvector(x) && isreal(x)); % [x,y] (pixels)
+      p.addParameter('position',[0.0,0.0],@(x) isvector(x) && isreal(x)); % [x,y] (pixels)
       
       p.addParameter('colour',[1,0,0],@double);
       p.addParameter('visible',true,@islogical);
@@ -105,7 +105,7 @@ classdef dots < handle
       
       try
         p.parse(args{:});
-      catch,
+      catch
         warning('Failed to parse name-value arguments.');
         return;
       end

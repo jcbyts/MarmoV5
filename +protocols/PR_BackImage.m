@@ -4,16 +4,16 @@ classdef PR_BackImage < handle
   % The class constructor can be called with a range of arguments:
   %
   
-  properties (Access = public),    
-       Iti@double = 1;        % default Iti duration
-       startTime@double = 0;  % trial start time
-       imageOff@double = 0;   % offset of image
+  properties (Access = public)
+       Iti double = 1;        % default Iti duration
+       startTime double = 0;  % trial start time
+       imageOff double = 0;   % offset of image
   end
       
   properties (Access = private)
     winPtr; % ptb window
-    state@double = 0;      % state countern trial
-    error@double = 0;      % default, need defined even if always 0
+    state double = 0;      % state countern trial
+    error double = 0;      % default, need defined even if always 0
    %************
     S;      % copy of Settings struct (loaded per trial start)
     P;      % copy of Params struct (loaded per trial)
@@ -34,7 +34,7 @@ classdef PR_BackImage < handle
         state = o.state;
     end
     
-    function initFunc(o,S,P);
+    function initFunc(o,S,~)
         o.ImoScreen = [];
         o.ImageDirectory = S.ImageDirectory;  
     end
@@ -43,7 +43,7 @@ classdef PR_BackImage < handle
         o.ImageDirectory = imagedir;
     end
     
-    function closeFunc(o),
+    function closeFunc(o)
         if (~isempty(o.ImoScreen))
             Screen('Close',o.ImoScreen);
             o.ImoScreen = [];
@@ -54,11 +54,11 @@ classdef PR_BackImage < handle
         end     
     end
    
-    function generate_trialsList(o,S,P)
+    function generate_trialsList(o,S,P) %#ok<*INUSD>
            % nothing for this protocol
     end
     
-    function P = next_trial(o,S,P);
+    function P = next_trial(o,S,P)
           %********************
           o.S = S;
           o.P = P;       
@@ -82,7 +82,7 @@ classdef PR_BackImage < handle
     function [FP,TS] = prep_run_trial(o)
         % Setup the state
         o.state = 0; % Showing the face
-        Iti = o.P.iti;   % set ITI interval from P struct stored in trial
+%         Iti = o.P.iti;   % set ITI interval from P struct stored in trial
         %*******
         FP(1).states = 0;  % any special plotting of states, 
         FP(1).col = 'b';   % FP(1).states = 1:2; FP(1).col = 'b';
@@ -150,7 +150,8 @@ classdef PR_BackImage < handle
         ciy = (iy - cp(2)) * (eR/idy);
         %*********** draw the scaled image, then overlay eye position
         subplot(handles.EyeTrace); hold off;
-        H = imagesc(cix,ciy,flipud(o.imo(iy,ix,:)));
+%         H = imagesc(cix,ciy,flipud(o.imo(iy,ix,:)));
+        imagesc(cix,ciy,flipud(o.imo(iy,ix,:))); % don't output handle
         if (size(o.imo,3)==1)
             colormap('gray');
         end

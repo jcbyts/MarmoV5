@@ -5,25 +5,25 @@ classdef PR_FixFlash < handle
   %
   
   properties (Access = public), 
-       Iti@double = 1;            % default Iti duration
-       startTime@double = 0;      % trial start time
-       fixStart@double = 0;       % fix acquired time
-       itiStart@double = 0;       % start of ITI interval
-       fixDur@double = 0;         % fixation duration
-       faceTrial@logical = true;  % trial with face to start
-       showFix@logical = true;    % trial start with fixation
-       flashCounter@double = 0;   % counter to flash fixation
-       rewardCount@double = 0;    % counter for reward drops
-       RunFixBreakSound@double = 0;       % variable to initiate fix break sound (only once)
-       NeverBreakSoundTwice@double = 0;   % other variable for fix break sound
-       BlackFixation@double = 6;          % frame to see black fixation, before reward
-       GABcounter@double = 1;             % counter for Gabor flashing stimuli
+       Iti double = 1;            % default Iti duration
+       startTime double = 0;      % trial start time
+       fixStart double = 0;       % fix acquired time
+       itiStart double = 0;       % start of ITI interval
+       fixDur double = 0;         % fixation duration
+       faceTrial logical = true;  % trial with face to start
+       showFix logical = true;    % trial start with fixation
+       flashCounter double = 0;   % counter to flash fixation
+       rewardCount double = 0;    % counter for reward drops
+       RunFixBreakSound double = 0;       % variable to initiate fix break sound (only once)
+       NeverBreakSoundTwice double = 0;   % other variable for fix break sound
+       BlackFixation double = 6;          % frame to see black fixation, before reward
+       GABcounter double = 1;             % counter for Gabor flashing stimuli
   end
       
   properties (Access = private)
     winPtr; % ptb window
-    state@double = 0;      % state counter
-    error@double = 0;      % error state in trial
+    state double = 0;      % state counter
+    error double = 0;      % error state in trial
     %*********
     S;      % copy of Settings struct (loaded per trial start)
     P;      % copy of Params struct (loaded per trial)

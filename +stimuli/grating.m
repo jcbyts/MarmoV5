@@ -13,19 +13,19 @@ classdef grating < handle
   
   % 14-08-2018 - Jude Mitchell
   
-  properties (Access = public),
-    position@double = [0.0, 0.0]; % [x,y] (pixels)
-    radius@double = 50; % (pixels)
-    orientation@double = 0;  % horizontal
-    cpd@double = 2; % cycles per degree
-    cpd2@double = NaN; % default not used, else composite stim
-    phase@double = 0;  % (radians)
-    square@logical = false;  
-    bkgd@double = 127;  
-    range@double = 127;
-    gauss@logical = true;  %gaussian aperture
-    transparent@double = 0.5;  % from 0 to 1, how transparent
-    pixperdeg@double = 0;  % set non-zero to use for CPD computation
+  properties (Access = public)
+    position double = [0.0, 0.0]; % [x,y] (pixels)
+    radius double = 50; % (pixels)
+    orientation double = 0;  % horizontal
+    cpd double = 2; % cycles per degree
+    cpd2 double = NaN; % default not used, else composite stim
+    phase double = 0;  % (radians)
+    square logical = false;  
+    bkgd double = 127;  
+    range double = 127;
+    gauss logical = true;  %gaussian aperture
+    transparent double = 0.5;  % from 0 to 1, how transparent
+    pixperdeg double = 0;  % set non-zero to use for CPD computation
     screenRect = [];   % if radius Inf, then fill whole area
   end
         
@@ -43,7 +43,7 @@ classdef grating < handle
       o.texRect = [];
       o.goRect = [];
       
-      if nargin == 1,
+      if nargin == 1
         return
       end
 
@@ -52,7 +52,7 @@ classdef grating < handle
       p = inputParser;
       p.StructExpand = true;
       
-      p.addParameter('position',o.position,@isfloat); % [x,y] (pixels)
+      p.addParameter('position',o.position, @isfloat); % [x,y] (pixels)
       p.addParameter('radius',o.radius,@isfloat);
       p.addParameter('orientation',o.orientation,@isfloat);
       p.addParameter('cpd',o.cpd,@isfloat);
