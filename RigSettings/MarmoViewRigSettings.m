@@ -84,7 +84,7 @@ switch RigName
         S.centerPix =  [960 540];           % Pixels of center of the screen
         S.guiLocation = [800 100 890 660];
         S.bgColour = 127; %127; %186;  % use 127 if gamma corrected
-        
+        S.gamma = 1;
         S.screenDistance = 87;              % Distance of eye to screen (cm)
         S.pixPerDeg = PixPerDeg(S.screenDistance,S.screenWidth,S.screenRect(3));
         
@@ -131,6 +131,7 @@ if S.DummyScreen
 
 end
 
-S.gamma = 2.2;                      % Single value gamma correction, this
-                                    % works for BenQ, others might need a
+if ~isfield(S, 'gamma')
+    S.gamma = 2.2;                  % Single value gamma correction, this
+end                                 % works for BenQ, others might need a
                                     % table based correction
