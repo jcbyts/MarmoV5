@@ -61,12 +61,12 @@ classdef newera < marmoview.liquid
         
         if ~isempty(o.dev)
             
-            % note: value is in ml, however, if diameter > 14.0mm, the pump
-            %       is expecting volume in microliters (unless the default units
-            %       have been over-riden).
-            if o.diameter <= 14.0
-                value = value*1e3; % microliters
-            end
+%             % note: value is in ml, however, if diameter > 14.0mm, the pump
+%             %       is expecting volume in microliters (unless the default units
+%             %       have been over-riden).
+%             if o.diameter <= 14.0
+%                 value = value*1e3; % microliters
+%             end
             o.setvol(value);
             o.volume = value;
         else
