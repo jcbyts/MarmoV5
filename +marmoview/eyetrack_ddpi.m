@@ -25,11 +25,11 @@ classdef eyetrack_ddpi < handle
             % initialise input parser
             p = inputParser;
             p.addParameter('EyeDump',true,@islogical); % default 1, do EyeDump
-            p.addParameter('width', 1440)%640)
-            p.addParameter('height', 1080)%480)
+            p.addParameter('width', 720)%640)
+            p.addParameter('height', 540)%480)
             p.addParameter('downsamplingRate', 1)
-            p.addParameter('frameRateD', 2500000)%601)
-            p.addParameter('frameRateN', 10593)%1)
+            p.addParameter('frameRateD', 539)%601)
+            p.addParameter('frameRateN', 1)%1)
             p.parse(varargin{:});
             
             args = p.Results;
@@ -47,7 +47,7 @@ classdef eyetrack_ddpi < handle
             ddpiM('enableDisplay', true);
             ddpiM('enableTrack', true);
             ddpiM('setP1Threshold', 250);
-            ddpiM('setP1BoundingBoxSize', 128);
+            ddpiM('setP1BoundingBoxSize', 64);
             ddpiM('setP4BoundingBoxSize', 32);
             ddpiM('setP4Template', [o.p4intensity, o.p4radius]);
             
