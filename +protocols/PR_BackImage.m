@@ -63,7 +63,11 @@ classdef PR_BackImage < handle
           o.S = S;
           o.P = P;       
           %*******************
-          flist = dir([o.ImageDirectory,filesep,'*.jpg']);
+          flist = dir([o.ImageDirectory,filesep,'*.*']);
+          fext = cellfun(@(x) x(strfind(x, '.'):end), {flist.name}, 'uni', 0);
+          isimg = cellfun(@(x) any(strcmp(x, {'.bmp', '.png', '.jpg', '.JPG', '.PNG'})), fext);
+          flist = flist(isimg);
+          
           o.closeFunc();  % clear any remaining images in memory
                           % before you allocated more (one per time)
           %******************

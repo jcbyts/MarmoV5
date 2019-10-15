@@ -104,7 +104,7 @@ P.showEye = 0;
 S.showEye = 'Show the gaze indicator? (0 or 1):';
 
 %***** FORAGE CAN ACCEPT DIFFERENT BACKGROUND TYPES *****
-P.noisetype = 2;
+P.noisetype = 3;
 S.noisetype = 'Background (0-none,1-hartley, 2-spatial, ...):';
 
 if (P.noisetype == 1)
@@ -134,9 +134,9 @@ if (P.noisetype == 2)
     P.snoiseheight = 15.0;  % radius of noise field around origin
     S.snoiseheight = 'Spatial noise height (degs, +/- origin):';
     if (1)  % for V1
-      P.snoisenum = 16;   % number of white/black ovals to draw
+      P.snoisenum = 8;   % number of white/black ovals to draw
       S.snoisenum = 'Number of noise ovals:';
-      P.snoisediam = 0.25;  % diameter in dva of noise oval
+      P.snoisediam = 0.5;  % diameter in dva of noise oval
       S.snoisediam = 'Diameter of noise ovals (dva): ';
     else  % for MT
       P.snoisenum = 3;   % number of white/black ovals to draw
@@ -161,7 +161,7 @@ if (P.noisetype == 3)
 end
 
 if (P.noisetype == 4)
-    %****** in this version fixation noise is spatial noise
+    %****** in this version full field motion 
     P.noisewidth = 25.0;  % radius of noise field around origin
     S.noisewidth = 'Spatial noise width (degs, +/- origin):';
     P.noiseheight = 15.0;  % radius of noise field around origin
@@ -177,13 +177,13 @@ if (P.noisetype == 4)
     S.dotSize = 'Diameter of dots (dva): '; 
     P.dotLifeTime = inf; % duration of each dot, in frames
     S.dotLifeTime = 'Duration in frames :';
-    P.numSpeed = 4;   % number of speeds to sample
+    P.numSpeed = 2;   % number of speeds to sample, changed 9/13 from 4 to 2
     S.numSpeed = 'Number of speeds: ';
-    P.dotSpeed = 12.0; % diameter in dva of noise oval
+    P.dotSpeed = 15.0; % diameter in dva of noise oval
     S.dotSpeed = 'Dot speed (dva/s): ';   
-    P.dotSpeedMin = 8.0; %4.0; % diameter in dva of noise oval
+    P.dotSpeedMin = 8; % diameter in dva of noise oval
     S.dotSpeedMin = 'Min Dot speed (dva/s): ';   
-    P.dotSpeedMax = 32.0; % diameter in dva of noise oval
+    P.dotSpeedMax = 16; %32.0; % diameter in dva of noise oval, change 9/13 32 to 16
     S.dotSpeedMax = 'Max Dot speed (dva/s): ';   
     P.noisenum = 16; % number of motion directions
     S.noisenum = 'Dot motion directions: ';   
@@ -192,16 +192,16 @@ if (P.noisetype == 4)
 end
 
 if (P.noisetype == 5)
-    %****** in this version fixation noise is spatial noise
+    %****** in this version moving large dots for motion RF
     P.snoisewidth = 25.0;  % radius of noise field around origin
     S.snoisewidth = 'Spatial noise width (degs, +/- origin):';
     P.snoiseheight = 15.0;  % radius of noise field around origin
     S.snoiseheight = 'Spatial noise height (degs, +/- origin):';
-    P.snoisenum = 8;   % number of white/black ovals to draw
+    P.snoisenum = 16; %8; %2; %8;   % number of white/black ovals to draw
     S.snoisenum = 'Number of noise ovals:';
-    P.snoisediam = 1.0;  % diameter in dva of noise oval
+    P.snoisediam = 1.0; %2.0; %1.0;  % diameter in dva of noise oval
     S.snoisediam = 'Diameter of noise ovals (dva): ';
-    P.snoiselife = 5;  % lifetime in video frames
+    P.snoiselife = 6;  % lifetime in video frames
     S.snoiselife = 'Lifetime in frames';
     P.snoisespeed = 15;  % motion speed
     S.snoisespeed = 'Speed of dot';

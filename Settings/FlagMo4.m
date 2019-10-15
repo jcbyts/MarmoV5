@@ -1,5 +1,5 @@
 
-function [S,P] = FlagMo2
+function [S,P] = FlagMo4
 
 %%%% NECESSARY VARIABLES FOR GUI
 %%%% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -17,7 +17,7 @@ S.MarmoViewVersion = '5';
 S.finish = 800;
 
 % PROTOCOL PREFIX
-S.protocol = 'FlagMo2';
+S.protocol = 'FlagMo4';
 % PROTOCOL PREFIXS
 S.protocol_class = ['protocols.PR_',S.protocol];
 
@@ -50,25 +50,26 @@ P.CycleBackImage = 20;
 S.CycleBackImage = 'If def, backimage every # trials:';
 
 %**********************
-P.probNull = 0.50;
-S.probNull = 'Prob no reward (for null cued target):';
-P.showCue = 0;
-S.showCue = 'Show line cue? (1 or 0): ';
 P.gazecontin = 0;
 S.gazecontin = 'Make noise gaze contingent:';
+P.catchprob = 0.0; %2;
+S.catchprob = 'Prob of catch trial:';
+P.showcue = 0;
+S.showcue = 'Show line cue:';
 P.holdDur = 0.10;
 S.holdDur = 'Duration at grating for reward (s):';
-P.stimOnDel = 0.3;   % was 0.1 or 0.2, is 0.3 too long?
-S.stimOnDel = 'Jitter onset of stim 0-? s:';  % hold periods after cue
-%******
-P.stimDur = 1.0; %0.10; %0.20 % duration of peripheral stim (offset before sac)
+P.stimOnDel = 0.3;   % was 0.3!!! too long
+S.stimOnDel = 'Jitter onset of stim 0-? s:';
+P.stimDur = 1.00;  % duration of peripheral stim (offset before sac)
 S.stimDur = 'Duration of peripheral stim (s):';
-P.dotdelay = 0.10; %0.30 % extra duration stim presentation after saccade
+P.dotdelay = 0.10; %0.30; % extra duration stim presentation after saccade
 S.dotdelay = 'Extra dot time(s):';
 P.dotdelay2 = 0.30 % extra duration stim presentation after saccade
 S.dotdelay2 = 'Extra time before face(s):';
 P.fixslots = 0.08;  % give juice for fixation from fraction   
 S.fixslots = 'Fraction of fix trials:';
+P.cueDur = 0.10;  
+S.cueDur = 'Line Cue Duration(s):';
 P.fixMin = 0.10;  
 S.fixMin = 'Minimum fixation (s):';
 P.fixRan = 0.10;
@@ -81,7 +82,7 @@ S.fixation = 'Reward fixation (no target):';
 %******* parameters for spatial cue to target
 P.width1 = 0.11; 
 S.width1 = 'Cue line width in degs';
-P.sigma1 = 1.0;
+P.sigma1 = 0.7;
 S.sigma1 = 'Cue line width near fixation';
 P.FixN = 1;
 S.FixN = 'Steps to fixation fade:';
@@ -98,11 +99,9 @@ P.stimEcc = 7.0;
 S.stimEcc = 'Ecc of stimulus (degrees):';
 
 %************
-P.orinum = 16;  
-S.orinum = 'Motion dirs to sample of stimulus';
-P.RF_X = -3;
+P.RF_X = 5;
 S.RF_X = 'Position of RF, x-pos (degs):';
-P.RF_Y = -7;
+P.RF_Y = -5;
 S.RF_Y = 'Position of RF, y-pos (degs):';
 ecc = norm([P.RF_X,P.RF_Y]);
 P.targnum = 3;  %total choice locations
@@ -112,8 +111,6 @@ P.xDeg = P.RF_X;
 S.xDeg = 'X center of stimulus (degrees):';
 P.yDeg = P.RF_Y;
 S.yDeg = 'Y center of stimulus (degrees):';
-P.radius = 0.5 * ecc;  % diameter of target is dva
-S.radius = 'Size of Target(dva):';
 P.choiceRadius = 0.5 * ecc;
 S.choiceRadius = 'Choice on target (degs):';
 %********
@@ -122,12 +119,21 @@ S.choiceRadius = 'Choice on target (degs):';
 P.motionStimulus = 1;
 S.motionStimulus = 'Use moving dot field:';
 
-if (P.motionStimulus == 0)  % use grating      
-    P.cpd = 8;  % must be scaled by pixperDeg
-    S.cpd = 'Cycles per degree:';
+if (P.motionStimulus == 0)  % use grating  
+    P.radius = 0.25 * ecc;  % diameter of target is dva
+    S.radius = 'Size of Target(dva):';
+    %********
+    P.orinum = 18;  % first 12 are ori, 6 more for sf  
+    S.orinum = 'Samples of stimulus';
+    P.baseori = 12;  % based orientations sampled
+    S.baseori = 'Number of orientations';
+    P.cpd = 1.5;  % must be scaled by pixperDeg
+    S.cpd = 'Pref cycles per degree:';
+    P.oripref = 15.0;  % pref ori for spat freq samples
+    S.oripref = 'Pref ori';
     P.cpd2 = NaN;  % must be scaled by pixperDeg
     S.cpd2 = '2nd Cycles per deg:';
-    P.phase = -1;
+    P.phase = 0;
     S.phase = 'Grating phase (-1 or 1):';
     P.squareWave = 0;
     S.squareWave = '0 - sine wave, 1 - square wave';
@@ -135,17 +141,36 @@ if (P.motionStimulus == 0)  % use grating
     S.probecon = 'Transparency of Probe (1-none, 0-gone):';
     P.range = 64;
     S.range = 'Luminance range of grating (1-127):';
-else 
-    P.dotColor = 0;  % over-ridden by dot fade-in 
+else
+    P.radius = 0.4 * ecc;  % diameter of target is dva
+    S.radius = 'Size of Target(dva):';
+    %*********
+    P.orinum = 16;
+    S.orinum = 'Motion dirs to sample of stimulus';
+    P.dotColor = 0;  % over-ridden by dot fade-in
     S.dotColor = 'Dot color (0-255):';
     P.dotSpeed = 15; 
     S.dotSpeed = 'Dot Speed (Degree per sec):';
     P.dotSize = 0.15; 
     S.dotSize = 'Dot Size (Degree):';
-    P.dotNum = floor( 50 * ((ecc/5)^ 2) );
+    P.dotNum = floor( 20 * ((ecc/5)^ 2) );
     S.dotNum = 'Number of dots:';
     P.range = 127;
     S.range = 'Luminance range of grating (1-127):';
+    %********
+    P.motionback = 1;   % show motion background
+    S.motionback = 'Motion background: ';
+    P.dotNumBack = 320; % 640;
+    S.dotNumBack = 'Number of back dots: ';
+    P.rangeBack = 64; %96;
+    S.rangeBack = 'Luminance background(1-127):';
+    P.dotSpeedBack = 2; 
+    S.dotSpeedBack = 'Dot Speed Back (Degree per sec):';
+    P.noisewidth = 25.0;  % radius of noise field around origin
+    S.noisewidth = 'Spatial noise width (degs, +/- origin):';
+    P.noiseheight = 15.0;  % radius of noise field around origin
+    S.noiseheight = 'Spatial noise height (degs, +/- origin):';
+    %********
 end
 
 %*******
@@ -162,7 +187,6 @@ S.eyeIntensity = 'Indicator intensity:';
 P.showEye = 0;
 S.showEye = 'Show the gaze indicator? (0 or 1):';
 
-
 %****** fixation properties
 P.fixPointRadius = 0.3;  
 S.fixPointRadius = 'Fix Point Radius (degs):';
@@ -170,7 +194,7 @@ S.fixPointRadius = 'Fix Point Radius (degs):';
 % Windows
 P.initWinRadius = 1;
 S.initWinRadius = 'Enter to initiate fixation (deg):';
-P.fixWinRadius = 1.5;  %by JM 10/18/17
+P.fixWinRadius = 2.0;  %by JM 10/18/17
 S.fixWinRadius = 'Fixation window radius (deg):';
 % P.stimWinMinRad = 4; % by JM
 % S.stimWinMinRad = 'Minumum saccade from fixation (deg):';
