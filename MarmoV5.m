@@ -156,7 +156,7 @@ else, % no syringe pump? use the @dbgreward object object instead
   if handles.S.solenoid
      handles.reward = marmoview.SolenoidControl(S.pumpCom); 
      S.pumpDefVol = handles.reward.volume;
-     vol = sprintf('%d',S.pumpDefVol * 1e3);
+     vol = sprintf('%d',S.pumpDefVol);
      set(handles.JuiceVolumeText,'String',[vol ' ms']); % displayed in microliters!!
   else
      handles.reward = marmoview.dbgreward();
@@ -532,9 +532,9 @@ handles.PI = struct;
 handles.A.juiceVolume = handles.reward.volume;
 handles.A.juiceCounter = 0;
 if handles.S.solenoid
-  set(handles.JuiceVolumeText,'String',sprintf('%3i ms',handles.A.juiceVolume*1e3));  
+  set(handles.JuiceVolumeText,'String',sprintf('%3i ms',handles.A.juiceVolume));  
 else
-  set(handles.JuiceVolumeText,'String',sprintf('%3i ul',handles.A.juiceVolume*1e3));
+  set(handles.JuiceVolumeText,'String',sprintf('%3i ul',handles.A.juiceVolume));
 end
 
 % RE-ENABLE CONTROLS
