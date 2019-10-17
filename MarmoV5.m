@@ -698,6 +698,7 @@ while handles.runTask && A.j <= A.finish
        end
     end
     %*****************************
+    P.rng_before_trial = rng(); % save current state of the random number generator
     
     % EXECUTE THE NEXT TRIAL COMMAND
     if ~handles.runImage
