@@ -70,17 +70,35 @@ classdef PR_BackImage < handle
           
           o.closeFunc();  % clear any remaining images in memory
                           % before you allocated more (one per time)
+          
           %******************
           if (~isempty(flist))
              fimo = 1 + floor( (rand * 0.99) * size(flist,1) );
              fname = flist(fimo).name;  % name of an image
              o.ImageFile = [o.ImageDirectory,filesep,fname];
              o.imo = imread(o.ImageFile);
+             
+             % image can't be bigger than screen. Don't waste texture size?
+             o.imo = imresize(o.imo, S.screenRect([4 3]));
+             
              %******* insert image in middle texture
              o.ImoScreen = Screen('MakeTexture',o.winPtr,o.imo);
              o.ImoRect = [0 0 size(o.imo,2) size(o.imo,1)];
              o.ScreenRect = S.screenRect;
-          end      
+          end
+          
+          aspectRatio = size(o.imo,1)./size(o.imo,2);
+          
+          % check if there are size and position variables
+          if isfield(P, 'imageSizes') && isfield(P, 'imageCtrX') && isfield(P, 'imageCtrY')
+              imWidthDeg = randsample(P.imageSizes, 1);
+              imWidthPx = S.pixPerDeg * imWidthDeg;
+              imHeightPx = aspectRatio * imWidthPx;
+              
+              ctr = S.centerPix + [P.imageCtrX P.imageCtrY]*S.pixPerDeg;
+              o.ScreenRect = CenterRectOnPoint([0 0 imWidthPx imHeightPx], ctr(1), ctr(2));
+          end
+          
     end
     
     function [FP,TS] = prep_run_trial(o)
@@ -170,6 +188,7 @@ classdef PR_BackImage < handle
         PR.startTime = o.startTime;
         PR.imageOff = o.imageOff;
         PR.imagefile = o.ImageFile;   % file name, if you want to load later
+        PR.destRect = o.ScreenRect;
     end
     
   end % methods
