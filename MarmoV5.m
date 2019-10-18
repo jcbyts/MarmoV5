@@ -159,7 +159,7 @@ else, % no syringe pump? use the @dbgreward object object instead
      vol = sprintf('%d',S.pumpDefVol);
      set(handles.JuiceVolumeText,'String',[vol ' ms']); % displayed in microliters!!
   else
-     handles.reward = marmoview.dbgreward();
+     handles.reward = marmoview.dbgreward(handles);
   end
 end
 % % TYPICALLY, I PREFER TO HANDLES LARGER/SMALLER REWARDS BY NUMBER OF PULSES
