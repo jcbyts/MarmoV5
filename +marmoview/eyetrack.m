@@ -32,6 +32,9 @@ classdef eyetrack < handle
     function startfile(o,handles),   
         % no file is saved if using mouse
     end
+    
+    function endtrial(varargin)
+    end
 
     function closefile(o),        
     end
@@ -51,7 +54,7 @@ classdef eyetrack < handle
         r = 1.0;
     end
     
-    function sendcommand(o,tstring),
+    function sendcommand(o,varargin)
     end
     
   end % methods
