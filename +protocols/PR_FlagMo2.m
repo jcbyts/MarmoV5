@@ -153,7 +153,7 @@ classdef PR_FlagMo2 < handle
        %*********************
     end
    
-    function closeFunc(o),
+    function closeFunc(o)
         o.Faces.CloseUp();
         o.hFix.CloseUp();
         o.hPoint.CloseUp();
@@ -884,6 +884,8 @@ classdef PR_FlagMo2 < handle
         PR.targ_x = o.targ_x;
         PR.targ_y = o.targ_y;
         PR.targ_motion = o.targ_motion;
+        % save out dot objects
+        PR.hProbes = o.hProbe;
         %******* this is also where you could store Gabor Flash Info
         
         %%%% Record some data %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

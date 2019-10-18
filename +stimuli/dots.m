@@ -1,4 +1,4 @@
-classdef dots < handle
+classdef dots < stimuli.stimulus
   % Matlab class for drawing a patch of random dots.
   %
   % The class constructor can be called with a range of arguments:
@@ -141,7 +141,7 @@ classdef dots < handle
       
       % initialise dots' lifetime
       if o.lifetime ~= Inf
-        o.frameCnt = randi(o.lifetime,o.numDots,1); % 1:numDots
+        o.frameCnt = randi(o.rng, o.lifetime,o.numDots,1); % 1:numDots
       else
         o.frameCnt = inf(o.numDots,1);
       end
@@ -171,14 +171,14 @@ classdef dots < handle
       o.frameCnt(idx) = o.lifetime; % default: Inf
       
       if isinf(o.maxRadius)
-          x_ = (rand(n,1) * (o.Xtop - o.Xbot)) + o.Xbot;
-          y_ = (rand(n,1) * (o.Ytop - o.Ybot)) + o.Ybot;
+          x_ = (rand(o.rng, n,1) * (o.Xtop - o.Xbot)) + o.Xbot;
+          y_ = (rand(o.rng, n,1) * (o.Ytop - o.Ybot)) + o.Ybot;
           o.x(idx) = x_;
           o.y(idx) = y_;
       else
           % dot positions (polar coordinates, r and theta) - store this?
-          r = sqrt(rand(n,1).*o.maxRadius.*o.maxRadius); % pixels
-          th = rand(n,1).*360.0; % deg.
+          r = sqrt(rand(o.rng, n,1).*o.maxRadius.*o.maxRadius); % pixels
+          th = rand(o.rng, n,1).*360.0; % deg.
 
           % convert r and theta to x and y
           [x_,y_] = pol2cart(th.*(pi/180.0),r);
@@ -202,7 +202,7 @@ classdef dots < handle
           % set displacements for the dots moving incoherently
           idx_ = idx(idx > nc);
           if o.coherence == 0.0 || ~isempty(idx_)
-            direction_ = rand(size(idx_)).*360.0; % deg.
+            direction_ = rand(o.rng, size(idx_)).*360.0; % deg.
 
             [o.dx(idx_),o.dy(idx_)] = pol2cart(direction_*(pi/180),o.speed);
 %             o.dx(idx_) = dx;
@@ -212,16 +212,16 @@ classdef dots < handle
         case 1 % directions sampled from some distribution
           switch o.dist
             case 0  % gaussian
-              phi = o.bandwdth.*randn(n,1);
+              phi = o.bandwdth.*randn(o.rng, n,1);
               if o.truncateGauss ~= -1
                 a = abs(direction_/o.bandwdth) > o.truncateGauss;
                 while max(a)
-                  phi(a) = o.bandwdth.*randn(sum(a),1);
+                  phi(a) = o.bandwdth.*randn(o.rng, sum(a),1);
                   a = abs(phi(idx)/o.bandwdth) > o.truncateGauss;
                 end
               end
             case 1 % uniform
-              phi = o.bandwdth.*rand(n,1) - o.bandwdth/2;
+              phi = o.bandwdth.*rand(o.rng, n,1) - o.bandwdth/2;
             otherwise
               error('Unknown noiseDist');
           end
