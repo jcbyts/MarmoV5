@@ -95,7 +95,9 @@ classdef gaussimages < handle
           %**** set transparency
           rim(:,:,4) = uint8(t1);
           % Create the gauss texture 
-          o.tex(i) = Screen('MakeTexture',o.winPtr,rim);
+          if o.winPtr ~= 0
+            o.tex(i) = Screen('MakeTexture',o.winPtr,rim);
+          end
           
           %**** initialize default radius based on last loaded image size
           o.radius = length(imo);

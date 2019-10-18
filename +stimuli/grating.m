@@ -179,7 +179,9 @@ classdef grating < handle
        %**** set transparency
        rim(:,:,4) = uint8(t1);
        % Create the gabor texture 
+       if o.winPtr ~=0
        o.tex = Screen('MakeTexture',o.winPtr,rim);
+       end
        
        % Determine the texture placement
        if isinf(o.radius)
