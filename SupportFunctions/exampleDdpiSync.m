@@ -1,7 +1,7 @@
 
 %% find all files from a particular session
-subject = 'Ellie';
-date = '141019';
+subject = 'Logan';
+date = '301019';
 dataDir = '/home/marmorig/Documents/MATLAB/MarmoV5/Output';
 
 % find all files for subject and date
@@ -203,10 +203,10 @@ gazex = (dstruct.gazex-tcx)./(tdx*ppd);
 gazey = (dstruct.gazey-tcy)./(tdy*ppd);
 
 % % % scale
-% gazex = gazex * (1/2);
-% gazey = gazey * (1/2);
-gazex = sgolayfilt(gazex, 1, 5);
-gazey = sgolayfilt(gazey, 1, 5);
+gazex = gazex * (60);
+gazey = gazey * (60);
+% gazex = sgolayfilt(gazex, 1, 5);
+% gazey = sgolayfilt(gazey, 1, 5);
 idx = 1:numel(gazex);
 plot(gazex); hold on
 plot(gazey)

@@ -104,7 +104,7 @@ P.showEye = 0;
 S.showEye = 'Show the gaze indicator? (0 or 1):';
 
 %***** FORAGE CAN ACCEPT DIFFERENT BACKGROUND TYPES *****
-P.noisetype = 3;
+P.noisetype = 2;
 S.noisetype = 'Background (0-none,1-hartley, 2-spatial, ...):';
 
 if (P.noisetype == 1)
@@ -134,9 +134,9 @@ if (P.noisetype == 2)
     P.snoiseheight = 15.0;  % radius of noise field around origin
     S.snoiseheight = 'Spatial noise height (degs, +/- origin):';
     if (1)  % for V1
-      P.snoisenum = 8;   % number of white/black ovals to draw
+      P.snoisenum = 64;   % number of white/black ovals to draw
       S.snoisenum = 'Number of noise ovals:';
-      P.snoisediam = 0.5;  % diameter in dva of noise oval
+      P.snoisediam = 0.15; %0.5;  % diameter in dva of noise oval
       S.snoisediam = 'Diameter of noise ovals (dva): ';
     else  % for MT
       P.snoisenum = 3;   % number of white/black ovals to draw

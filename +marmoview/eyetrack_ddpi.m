@@ -101,7 +101,7 @@ classdef eyetrack_ddpi < handle
 %             [o.p1, o.p4] = o.capture;
             % only take the last sample TODO: need to store x,y,time
             % somehow
-            x = ret(2).x - ret(1).x; %o.p4.x(end) - o.p1.x(end);
+            x = -(ret(2).x - ret(1).x); %o.p4.x(end) - o.p1.x(end);
             y = -(ret(2).y - ret(1).y);  % -(o.p4.y(end)-o.p1.y(end)); % NEED TO INVERT SO ++ IS UP
 %             tnow = GetSecs();
 % %             o.time = linspace(o.timeLastSample, tnow, numel(x));

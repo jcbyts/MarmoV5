@@ -61,11 +61,11 @@ S.holdDur = 'Duration at grating for reward (s):';
 P.stimOnDel = 0.3;   % was 0.1 or 0.2, is 0.3 too long?
 S.stimOnDel = 'Jitter onset of stim 0-? s:';  % hold periods after cue
 %******
-P.stimDur = 1.0; %0.10; %0.20 % duration of peripheral stim (offset before sac)
+P.stimDur = 1.00; %0.20 % duration of peripheral stim (offset before sac)
 S.stimDur = 'Duration of peripheral stim (s):';
 P.dotdelay = 0.10; %0.30 % extra duration stim presentation after saccade
 S.dotdelay = 'Extra dot time(s):';
-P.dotdelay2 = 0.30 % extra duration stim presentation after saccade
+P.dotdelay2 = 0.30; % extra duration stim presentation after saccade
 S.dotdelay2 = 'Extra time before face(s):';
 P.fixslots = 0.08;  % give juice for fixation from fraction   
 S.fixslots = 'Fraction of fix trials:';
@@ -100,9 +100,9 @@ S.stimEcc = 'Ecc of stimulus (degrees):';
 %************
 P.orinum = 16;  
 S.orinum = 'Motion dirs to sample of stimulus';
-P.RF_X = -3;
+P.RF_X = -5;
 S.RF_X = 'Position of RF, x-pos (degs):';
-P.RF_Y = -7;
+P.RF_Y = -5;
 S.RF_Y = 'Position of RF, y-pos (degs):';
 ecc = norm([P.RF_X,P.RF_Y]);
 P.targnum = 3;  %total choice locations
@@ -112,9 +112,9 @@ P.xDeg = P.RF_X;
 S.xDeg = 'X center of stimulus (degrees):';
 P.yDeg = P.RF_Y;
 S.yDeg = 'Y center of stimulus (degrees):';
-P.radius = 0.5 * ecc;  % diameter of target is dva
+P.radius = 0.4 * ecc;  % diameter of target is dva
 S.radius = 'Size of Target(dva):';
-P.choiceRadius = 0.5 * ecc;
+P.choiceRadius = 0.3 * ecc;
 S.choiceRadius = 'Choice on target (degs):';
 %********
 
@@ -193,6 +193,8 @@ P.noresponseDur = 2.5;
 S.noresponseDur = 'Duration to count error if no response(s):';
 P.flightDur = 0.05;
 S.flightDur = 'Time for saccade to finish (s):';
+P.flightConfirm = 0.03;
+S.flightConfirm = 'Time to wait on target to confirm it (s)';
 P.flightWait = 0.5;
 S.flightWait = 'Time to find a target (s):';
 P.iti = 1;

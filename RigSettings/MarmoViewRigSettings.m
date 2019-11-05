@@ -17,7 +17,8 @@ function S = MarmoViewRigSettings
 % For example, if you change the monitor set up, you only change those
 % monitor related variables here.
 
-RigName = 'propixx';
+% RigName = 'propixx';
+RigName = 'test';
 
 switch RigName
     case 'Rig3'
@@ -88,14 +89,46 @@ switch RigName
         S.screenDistance = 87;              % Distance of eye to screen (cm)
         S.pixPerDeg = PixPerDeg(S.screenDistance,S.screenWidth,S.screenRect(3));
         
+    case 'test'
+        S.newera = true;         % use Newera juice pump
+        S.arrington = false;      % use Arrington eye tracker
+        S.DummyEye = true;       % use mouse instead of eye tracker
+        S.solenoid = false;      % use solenoid juice delivery
+        S.DummyScreen = false;   % don't use a Dummy Display
+        S.EyeDump = true;        % store all eye position data
+        S.DataPixx = true;
+        
+        % setup screen
+        S.monitor = 'PROPIXX';         % Monitor used for display window
+        S.screenNumber = 1;                 % Designates the display for task stimuli
+        S.frameRate = 120; % 120;           % Frame rate of screen in Hz
+        S.screenRect = [0 0 1920 1080];     % Screen dimensions in pixels
+        S.screenWidth = 70;                 % Width of screen (cm)
+        S.centerPix =  [960 540];           % Pixels of center of the screen
+        S.guiLocation = [800 100 890 660];
+        S.bgColour = 127; %127; %186;  % use 127 if gamma corrected
+        S.gamma = 1;
+        S.screenDistance = 87;              % Distance of eye to screen (cm)
+        S.pixPerDeg = PixPerDeg(S.screenDistance,S.screenWidth,S.screenRect(3));
+        
     otherwise % laptop development
         S.newera = false;
         S.solenoid = false;
         S.arrington = false;
-        S.DummyEye = true;
+        S.DummyEye = true; % switch on if you want a small PTB window
         S.DummyScreen = true;
         S.EyeDump = false;
         S.DataPixx = false;
+        S.screenNumber = 1;                 % Designates the display for task stimuli
+        S.frameRate = 120; % 120;           % Frame rate of screen in Hz
+        S.screenRect = [0 0 1920 1080];     % Screen dimensions in pixels
+        S.screenWidth = 70;                 % Width of screen (cm)
+        S.centerPix =  [960 540];           % Pixels of center of the screen
+        S.guiLocation = [800 100 890 660];
+        S.bgColour = 127; %127; %186;  % use 127 if gamma corrected
+        S.gamma = 1;
+        S.screenDistance = 87;              % Distance of eye to screen (cm)
+        S.pixPerDeg = PixPerDeg(S.screenDistance,S.screenWidth,S.screenRect(3));
 end
         
 S.TimeSensitive = [];  % default, allow GUI updating in run func states

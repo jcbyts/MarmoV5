@@ -46,6 +46,7 @@ classdef PR_FlagMo2 < handle
     last_item;         % record last chosen location, or NaN if none
     gotTarget;         % within same trial, target choosen
     chooseTarget;      % target identity chosen by saccade
+    chooseTargetFirst; % target confirmation at least target confirm time
     targ_x;            % target x locations
     targ_y;            % target y locations
     targ_motion;       % target directions (start of trial)
@@ -153,7 +154,7 @@ classdef PR_FlagMo2 < handle
        %*********************
     end
    
-    function closeFunc(o)
+    function closeFunc(o),
         o.Faces.CloseUp();
         o.hFix.CloseUp();
         o.hPoint.CloseUp();
@@ -453,6 +454,7 @@ classdef PR_FlagMo2 < handle
             o.flashCounter = 0;
             o.gotTarget = 0;
             o.chooseTarget = 0;
+            o.chooseTargetFirst = 0;
             
             % WHAT TO DO HERE ... direct communication out to the eyetrack
             % for sending out commands .... need a way to do this ...   THIS SHOULD NOT BE NECESSARY, REBUILD ANALYSIS! 
@@ -607,16 +609,67 @@ classdef PR_FlagMo2 < handle
 
         %%%%% STATE 5 -- IN FLIGHT %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         % Give the saccade time to finish flight
+%         if o.state == 5 && currentTime > o.responseStart + o.P.flightDur
+%             %******* determine if a stimulus is select by saccade
+%             if (o.chooseTarget == 0)
+%                 bestdist = Inf;
+%                 for zk = 1:o.targnum
+%                     dist = norm([x-o.targ_x(zk),y-o.targ_y(zk)]);
+%                     if (dist < o.P.choiceRadius)
+%                        if (dist < bestdist) 
+%                          o.chooseTarget = zk;
+%                          bestdist = dist;
+%                        end
+%                     end
+%                 end
+%             end
+%             %******* no state transition till you choose a target 
+%             if (o.chooseTarget > 0)
+%                 if (o.chooseTarget ~= o.last_item)
+%                     o.state = 6; % Move to hold stimulus
+%                     o.responseEnd = GetSecs;
+%                    % Otherwise the response failed to select the stimulus
+%                 else
+%                     o.gotTarget = o.chooseTarget;  % mark where they went
+%                     o.state = 6; % Move to iti -- inter-trial interval
+%                     o.error = 4; % Error 4 is failure to select good stimulus.
+%                     o.responseEnd = GetSecs;
+%                 end
+%             end
+%             %*************
+%         end
+%       *******************
+
         if o.state == 5 && currentTime > o.responseStart + o.P.flightDur
             %******* determine if a stimulus is select by saccade
+            if (o.chooseTargetFirst == 0)
+                bestdist = Inf;
+                for zk = 1:o.targnum
+                    dist = norm([x-o.targ_x(zk),y-o.targ_y(zk)]);
+                    if (dist < o.P.choiceRadius)
+                       if (dist < bestdist) 
+                         o.chooseTargetFirst = zk;
+                         bestdist = dist;
+                       end
+                    end
+                end
+            end
+        end
+        if o.chooseTargetFirst > 0
+          if o.state == 5 && currentTime > o.responseStart + o.P.flightDur + o.P.flightConfirm
+            %***************************************
             if (o.chooseTarget == 0)
                 bestdist = Inf;
                 for zk = 1:o.targnum
                     dist = norm([x-o.targ_x(zk),y-o.targ_y(zk)]);
                     if (dist < o.P.choiceRadius)
                        if (dist < bestdist) 
-                         o.chooseTarget = zk;
-                         bestdist = dist;
+                          bestdist = dist;
+                          if (o.chooseTargetFirst == zk)  % got same target twice
+                              o.chooseTarget = zk;
+                          else
+                              o.chooseTargetFirst = zk;
+                          end
                        end
                     end
                 end
@@ -635,7 +688,9 @@ classdef PR_FlagMo2 < handle
                 end
             end
             %*************
+          end
         end
+        %*********
         if o.state == 5 && currentTime > o.responseStart + o.P.flightWait
            o.state = 7;
            o.error = 4;
@@ -752,11 +807,19 @@ classdef PR_FlagMo2 < handle
             case 5    % saccade in flight, dim fixation, just in case not done before
                              
                 if (o.P.fixation == 0)
+                    %****** swap to new target immediately in flight
+                    for k = 1:o.targnum
+                              o.hProbe{o.targnum+k}.beforeFrame();
+                    end
+                    %****** older code did not swap till state 6
+                    %****** and thus had in flight blank
+                    
                     %****** don't show any targets once in flight
                     % for k = 1:o.targnum
                     %   o.hProbe{k}.beforeFrame();
                     % end
                     %******
+                    
                 end
 
             case {6 7} % once saccade landed, reappear stimulus,  show correct option
@@ -808,7 +871,7 @@ classdef PR_FlagMo2 < handle
         end
         %***********
         if (o.P.motionStimulus == 1)
-           if (o.state < 6)
+           if (o.state < 5)
               for k = 1:o.targnum
                  o.hProbe{k}.afterFrame;
               end
@@ -884,8 +947,6 @@ classdef PR_FlagMo2 < handle
         PR.targ_x = o.targ_x;
         PR.targ_y = o.targ_y;
         PR.targ_motion = o.targ_motion;
-        % save out dot objects
-        PR.hProbes = o.hProbe;
         %******* this is also where you could store Gabor Flash Info
         
         %%%% Record some data %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
