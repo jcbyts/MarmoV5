@@ -87,10 +87,10 @@ set(handles.SettingsFile,'String',handles.settingsFile);
 % could be if two subjects had substantially different eye position gains
 handles.calibFile = 'MarmoViewLastCalib.mat';
 set(handles.CalibFilename,'String',handles.calibFile);
-load([handles.supportPath handles.calibFile]);
-handles.C.dx = dx;
-handles.C.dy = dy;
-handles.C.c = c;
+tmp = load([handles.supportPath handles.calibFile]);
+handles.C.dx = tmp.dx;
+handles.C.dy = tmp.dy;
+handles.C.c = tmp.c;
 handles.eyeTraceRadius = 15;
 % This C structure is never changed until a protocol is cleared or
 % MarmoV5 is exited, until then, it may be reset to the C values using

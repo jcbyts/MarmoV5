@@ -1,4 +1,4 @@
-classdef grating < handle
+classdef grating < stimuli.stimulus
   % Matlab class for drawing a Gabor grating using the psych. toolbox.
   %
   % The class constructor can be called with a range of arguments:
@@ -13,7 +13,7 @@ classdef grating < handle
   
   % 14-08-2018 - Jude Mitchell
   
-  properties (Access = public),
+  properties (Access = public)
     position@double = [0.0, 0.0]; % [x,y] (pixels)
     radius@double = 50; % (pixels)
     orientation@double = 0;  % horizontal
