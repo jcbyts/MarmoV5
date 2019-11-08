@@ -90,7 +90,7 @@ classdef PR_Forage2 < handle
        o.targOri = 1;
        for kk = 1:o.oriNum
            %*******
-           o.hProbe{kk} = stimuli.grating(o.winPtr);  % grating probe
+           o.hProbe{kk} = stimuli.grating_procedural(o.winPtr);  % grating probe
            o.hProbe{kk}.transparent = -P.probecon;  % blend in proportion to gauss
            o.hProbe{kk}.gauss = true;
            o.hProbe{kk}.pixperdeg = S.pixPerDeg;
@@ -149,7 +149,7 @@ classdef PR_Forage2 < handle
            o.noiseNum = P.noiseorinum * P.spfnum;
            o.hNoise = cell(1,o.noiseNum);
            for k = 1:o.noiseNum
-               o.hNoise{k} = stimuli.grating(o.winPtr);  % grating probe
+               o.hNoise{k} = stimuli.grating_procedural(o.winPtr);  % grating probe
                o.hNoise{k}.position = S.centerPix; 
                if isinf(P.noiseradius)
                    o.hNoise{k}.radius = Inf;    %fill entire screen
@@ -166,7 +166,7 @@ classdef PR_Forage2 < handle
                o.hNoise{k}.cpd = o.spatfreqs(kspf);   
                o.hNoise{k}.range = P.noiserange;
                o.hNoise{k}.square = logical(P.squareWave);
-               o.hNoise{k}.gauss = true;
+               o.hNoise{k}.gauss = false;
                o.hNoise{k}.bkgd = P.bkgd;
                o.hNoise{k}.transparent = 0.5;
                o.hNoise{k}.pixperdeg = S.pixPerDeg;
@@ -180,24 +180,24 @@ classdef PR_Forage2 < handle
            o.NoiseHistory = zeros(o.MaxFrame,(1+(o.noiseNum * 2)));  % store time, then x,y positions
            o.hNoise = cell(1,o.noiseNum);
            if (0) % comment for now, using ovals instead
-             for k = 1:o.noiseNum
-               o.hNoise{k} = stimuli.grating(o.winPtr);  % grating probe
-               o.hNoise{k}.radius = round((P.snoisediam/2)*S.pixPerDeg);
-               o.hNoise{k}.orientation = 0; % cpd will be zero => all one color
-               if (mod(k,2) == 1)
-                   o.hNoise{k}.phase = 0;   % white
-               else
-                   o.hNoise{k}.phase = 180; % black
+               for k = 1:o.noiseNum
+                   o.hNoise{k} = stimuli.grating_procedural(o.winPtr);  % grating probe
+                   o.hNoise{k}.radius = round((P.snoisediam/2)*S.pixPerDeg);
+                   o.hNoise{k}.orientation = 0; % cpd will be zero => all one color
+                   if (mod(k,2) == 1)
+                       o.hNoise{k}.phase = 0;   % white
+                   else
+                       o.hNoise{k}.phase = 180; % black
+                   end
+                   o.hNoise{k}.cpd = 0; % when cpd is zero, you get a Gauss
+                   o.hNoise{k}.range = P.range;
+                   o.hNoise{k}.square = false; % true;  % if you want circle
+                   o.hNoise{k}.gauss = true;
+                   o.hNoise{k}.bkgd = P.bkgd;
+                   o.hNoise{k}.transparent = -0.5;
+                   o.hNoise{k}.pixperdeg = S.pixPerDeg;
+                   o.hNoise{k}.updateTextures();
                end
-               o.hNoise{k}.cpd = 0; % when cpd is zero, you get a Gauss
-               o.hNoise{k}.range = P.range;
-               o.hNoise{k}.square = false; % true;  % if you want circle
-               o.hNoise{k}.gauss = true;
-               o.hNoise{k}.bkgd = P.bkgd;
-               o.hNoise{k}.transparent = -0.5;
-               o.hNoise{k}.pixperdeg = S.pixPerDeg;
-               o.hNoise{k}.updateTextures();
-             end
            end
        end
        %********* CSD will be similar to hartley, but all white (SF=0)
@@ -209,7 +209,7 @@ classdef PR_Forage2 < handle
            o.noiseNum = 1;
            o.hNoise = cell(1,o.noiseNum);
            for k = 1:o.noiseNum
-               o.hNoise{k} = stimuli.grating(o.winPtr);  % grating probe
+               o.hNoise{k} = stimuli.grating_procedural(o.winPtr);  % grating probe
                o.hNoise{k}.position = S.centerPix; 
                o.hNoise{k}.radius = Inf;    %fill entire screen
                o.hNoise{k}.screenRect = S.screenRect;
@@ -592,6 +592,8 @@ classdef PR_Forage2 < handle
            o.Faces.beforeFrame(); 
         end
         %****************************************   
+        
+        Screen('DrawingFinished', o.winPtr, 2)
     end
     
     function Iti = end_run_trial(o)

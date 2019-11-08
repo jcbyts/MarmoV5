@@ -36,6 +36,8 @@ classdef FrameControl < handle
      c;          % struct that holds eye calibration data, center
      dx;         %   eye calib x scale
      dy;         %   eye calib y scale
+     dontclear   % Screen('Flip') argument. 0=clear the buffer (default) 1=don't clear
+     dontsync    % Screen('Flip') argument. 0=synchronize with vertical retrace, 1-2=don't synchronize
      FMAX;       % Max screen flips in any trial
      FIELDS;     % Max number of fields to store in eye data
      eyeColor;   % for ShowEye of eye position tracker
@@ -63,13 +65,15 @@ classdef FrameControl < handle
       %*************
       o.TimeSensitive = [];  %no states time sensitive by default
       %*************
-      o.FMAX = 3000;  %capped at a Max of 3000 screen flips
+      o.FMAX = 5000;  %capped at a Max of 5000 screen flips
       o.FIELDS = 6;
       o.FData = nan(o.FMAX,o.FIELDS);   %per trial data storage
       o.FCount = 0;
       o.c  = [0,0];
       o.dx = 1;
       o.dy = 1;
+      o.dontclear = 0;
+      o.dontsync = 0;
       %**************
       o.FP = [];
     end
@@ -77,7 +81,7 @@ classdef FrameControl < handle
 
   methods (Access = public)
   
-     function o = initialize(o,winPtr,P,C,S,varargin), 
+     function o = initialize(o,winPtr,P,C,S,varargin)
            % winPtr is the window point of psych display
            % P is the parameter struct defined by settings
            % C is the eye calibration struct
@@ -96,12 +100,24 @@ classdef FrameControl < handle
         o.dy = C.dy;
         %**************
         o.frameRate = S.frameRate;
+        o.FMAX = ceil(20*o.frameRate); % max trial is 20 seconds, regardless of framerate
         o.centerPix = S.centerPix;
         o.pixPerDeg = S.pixPerDeg;
+        
+        if isfield(P, 'dontclear')
+            o.dontclear = P.dontclear;
+        else
+            o.dontclear = 0;
+        end
+        
+        if isfield(P, 'dontsync')
+            o.dontsync = P.dontsync;
+        else
+            o.dontsync = 0;
+        end
         %*************
         
         % initialise input parser
-        args = varargin;
         p = inputParser;
         p.KeepUnmatched = true;
         p.StructExpand = true;
@@ -221,7 +237,7 @@ classdef FrameControl < handle
        end
       
        % FLIP SCREEN NOW
-       screenTime = Screen('Flip',o.winPtr,GetSecs);
+       screenTime = Screen('Flip',o.winPtr,0,o.dontclear,o.dontsync);
        o.FData(eyeI,6) = screenTime;
        % Reset the screen
        Screen('FillRect',o.winPtr,o.Bkgd);

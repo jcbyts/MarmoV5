@@ -1,5 +1,5 @@
 
-function [S,P] = Forage
+function [S,P] = Forage2()
 
 %%%% NECESSARY VARIABLES FOR GUI
 %%%% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -84,7 +84,7 @@ P.stimSpeed = 0;
 S.stimSpeed = 'Speed of probe (degs/sec):';
 P.orinum = 3;  
 S.orinum = 'Orientations to sample of stimulus';
-P.prefori = 40
+P.prefori = 40;
 S.prefori = 'Preferred orientation (degs):';
 P.cpd = 3;  
 S.cpd = 'Probe Spatial Freq (cyc/deg)';
@@ -133,6 +133,7 @@ if (P.noisetype == 1)
     S.noiseradius = 'Size of Face(dva):';
     P.noiserange = 127;
     S.noiserange = 'Luminance range of grating (1-127):';
+    P.dontclear = 2;
 end
 
 if (P.noisetype == 2)
