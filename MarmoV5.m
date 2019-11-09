@@ -700,12 +700,15 @@ while handles.runTask && A.j <= A.finish
     %*****************************
     P.rng_before_trial = rng(); % save current state of the random number generator
     
-    % EXECUTE THE NEXT TRIAL COMMAND
-    if ~handles.runImage
-      P = handles.PR.next_trial(S,P);
+    % set which protocol to use
+    if handles.runImage
+        PR = handles.PRI;
     else
-      P = handles.PRI.next_trial(S,P);    
+        PR = handles.PR;
     end
+
+    % EXECUTE THE NEXT TRIAL COMMAND
+    P = PR.next_trial(S,P);
     
     % UPDATE IN CASE JUICE VOLUME WAS CHANGED USING A PARAMETER
     if handles.A.juiceVolume ~= A.juiceVolume
@@ -730,13 +733,11 @@ while handles.runTask && A.j <= A.finish
     
     % EXECUTE THE RUN TRIAL COMMAND
     % eval(handles.runCmd);
+    
     %******** IMPLEMENT DEFAULT RUN TRIAL HERE DIRECTLY **********
     %***** Note, PR will refer to the PROTOCOL object ************
-    if ~handles.runImage
-      [FP,TS] = handles.PR.prep_run_trial();
-    else
-      [FP,TS] = handles.PRI.prep_run_trial();    
-    end
+    [FP,TS] = PR.prep_run_trial();
+
     handles.FC.set_task(FP,TS);  % load values into class for plotting (FP)
                                  % and to label TimeSensitive states (TS)
     % Task Controller flips first frame and logs the trial start
@@ -784,11 +785,9 @@ while handles.runTask && A.j <= A.finish
        pupil = handles.eyetrack.getpupil();
        [currentTime,x,y] = handles.FC.grabeye_run_trial(state,[ex,ey],pupil);
        %**********************************
-       if ~handles.runImage
-           drop = handles.PR.state_and_screen_update(currentTime,x,y);  % return true if drop
-       else
-           drop = handles.PRI.state_and_screen_update(currentTime,x,y);
-       end
+
+       drop = PR.state_and_screen_update(currentTime,x,y);
+       
        %******* One idea, only deliver drop if there is alot of time
        %******* before the next screen flush (since drop command takes time)
        if ( drop > 0)
@@ -825,11 +824,8 @@ while handles.runTask && A.j <= A.finish
            A.dy = handles.A.dy;
            handles.FC.update_eye_calib(A.c,A.dx,A.dy);
        end
-       if ~handles.runImage
-          runloop = handles.PR.continue_run_trial(screenTime);
-       else
-          runloop = handles.PRI.continue_run_trial(screenTime);
-       end
+       
+        runloop = PR.continue_run_trial(screenTime);
     end
         
     %******** Update eye trace window before ITI start
@@ -856,20 +852,15 @@ while handles.runTask && A.j <= A.finish
     %**********************************************************
     
     %******** Any final clean-up for PR in the trial
-    if ~handles.runImage
-      Iti = handles.PR.end_run_trial();  % returns duration of Iti remaining
-    else
-      Iti = handles.PRI.end_run_trial();
-    end
+    Iti = PR.end_run_trial();
+    
     %*************************************************************
     % PLOT THE EYETRACE and enforce an ITI interval
     itiStart = GetSecs;
     subplot(handles.EyeTrace); hold off;  % clear old plot
-    if ~handles.lastRunWasImage
-       handles.PR.plot_trace(handles); hold on; % command to plot on eye traces 
-    else
-       handles.PRI.plot_trace(handles); hold on; % command to plot on eye traces    
-    end
+
+    PR.plot_trace(handles); hold on; % command to plot on eye traces 
+    
     handles.FC.plot_eye_trace_and_flips(handles);  %plot the eye traces
     % eval(handles.plotCmd);
     while (GetSecs < (itiStart + Iti))
