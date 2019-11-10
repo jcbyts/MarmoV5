@@ -66,7 +66,7 @@ classdef FrameControl < handle
       o.TimeSensitive = [];  %no states time sensitive by default
       %*************
       o.FMAX = 5000;  %capped at a Max of 5000 screen flips
-      o.FIELDS = 6;
+      o.FIELDS = 7;
       o.FData = nan(o.FMAX,o.FIELDS);   %per trial data storage
       o.FCount = 0;
       o.c  = [0,0];
@@ -185,19 +185,21 @@ classdef FrameControl < handle
      function CL = prep_run_trial(o,eyepos,pupil)
           %*************
           o.FData(:,:) = NaN;  % set all to NaN at start
-          o.FData(1:5,1) = GetSecs;  % column 1 timelock on eye pos
-          %*************
           o.FCount = 5;   % flip counter, why at 5 though? 
+          o.FData(1:o.FCount,1) = GetSecs;  % column 1 timelock on eye pos
+          %*************
+          
           % Setup first frame
           Screen('FillRect',o.winPtr,o.Bkgd);
           % when flipping, store time in eyeData
-          FStart = Screen('Flip',o.winPtr,GetSecs);
+          [vbl, stimOnset] = Screen('Flip',o.winPtr,0);
           %***** Get initial into *************
-          o.FData(1:5,2) = eyepos(1);
-          o.FData(1:5,3) = eyepos(2); 
-          o.FData(1:5,4) = pupil; 
-          o.FData(1:5,5) = 0;    %default, start state = 0
-          o.FData(1:5,6) = FStart; 
+          o.FData(1:o.FCount,2) = eyepos(1);
+          o.FData(1:o.FCount,3) = eyepos(2); 
+          o.FData(1:o.FCount,4) = pupil; 
+          o.FData(1:o.FCount,5) = 0;    %default, start state = 0
+          o.FData(1:o.FCount,6) = vbl; 
+          o.FData(1:o.FCount,7) = stimOnset; 
           %******* Store the Clock Sixlet ***********
           CL = fix(clock);
           CL(1) = CL(1) - 2000;
@@ -222,7 +224,7 @@ classdef FrameControl < handle
           y = (eyepos(2)-o.c(2)) / (o.dy*o.pixPerDeg);
     end
     
-    function [updateGUI,screenTime] = screen_update_run_trial(o,state)  
+    function [updateGUI,vblTime] = screen_update_run_trial(o,state)  
        % OTHER DRAWS
        eyeI = o.FCount;
        if o.showEye
@@ -237,10 +239,11 @@ classdef FrameControl < handle
        end
       
        % FLIP SCREEN NOW
-       screenTime = Screen('Flip',o.winPtr,0,o.dontclear,o.dontsync);
-       o.FData(eyeI,6) = screenTime;
+       [vblTime,stimOnset] = Screen('Flip',o.winPtr,0,o.dontclear,o.dontsync);
+       o.FData(eyeI,6) = vblTime;
+       o.FData(eyeI,7) = stimOnset;
        % Reset the screen
-       Screen('FillRect',o.winPtr,o.Bkgd);
+%        Screen('FillRect',o.winPtr,o.Bkgd);
     
        %********* if not time sensitive state, allow GUI updating
        if (~ismember(state,o.TimeSensitive))
