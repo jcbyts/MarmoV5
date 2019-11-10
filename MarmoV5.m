@@ -706,6 +706,10 @@ while handles.runTask && A.j <= A.finish
     else
         PR = handles.PR;
     end
+    
+    if isa(PR, 'protocols.protocol')
+        PR = copy(PR); % unlink PR from handles.PR
+    end
 
     % EXECUTE THE NEXT TRIAL COMMAND
     P = PR.next_trial(S,P);
@@ -775,11 +779,9 @@ while handles.runTask && A.j <= A.finish
     dropreject = 0;
     %**************
     while runloop
-       if ~handles.runImage
-          state = handles.PR.get_state();
-       else
-          state = handles.PRI.get_state();
-       end
+       
+       state = PR.get_state();
+       
        %%%%% GET ON-LINE VALUES %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
        [ex,ey] = handles.eyetrack.getgaze();
        pupil = handles.eyetrack.getpupil();
@@ -967,7 +969,7 @@ while handles.runTask && A.j <= A.finish
     % UPDATE THE PARAMETER LIST TO SHOW THE NEXT TRIAL PARAMETERS
     % NOTE, if running background image it is not listing the params
     %  but rather than main protocols params, in P struct, not PI struct
-    for i = 1:size(handles.pNames,1);
+    for i = 1:size(handles.pNames,1)
         pName = handles.pNames{i};
         tName = sprintf('%s = %2g',pName,handles.P.(pName));
         handles.pList{i,1} = tName;
