@@ -1,4 +1,4 @@
-classdef gaussimages < handle
+classdef gaussimages < stimuli.stimulus % inherit stimulus to have tracking / random number generator
   % Matlab class for drawing an image (typically a face) in a Gauss window
   %
   % The class constructor can be called with file name that is a .mat of images
@@ -10,18 +10,18 @@ classdef gaussimages < handle
   % 26-08-2018 - Jude Mitchell
   
   properties (Access = public),
-    tex;
-    texDim;  
-    imagenum@double = 0;   %if set zeros, picks at random which to show
-    position@double = [0.0, 0.0]; % [x,y] (pixels)
-    radius@double = 1;  % size in pixels, must be set
-    bkgd@double = 127;
-    gray@logical = true;
-    transparency@double = 0.5;
+    tex
+    texDim
+    imagenum double = 0   %if set zeros, picks at random which to show
+    position double = [0.0, 0.0] % [x,y] (pixels)
+    radius double = 1  % size in pixels, must be set
+    bkgd double = 127
+    gray logical = true
+    transparency double = 0.5
   end
         
   properties (Access = private)
-    winPtr; % ptb window
+    winPtr % ptb window
   end
   
   methods (Access = public)
@@ -114,13 +114,14 @@ classdef gaussimages < handle
     end
         
     function beforeTrial(o)
+        o.setRandomSeed(); % set the random seed
     end
     
     function beforeFrame(o)
       if (o.imagenum)
           o.drawGaussImage(o.imagenum);
       else
-          rd = randi(length(o.tex));  
+          rd = randi(o.rng, length(o.tex));  
           o.drawGaussImage(rd);
       end
     end
