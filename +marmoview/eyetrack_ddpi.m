@@ -50,7 +50,8 @@ classdef eyetrack_ddpi < handle
             ddpiM('setP1BoundingBoxSize', 64);
             ddpiM('setP4BoundingBoxSize', 32);
             ddpiM('setP4Template', [o.p4intensity, o.p4radius]);
-            
+            ddpiM('setP1roi', [20, 20, 600, 450]); % exclude regions
+            ddpiM('setP4roi', [20, 20, 600, 450]); % exclude regions
             
             ddpiM('start');
             o.timeLastSample = GetSecs();
