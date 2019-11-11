@@ -175,27 +175,39 @@ switch P.noisetype
         P.noiseCenterY = 0;
         S.noiseCenterY = 'Center of the noise patch (d.v.a):';
         
-        P.noiseRadius = 15;
+        P.noiseRadius = 20;
         S.noiseRadius = 'width of the noise patch (d.v.a):';
         
         P.numGabors = 100;
         S.numGabors = 'Number of Gabors:';
         
-        P.spfrange = 16;   % use log spacing
+        P.spfrange = 5;   % use log spacing
         S.spfrange = 'Rnage of spat freqs (cyc/deg):';
         
         P.noiseFrameRate = 60;
         S.noiseFrameRate = 'frame rate of the noise background:';
         
-        P.noiseContrast = .25;
+        P.noiseContrast = .15;
         S.noiseContrast = 'Contrast of the noise (0-1):';
         
-        P.minScale = 1/60;
+        P.minScale = .1;
         S.minScale = 'minimum width (stdev) of gabors (d.v.a):';
         
         P.scaleRange = 1;
         S.scaleRange = 'range of stdevs (d.v.a):';
         
+    case 5 % spatial noise dots (using DrawDots)
+        P.numDots = 500;
+        S.numDots = 'number of dots to show on each frame:';
+        
+        P.dotSize = .1;
+        S.dotSize = 'individual dot size (d.v.a):';
+        
+        P.noiseContrast = .2;
+        S.noiseContrast = 'contrast of the dot noise:';
+        
+        P.noiseFrameRate = 60;
+        S.noiseFrameRate = 'frame rate of the noise background:';
         
 end
 

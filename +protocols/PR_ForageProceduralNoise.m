@@ -209,6 +209,17 @@ classdef PR_ForageProceduralNoise < protocols.protocol
                o.hNoise.updateEveryNFrames = ceil(S.frameRate / P.noiseFrameRate);
                o.hNoise.updateTextures(); % create the procedural texture
                
+           case 5
+               o.NoiseHistory = zeros(o.MaxFrame,3);
+               % noise object is created here
+               o.hNoise = stimuli.dotspatialnoise(o.winPtr, 'numDots', P.numDots, ...
+                   'sigma', P.noiseApertureSigma);
+               o.hNoise.contrast = P.noiseContrast;
+               o.hNoise.size = P.dotSize * S.pixPerDeg;
+               o.hNoise.speed = P.dotSpeedSigma * S.pixPerDeg / S.frameRate;
+               o.hNoise.updateEveryNFrames = ceil(S.frameRate / P.noiseFrameRate);
+        
+               
        end
        %**********************************************************
        
@@ -418,6 +429,16 @@ classdef PR_ForageProceduralNoise < protocols.protocol
                      % NOTE: store screen time in "continue_run_trial" after flip
                      o.NoiseHistory(o.FrameCount,2) = o.hNoise.x(1);  % xposition of first gabor
                      o.NoiseHistory(o.FrameCount,3) = o.hNoise.mypars(2);  
+                     
+                 case 5
+                     o.hNoise.afterFrame(); % update parameters
+                     o.hNoise.beforeFrame(); % draw
+                     
+                     %**********
+                     o.FrameCount = o.FrameCount + 1;
+                     % NOTE: store screen time in "continue_run_trial" after flip
+                     o.NoiseHistory(o.FrameCount,2) = o.hNoise.x(1);  % xposition of first gabor
+                     o.NoiseHistory(o.FrameCount,3) = o.hNoise.y(1); 
              end
             %****************
          end
@@ -602,7 +623,7 @@ classdef PR_ForageProceduralNoise < protocols.protocol
         end
         %****************************************   
         
-        Screen('DrawingFinished', o.winPtr, 2)
+        Screen('DrawingFinished', o.winPtr, 2);
     end
     
     function Iti = end_run_trial(o)

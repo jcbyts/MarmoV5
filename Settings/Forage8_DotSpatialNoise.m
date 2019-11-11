@@ -1,5 +1,5 @@
 
-function [S,P] = Forage8_CSDflash()
+function [S,P] = Forage8_DotSpatialNoise()
 
 %%%% NECESSARY VARIABLES FOR GUI
 %%%% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -110,7 +110,7 @@ P.showEye = 0;
 S.showEye = 'Show the gaze indicator? (0 or 1):';
 
 %***** FORAGE CAN ACCEPT DIFFERENT BACKGROUND TYPES *****
-P.noisetype = 3;
+P.noisetype = 5;
 S.noisetype = 'Cannot change during protocol';
 
 switch P.noisetype
@@ -166,7 +166,7 @@ switch P.noisetype
         %*************
         
     case 4 % Garborium noise (based off "ProceduralGarboriumDemo")
-        P.spfmin = 1;
+        P.spfmin = 1;  % will be [0.5 1 2 4 8 16]
         S.spfmin = 'Minimum spat freq (cyc/deg):';
         
         P.noiseCenterX = 0;
@@ -175,7 +175,7 @@ switch P.noisetype
         P.noiseCenterY = 0;
         S.noiseCenterY = 'Center of the noise patch (d.v.a):';
         
-        P.noiseRadius = 15;
+        P.noiseRadius = 20;
         S.noiseRadius = 'width of the noise patch (d.v.a):';
         
         P.numGabors = 100;
@@ -187,15 +187,33 @@ switch P.noisetype
         P.noiseFrameRate = 60;
         S.noiseFrameRate = 'frame rate of the noise background:';
         
-        P.noiseContrast = .25;
+        P.noiseContrast = .15;
         S.noiseContrast = 'Contrast of the noise (0-1):';
         
         P.minScale = .1;
         S.minScale = 'minimum width (stdev) of gabors (d.v.a):';
         
-        P.scaleRange = .5;
+        P.scaleRange = 1;
         S.scaleRange = 'range of stdevs (d.v.a):';
         
+    case 5 % spatial noise dots (using DrawDots)
+        P.numDots = 1000;
+        S.numDots = 'number of dots to show on each frame:';
+        
+        P.dotSize = .1;
+        S.dotSize = 'individual dot size (d.v.a):';
+        
+        P.noiseApertureSigma = inf;
+        S.noiseApertureSigma = 'sigma of gaussian centered in screen (fullscreen if inf):';
+        
+        P.dotSpeedSigma = 0;
+        S.dotSpeedSigma = 'individual dot speed (deg/sec):';
+        
+        P.noiseContrast = .2;
+        S.noiseContrast = 'contrast of the dot noise:';
+        
+        P.noiseFrameRate = 60;
+        S.noiseFrameRate = 'frame rate of the noise background:';
         
 end
 

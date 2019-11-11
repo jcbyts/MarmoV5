@@ -707,9 +707,9 @@ while handles.runTask && A.j <= A.finish
         PR = handles.PR;
     end
     
-    if isa(PR, 'protocols.protocol')
-        PR = copy(PR); % unlink PR from handles.PR
-    end
+%     if isa(PR, 'protocols.protocol')
+%         PR = copy(PR); % unlink PR from handles.PR
+%     end
 
     % EXECUTE THE NEXT TRIAL COMMAND
     P = PR.next_trial(S,P);
@@ -899,14 +899,15 @@ while handles.runTask && A.j <= A.finish
     D.ENDCLOCKTIME = ENDCLOCKTIME;
     D.STARTCLOCK = STARTCLOCK;
     D.ENDCLOCK = ENDCLOCK;
+    
+    D.PR = PR.end_plots(P,A);   %if critical trial info save as D.PR
+    
     if ~handles.runImage
-       D.PR = handles.PR.end_plots(P,A);   %if critical trial info save as D.PR
        D.PR.name = handles.S.protocol;
        if (D.PR.error == 0)
            CorCount = CorCount + 1;
        end
     else
-       D.PR = handles.PRI.end_plots(P,A);
        D.PR.name = 'BackImage';
     end
     D.eyeData = handles.FC.upload_eyeData();
