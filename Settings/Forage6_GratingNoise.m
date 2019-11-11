@@ -161,9 +161,9 @@ end
 if (P.noisetype == 3)
     %****** in this version it is CSD, whole field white background
     %********* parameters for noise stimulus following gaze
-    P.noisedur = 40;  % number of frames to hold on stim
+    P.noisedur = 80;  % number of frames to hold on stim
     S.noisedur = 'Frames on of stim: ';
-    P.noiseoff = 80;  % number of frames to hold on stim
+    P.noiseoff = 160;  % number of frames to hold on stim
     S.noiseoff = 'Frames off of stim: ';
     P.noiserange = 127;
     S.noiserange = 'Luminance range of grating (1-127):';

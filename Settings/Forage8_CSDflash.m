@@ -110,7 +110,7 @@ P.showEye = 0;
 S.showEye = 'Show the gaze indicator? (0 or 1):';
 
 %***** FORAGE CAN ACCEPT DIFFERENT BACKGROUND TYPES *****
-P.noisetype = 4;
+P.noisetype = 3;
 S.noisetype = 'Cannot change during protocol';
 
 switch P.noisetype

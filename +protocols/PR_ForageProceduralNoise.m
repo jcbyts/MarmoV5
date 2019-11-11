@@ -187,25 +187,7 @@ classdef PR_ForageProceduralNoise < protocols.protocol
                
                o.NoiseHistory = zeros(o.MaxFrame,2);
                o.noiseNum = 1;
-               o.hNoise = cell(1,o.noiseNum);
-               for k = 1:o.noiseNum
-                   o.hNoise{k} = stimuli.grating_procedural(o.winPtr);  % grating probe
-                   o.hNoise{k}.position = S.centerPix;
-                   o.hNoise{k}.radius = Inf;    %fill entire screen
-                   o.hNoise{k}.screenRect = S.screenRect;
-                   %*********
-                   o.hNoise{k}.orientation = 0;
-                   o.hNoise{k}.phase = 0;  % white stim
-                   o.hNoise{k}.cpd = 0;  % all field
-                   o.hNoise{k}.range = P.noiserange;
-                   o.hNoise{k}.square = logical(P.squareWave);
-                   o.hNoise{k}.gauss = true;
-                   o.hNoise{k}.bkgd = P.bkgd;
-                   o.hNoise{k}.transparent = 0.5;
-                   o.hNoise{k}.pixperdeg = S.pixPerDeg;
-                   o.hNoise{k}.updateTextures();
-               end
-               %****************
+               o.hNoise = [];
            
            %***************************************************************
            case 4 % Garborium noise
@@ -243,7 +225,7 @@ classdef PR_ForageProceduralNoise < protocols.protocol
                     o.hNoise{kk}.CloseUp();
                 end
             end
-        else
+        elseif isa(o.hNoise, 'stimuli.stimulus')
             o.hNoise.CloseUp();
         end
     end
@@ -411,17 +393,14 @@ classdef PR_ForageProceduralNoise < protocols.protocol
                      o.NoiseHistory(o.FrameCount,:) = [NaN nlist];  % first element time, others x,y positions
                      %**********
                      
-                 case 3
+                 case 3 % CSD
                      kk = 0;
                      step = mod(o.FrameCount,(o.P.noisedur + o.P.noiseoff));
                      if (step >= o.P.noiseoff)
                          kk = 1;
-                         if ~isnan(xx) && ~isnan(yy)
-                             o.hNoise{kk}.position = [(o.S.centerPix(1) + round(xx*o.S.pixPerDeg)),(o.S.centerPix(2) - round(yy*o.S.pixPerDeg))];
-                         else
-                             o.hNoise{kk}.position = o.S.centerPix;
-                         end
-                         o.hNoise{kk}.beforeFrame();
+                         Screen('FillRect', o.winPtr, 127 + o.P.noiserange);
+                     else
+                         Screen('FillRect', o.winPtr, 127);
                      end
                      %**********
                      o.FrameCount = o.FrameCount + 1;
