@@ -182,13 +182,13 @@ classdef gabornoise < stimuli.stimulus
             % Conversion factor from degrees to radians:
             deg2rad = 3.141592654 / 180.0;
             
-            xax = rect(1):rect(3);
-            yax = rect(2):rect(4);
+            xax = rect(1):(rect(3)-1);
+            yax = rect(2):(rect(4)-1);
             
             [xx, yy] = meshgrid(xax,yax);
             
-            Angle = obj.orientation * deg2rad;
-            Phase = obj.mypars(1,:);
+            Angle = (obj.orientation) * deg2rad;
+            Phase = (-obj.mypars(1,:) + 90) * deg2rad;
             FreqTwoPi = obj.mypars(2,:) * twopi;
             SpaceConstant = obj.mypars(3,:);
             Expmultiplier = -0.5 ./ SpaceConstant.^2;
@@ -200,11 +200,11 @@ classdef gabornoise < stimuli.stimulus
             % Note that this is a constant for all fragments, but we can not do it in
             % the vertex shader, because the vertex shader does not have sufficient
             % numeric precision on some common hardware out there.
-            coeff = [cos(Angle); sin(Angle)] .* FreqTwoPi;
+            coeff = [sin(Angle); cos(Angle)] .* FreqTwoPi;
             
             % Evaluate sine grating at requested position, angle and phase: */
             % sv = sin(pos*coeff + Phase);
-            sv = sin(posx.*coeff(1,:) + posy.*coeff(2,:) + Phase);
+            sv = cos(posx.*coeff(1,:) + posy.*coeff(2,:) + Phase);
             
             % Compute exponential hull for the gabor:
             ev = exp((posx.^2 + posy.^2) .* Expmultiplier);
@@ -212,7 +212,7 @@ classdef gabornoise < stimuli.stimulus
             % Multiply/Modulate base color and alpha with calculated sine/gauss
             % values, add some constant color/alpha Offset, assign as final fragment
             % output color:
-            I = reshape(sum((ev .* sv),2), size(xx));
+            I = reshape(sum((ev .* sv),2), size(xx))*127 + 127;
             
             
         end
