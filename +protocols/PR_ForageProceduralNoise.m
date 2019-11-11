@@ -124,7 +124,7 @@ classdef PR_ForageProceduralNoise < protocols.protocol
                o.noiseNum = 0;
                o.hNoise = [];
                
-               %***************************************************************
+           %***************************************************************
            case 1 % "Hartley" background
                
                o.NoiseHistory = zeros(o.MaxFrame,3);
@@ -148,14 +148,13 @@ classdef PR_ForageProceduralNoise < protocols.protocol
                o.hNoise.numOrientations = P.noiseorinum;
                o.hNoise.orientations = o.spatoris;
                o.hNoise.spatialFrequencies = o.spatfreqs;
-               o.hNoise.randomizePhase = false;
-               
+               o.hNoise.randomizePhase = P.noiseRandomizePhase;
                o.hNoise.updateEveryNFrames = ceil(S.frameRate / P.noiseFrameRate);
                o.hNoise.updateTextures(); % create the procedural texture
+               o.hNoise.contrast = P.noiseContrast;
                
                
-               
-               %***************************************************************
+           %***************************************************************
            case 2 % use Spatial reverse correlation background
                o.noiseNum = P.snoisenum * 2;
                o.NoiseHistory = zeros(o.MaxFrame,(1+(o.noiseNum * 2)));  % store time, then x,y positions
@@ -180,7 +179,7 @@ classdef PR_ForageProceduralNoise < protocols.protocol
                    o.hNoise{k}.updateTextures();
                end
                
-               %***************************************************************
+           %***************************************************************
            case 3 % CSD flash
                
                % CSD will be similar to hartley, but all white (SF=0)
@@ -207,6 +206,27 @@ classdef PR_ForageProceduralNoise < protocols.protocol
                    o.hNoise{k}.updateTextures();
                end
                %****************
+           
+           %***************************************************************
+           case 4 % Garborium noise
+               o.NoiseHistory = zeros(o.MaxFrame,3);
+               
+               % noise object is created here
+               o.hNoise = stimuli.gabornoise(o.winPtr, 'pixPerDeg', S.pixPerDeg, 'numGabors', P.numGabors);
+               
+               x = P.noiseCenterX*S.pixPerDeg + S.centerPix(1);
+               y = -P.noiseCenterY*S.pixPerDeg + S.centerPix(2);
+               o.hNoise.position = [x y];
+               o.hNoise.radius = P.noiseRadius * S.pixPerDeg;
+               o.hNoise.contrast = P.noiseContrast;
+               o.hNoise.scaleRange = P.scaleRange;
+               o.hNoise.minScale = P.minScale;
+               o.hNoise.minSF = P.spfmin;
+               o.hNoise.sfRange =  P.spfrange;
+               
+               o.hNoise.updateEveryNFrames = ceil(S.frameRate / P.noiseFrameRate);
+               o.hNoise.updateTextures(); % create the procedural texture
+               
        end
        %**********************************************************
        
@@ -313,7 +333,17 @@ classdef PR_ForageProceduralNoise < protocols.protocol
             % rewardCount counts the number of juice pulses, 1 delivered per frame
             o.rewardCount = 0;
             
+            
             if isa(o.hNoise, 'stimuli.stimulus')
+                
+                if isprop(o.hNoise, 'probBlank')
+                    o.hNoise.probBlank = 1-o.P.probNoise;
+                end
+                
+                if isprop(o.hNoise, 'contrast')
+                    o.hNoise.contrast = o.P.noiseContrast;
+                end
+                
                 o.hNoise.beforeTrial();
             end
             
@@ -398,6 +428,17 @@ classdef PR_ForageProceduralNoise < protocols.protocol
                      % NOTE: store screen time in "continue_run_trial" after flip
                      o.NoiseHistory(o.FrameCount,2) = kk;  % store orientation number
                      %**********
+                 
+                 case 4 % "Garborium" noise
+                     
+                     o.hNoise.afterFrame(); % update parameters
+                     o.hNoise.beforeFrame(); % draw
+                     
+                     %**********
+                     o.FrameCount = o.FrameCount + 1;
+                     % NOTE: store screen time in "continue_run_trial" after flip
+                     o.NoiseHistory(o.FrameCount,2) = o.hNoise.x(1);  % xposition of first gabor
+                     o.NoiseHistory(o.FrameCount,3) = o.hNoise.mypars(2);  
              end
             %****************
          end

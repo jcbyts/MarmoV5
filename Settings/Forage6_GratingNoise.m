@@ -136,6 +136,12 @@ if (P.noisetype == 1)
     P.dontclear = 0;
     P.noiseFrameRate = 60;
     S.noiseFrameRate = 'frame rate of the noise background:';
+    
+    P.noiseContrast = .25;
+    S.noiseContrast = 'Contrast of the noise (0-1):';
+        
+    P.noiseRandomizePhase = false;
+    S.noiseRandomizePhase = 'randomize the phase of the gabors (logical):';
 end
 
 if (P.noisetype == 2)
