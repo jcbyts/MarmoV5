@@ -169,8 +169,50 @@ classdef gabornoise < stimuli.stimulus
             end
         end
         
-        function getImage(obj, rect)
+        function I = getImage(obj, rect)
+            if nargin < 2
+                rect = obj.position([1 2 1 2]) + [-1 -1 1 1].*obj.radius/2;
+            end
             
+            % try to get the image
+            % Constants we need (as they are called in the GLSL shader)
+            twopi     = 2.0 * 3.141592654;
+%             sqrtof2pi = 2.5066282746;
+            
+            % Conversion factor from degrees to radians:
+            deg2rad = 3.141592654 / 180.0;
+            
+            xax = rect(1):rect(3);
+            yax = rect(2):rect(4);
+            
+            [xx, yy] = meshgrid(xax,yax);
+            
+            Angle = obj.orientation * deg2rad;
+            Phase = obj.mypars(1,:);
+            FreqTwoPi = obj.mypars(2,:) * twopi;
+            SpaceConstant = obj.mypars(3,:);
+            Expmultiplier = -0.5 ./ SpaceConstant.^2;
+            
+            posx = xx(:) - obj.x;
+            posy = yy(:) - obj.y;
+            
+            % Compute (x,y) distance weighting coefficients, based on rotation angle:
+            % Note that this is a constant for all fragments, but we can not do it in
+            % the vertex shader, because the vertex shader does not have sufficient
+            % numeric precision on some common hardware out there.
+            coeff = [cos(Angle); sin(Angle)] .* FreqTwoPi;
+            
+            % Evaluate sine grating at requested position, angle and phase: */
+            % sv = sin(pos*coeff + Phase);
+            sv = sin(posx.*coeff(1,:) + posy.*coeff(2,:) + Phase);
+            
+            % Compute exponential hull for the gabor:
+            ev = exp((posx.^2 + posy.^2) .* Expmultiplier);
+            
+            % Multiply/Modulate base color and alpha with calculated sine/gauss
+            % values, add some constant color/alpha Offset, assign as final fragment
+            % output color:
+            I = reshape(sum((ev .* sv),2), size(xx));
             
             
         end
