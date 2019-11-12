@@ -240,6 +240,7 @@ classdef FrameControl < handle
       
        % FLIP SCREEN NOW
        [vblTime,stimOnset] = Screen('Flip',o.winPtr,0,o.dontclear,o.dontsync);
+%        o.FData(eyeI,5) = state; 
        o.FData(eyeI,6) = vblTime;
        o.FData(eyeI,7) = stimOnset;
        % Reset the screen

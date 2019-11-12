@@ -398,7 +398,7 @@ set(handles.TrialMaxEdit,'String','');
 % Get strings for the parameters list
 handles.pNames = fieldnames(handles.P);         % pNames are the actual parameter names
 handles.pList = cell(size(handles.pNames,1),1); % pList is the list of parameter names with values
-for i = 1:size(handles.pNames,1);
+for i = 1:size(handles.pNames,1)
     pName = handles.pNames{i};
     tName = sprintf('%s = %2g',pName,handles.P.(pName));
     handles.pList{i,1} = tName;

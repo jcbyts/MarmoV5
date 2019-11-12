@@ -623,7 +623,7 @@ classdef PR_ForageProceduralNoise < protocols.protocol
         end
         %****************************************   
         
-        Screen('DrawingFinished', o.winPtr, 2);
+%         Screen('DrawingFinished', o.winPtr);
     end
     
     function Iti = end_run_trial(o)
