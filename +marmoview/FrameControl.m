@@ -66,7 +66,7 @@ classdef FrameControl < handle
       o.TimeSensitive = [];  %no states time sensitive by default
       %*************
       o.FMAX = 5000;  %capped at a Max of 5000 screen flips
-      o.FIELDS = 7;
+      o.FIELDS = 9;
       o.FData = nan(o.FMAX,o.FIELDS);   %per trial data storage
       o.FCount = 0;
       o.c  = [0,0];
@@ -192,14 +192,16 @@ classdef FrameControl < handle
           % Setup first frame
           Screen('FillRect',o.winPtr,o.Bkgd);
           % when flipping, store time in eyeData
-          [vbl, stimOnset] = Screen('Flip',o.winPtr,0);
+          [vbl, stimOnset, FlipTimestamp, Missed] = Screen('Flip',o.winPtr,0);
           %***** Get initial into *************
           o.FData(1:o.FCount,2) = eyepos(1);
           o.FData(1:o.FCount,3) = eyepos(2); 
           o.FData(1:o.FCount,4) = pupil; 
           o.FData(1:o.FCount,5) = 0;    %default, start state = 0
           o.FData(1:o.FCount,6) = vbl; 
-          o.FData(1:o.FCount,7) = stimOnset; 
+          o.FData(1:o.FCount,7) = stimOnset;
+          o.FData(1:o.FCount,8) = FlipTimestamp;
+          o.FData(1:o.FCount,9) = Missed;
           %******* Store the Clock Sixlet ***********
           CL = fix(clock);
           CL(1) = CL(1) - 2000;
@@ -239,10 +241,12 @@ classdef FrameControl < handle
        end
       
        % FLIP SCREEN NOW
-       [vblTime,stimOnset] = Screen('Flip',o.winPtr,0,o.dontclear,o.dontsync);
+       [vblTime,stimOnset, FlipTimestamp, Missed] = Screen('Flip',o.winPtr,0,o.dontclear,o.dontsync);
 %        o.FData(eyeI,5) = state; 
-       o.FData(eyeI,6) = vblTime;
-       o.FData(eyeI,7) = stimOnset;
+        o.FData(eyeI,6) = vblTime;
+        o.FData(eyeI,7) = stimOnset;
+        o.FData(eyeI,8) = FlipTimestamp;
+        o.FData(eyeI,9) = Missed;
        % Reset the screen
 %        Screen('FillRect',o.winPtr,o.Bkgd);
     
