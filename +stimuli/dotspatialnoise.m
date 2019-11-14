@@ -94,19 +94,25 @@ classdef dotspatialnoise < stimuli.dotsbase
             [xx, yy] = meshgrid(xax,yax);
             
             posx = xx(:) - obj.x - obj.position(1);
-            posy = yy(:) - obj.y - obj.position(2);
+            posy = yy(:) + (obj.y - obj.position(2));
             
-            I = sqrt(posx.^2 + posy.^2) < obj.size/2;
+            I = double(sqrt(posx.^2 + posy.^2) < obj.size/2);
             c = mean(obj.color) - 127;
-            Iind = cumsum(I,2);
-            occlusions = Iind(:,end) > 1; % means more than one dot was shown in this location
-            occluders = [zeros(sum(occlusions), 1) diff(Iind(occlusions,:)==max(Iind(occlusions,:), [], 2), [], 2)]==1;
-            
             I = I.*c;
-            Itmp = I(occlusions,:); % extract only the multidot locations
+            
+%             I = fliplr(I);
+            
+            Iind = cumsum(abs(I),2);
+%             
+            occlusions = Iind(:,end) > max(c); % means more than one dot was shown in this location
+            finalValue = Iind(occlusions,:)==max(Iind(occlusions,:), [], 2);
+%             occluders = [zeros(sum(occlusions), 1) diff(finalValue, [], 2)]==1;
+            
+            
+            
             
             img = sum(I,2);
-            img(occlusions) = Itmp(occluders);
+            img(occlusions) = sum((I(occlusions,:).*finalValue),2);
             
             I = reshape(img, size(xx));
             
