@@ -210,6 +210,9 @@ classdef FrameControl < handle
     
     function [currentTime,x,y] = grabeye_run_trial(o,state,eyepos,pupil)
           currentTime = GetSecs;
+%           Datapixx('EnablePropixxLampLed');
+%           Datapixx('RegWr'); 
+%           WaitSecs(.001);
           % GET EYE POSITION
           o.FCount = o.FCount + 1;
           k = o.FCount;
@@ -224,9 +227,12 @@ classdef FrameControl < handle
           end
           x = (eyepos(1)-o.c(1)) / (o.dx*o.pixPerDeg);
           y = (eyepos(2)-o.c(2)) / (o.dy*o.pixPerDeg);
+          
+           
     end
     
-    function [updateGUI,vblTime] = screen_update_run_trial(o,state)  
+    function [updateGUI,vblTime] = screen_update_run_trial(o,state) 
+        
        % OTHER DRAWS
        eyeI = o.FCount;
        if o.showEye
@@ -241,7 +247,34 @@ classdef FrameControl < handle
        end
       
        % FLIP SCREEN NOW
-       [vblTime,stimOnset, FlipTimestamp, Missed] = Screen('Flip',o.winPtr,0,o.dontclear,o.dontsync);
+       
+       if o.dontsync
+           Screen('DrawingFinished', o.winPtr, 0, 1);
+           %                   WaitSecs('YieldSecs', 0.002);
+           
+           beampos = 1000;
+           while beampos > 5 %abs(beampos - winRect(4)/2) > 5
+               beampos = Screen('GetWindowInfo', o.winPtr, 1);
+           end
+           
+           % Flip immediately without sync to vertical retrace, do clear
+           % backbuffer after flip for visualization purpose:
+           vblTime = GetSecs;
+           stimOnset = nan;
+           FlipTimestamp = nan;
+           Missed = nan;
+           Screen('Flip', o.winPtr, vblTime, 0, 2, 0);
+           
+%            % Above flip won't return a 'beampos' in non-VSYNC'ed mode,
+%            % so we query it manually:
+%            beampos = Screen('GetWindowInfo', win, 1);
+           
+       else
+            Screen('DrawingFinished', o.winPtr);
+            ifi = 1./o.frameRate;
+            [vblTime,stimOnset, FlipTimestamp, Missed] = Screen('Flip',o.winPtr,o.FData(eyeI-1,6)+ifi/2,o.dontclear);
+       end
+
 %        o.FData(eyeI,5) = state; 
         o.FData(eyeI,6) = vblTime;
         o.FData(eyeI,7) = stimOnset;
