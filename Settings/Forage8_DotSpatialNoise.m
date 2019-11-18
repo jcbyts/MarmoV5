@@ -46,7 +46,7 @@ S.protocolTitle = 'Foraging with back mapping';
 % Reward setting
 P.rewardNumber = 1;   % Max juice, only one drop ... it is so easy!
 S.rewardNumber = 'Number of juice pulses to deliver:';
-P.CycleBackImage = 5;
+P.CycleBackImage = 8;
 S.CycleBackImage = 'If def, backimage every # trials:';
 
 %******* trial timing and reward
@@ -70,13 +70,13 @@ P.faceTime = 0.1;  % duration of flashed face, in ms
 S.faceTime = 'Duration of Face Flash (s):';
 
 %************** Probe properties
-P.proberadius = 2.5;  % radius of target is dva
+P.proberadius = 1.0;  % radius of target is dva
 S.proberadius = 'Size of Target(dva):';
 P.probecon = 0.50; 
 S.probecon = 'Transparency of Probe (1-none, 0-gone):';
 P.proberange = 48; %a bit brighter
 S.proberange = 'Luminance range of grating (1-127):';
-P.stimEcc = 4.0;
+P.stimEcc = 3.0;
 S.stimEcc = 'Ecc of stimulus (degrees):';
 P.stimBound = 7.0;
 S.stimBound = 'Boundary if moving (degs):';
@@ -86,12 +86,12 @@ P.orinum = 3;
 S.orinum = 'Orientations to sample of stimulus';
 P.prefori = 40;
 S.prefori = 'Preferred orientation (degs):';
-P.cpd = 3;  
+P.cpd = 4;  
 S.cpd = 'Probe Spatial Freq (cyc/deg)';
 %*****
 P.nonprefori = 130;  
 S.nonprefori = 'Preferred orientation (degs):';
-P.noncpd = 3;  
+P.noncpd = 4;  
 S.noncpd = 'Probe Spatial Freq (cyc/deg)';
 %*****
 P.bkgd = 127;
@@ -209,7 +209,7 @@ switch P.noisetype
         P.dotSpeedSigma = 0;
         S.dotSpeedSigma = 'individual dot speed (deg/sec):';
         
-        P.noiseContrast = .2;
+        P.noiseContrast = .5;
         S.noiseContrast = 'contrast of the dot noise:';
         
         P.noiseFrameRate = 60;

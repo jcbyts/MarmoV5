@@ -1,5 +1,5 @@
 
-function [S,P] = Forage9_DotSpatialMini()
+function [S,P] = Forage10_DotSpatialLarge()
 
 %%%% NECESSARY VARIABLES FOR GUI
 %%%% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -52,7 +52,7 @@ S.CycleBackImage = 'If def, backimage every # trials:';
 %******* trial timing and reward
 P.holdDur = 0.10;
 S.holdDur = 'Duration at grating for reward (s):';
-P.fixRadius = 1.0;  
+P.fixRadius = 2.5;  
 S.fixRadius = 'Probe reward radius(degs):';
 P.trialdur = 10; 
 S.trialdur = 'Trial Duration (s):';
@@ -76,7 +76,7 @@ P.probecon = 0.50;
 S.probecon = 'Transparency of Probe (1-none, 0-gone):';
 P.proberange = 48; %a bit brighter
 S.proberange = 'Luminance range of grating (1-127):';
-P.stimEcc = 1.5;
+P.stimEcc = 3.0;
 S.stimEcc = 'Ecc of stimulus (degrees):';
 P.stimBound = 7.0;
 S.stimBound = 'Boundary if moving (degs):';
@@ -86,12 +86,12 @@ P.orinum = 3;
 S.orinum = 'Orientations to sample of stimulus';
 P.prefori = 40;
 S.prefori = 'Preferred orientation (degs):';
-P.cpd = 3;  
+P.cpd = 4;  
 S.cpd = 'Probe Spatial Freq (cyc/deg)';
 %*****
 P.nonprefori = 130;  
 S.nonprefori = 'Preferred orientation (degs):';
-P.noncpd = 3;  
+P.noncpd = 4;  
 S.noncpd = 'Probe Spatial Freq (cyc/deg)';
 %*****
 P.bkgd = 127;
@@ -197,19 +197,19 @@ switch P.noisetype
         S.scaleRange = 'range of stdevs (d.v.a):';
         
     case 5 % spatial noise dots (using DrawDots)
-        P.numDots = 20;
+        P.numDots = 100;
         S.numDots = 'number of dots to show on each frame:';
         
-        P.dotSize = .1;
+        P.dotSize = .5;
         S.dotSize = 'individual dot size (d.v.a):';
         
-        P.noiseApertureSigma = 1;
+        P.noiseApertureSigma = inf;
         S.noiseApertureSigma = 'sigma of gaussian centered in screen (fullscreen if inf):';
         
         P.dotSpeedSigma = 0;
         S.dotSpeedSigma = 'individual dot speed (deg/sec):';
         
-        P.noiseContrast = 1.0;
+        P.noiseContrast = .5;
         S.noiseContrast = 'contrast of the dot noise:';
         
         P.noiseFrameRate = 60;
