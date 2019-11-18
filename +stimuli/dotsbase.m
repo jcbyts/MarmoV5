@@ -176,7 +176,9 @@ classdef (Abstract) dotsbase < stimuli.stimulus
                 return
             end
             
+            [sourceFactorOld, destinationFactorOld] = Screen('BlendFunction', obj.winPtr, GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
             Screen('DrawDots',obj.winPtr,[obj.x(:), -1*obj.y(:)]', obj.size, obj.color, obj.position, obj.dotType);
+            Screen('BlendFunction', obj.winPtr, sourceFactorOld, destinationFactorOld);
         end
         
         % initialize position (x,y) and frame displacement (dx,dy) for each dot
