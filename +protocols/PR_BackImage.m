@@ -4,7 +4,7 @@ classdef PR_BackImage < handle
   % The class constructor can be called with a range of arguments:
   %
   
-  properties (Access = public),    
+  properties (Access = public)    
        Iti@double = 1;        % default Iti duration
        startTime@double = 0;  % trial start time
        imageOff@double = 0;   % offset of image
@@ -23,6 +23,7 @@ classdef PR_BackImage < handle
     ImageDirectory = [];  % directory from which to pull images
     ImageFile = [];
     imo = [];  % matlab image struct
+    grayscale = false
   end
   
   methods (Access = public)
@@ -34,16 +35,19 @@ classdef PR_BackImage < handle
         state = o.state;
     end
     
-    function initFunc(o,S,P);
+    function initFunc(o,S,P)
         o.ImoScreen = [];
-        o.ImageDirectory = S.ImageDirectory;  
+        o.ImageDirectory = S.ImageDirectory;
+        if isfield(P, 'useGrayScale')
+            o.grayscale = P.useGrayScale;
+        end
     end
    
     function load_image_dir(o,imagedir)
         o.ImageDirectory = imagedir;
     end
     
-    function closeFunc(o),
+    function closeFunc(o)
         if (~isempty(o.ImoScreen))
             Screen('Close',o.ImoScreen);
             o.ImoScreen = [];
@@ -58,7 +62,7 @@ classdef PR_BackImage < handle
            % nothing for this protocol
     end
     
-    function P = next_trial(o,S,P);
+    function P = next_trial(o,S,P)
           %********************
           o.S = S;
           o.P = P;       
@@ -81,6 +85,9 @@ classdef PR_BackImage < handle
              % image can't be bigger than screen. Don't waste texture size?
              o.imo = imresize(o.imo, S.screenRect([4 3]));
              
+             if o.grayscale
+                 o.imo = uint8(mean(o.imo,3));
+             end
              %******* insert image in middle texture
              o.ImoScreen = Screen('MakeTexture',o.winPtr,o.imo);
              o.ImoRect = [0 0 size(o.imo,2) size(o.imo,1)];
