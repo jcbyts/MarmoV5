@@ -57,6 +57,9 @@ S.showEye = 'Show the gaze indicator? (0 or 1):';
 P.bkgd = 127;
 S.bkgd = 'Choose the background color (0-255):';
 
+P.useGrayScale = true;
+S.useGrayScale = 'Are the images grayscale (true) or color (false):';
+
 % Trial timing
 P.imageDur = 10;
 S.imageDur = 'Duration to display image (s):';
@@ -64,7 +67,7 @@ P.iti = 2;
 S.iti = 'Duration of intertrial interval (s):';
 
 % Image size settings
-P.imageSizes = 2.^(1:6);
+P.imageSizes = 2.^(2:5);
 S.imageSizes = 'width of image in d.v.a. (must be changed in Settings file)';
 P.imageCtrX = 0;
 S.imageCtrX = 'X center of image in d.v.a (relative to center of screen)';

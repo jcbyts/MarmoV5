@@ -57,6 +57,9 @@ S.showEye = 'Show the gaze indicator? (0 or 1):';
 P.bkgd = 127;
 S.bkgd = 'Choose the background color (0-255):';
 
+P.useGrayScale = true;
+S.useGrayScale = 'Are the images grayscale (true) or color (false):';
+
 % Trial timing
 P.imageDur = 10;
 S.imageDur = 'Duration to display image (s):';
