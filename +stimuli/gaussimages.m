@@ -9,7 +9,7 @@ classdef gaussimages < stimuli.stimulus % inherit stimulus to have tracking / ra
   %
   % 26-08-2018 - Jude Mitchell
   
-  properties (Access = public),
+  properties (Access = public)
     tex
     texDim
     imagenum double = 0   %if set zeros, picks at random which to show
@@ -30,7 +30,7 @@ classdef gaussimages < stimuli.stimulus % inherit stimulus to have tracking / ra
       o.tex = [];
       o.texDim = [];
       
-      if nargin == 1,
+      if nargin == 1
         return
       end
 
