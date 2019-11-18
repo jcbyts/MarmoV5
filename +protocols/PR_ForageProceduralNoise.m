@@ -209,11 +209,12 @@ classdef PR_ForageProceduralNoise < protocols.protocol
                o.hNoise.updateEveryNFrames = ceil(S.frameRate / P.noiseFrameRate);
                o.hNoise.updateTextures(); % create the procedural texture
                
-           case 5
-               o.NoiseHistory = zeros(o.MaxFrame,3);
+           case 5 % dot spatial noise
+               o.noiseNum = min(P.numDots, 100); % only store up to 500 dots
+               o.NoiseHistory = zeros(o.MaxFrame,(1+(o.noiseNum * 2))); 
                % noise object is created here
                o.hNoise = stimuli.dotspatialnoise(o.winPtr, 'numDots', P.numDots, ...
-                   'sigma', P.noiseApertureSigma);
+                   'sigma', P.noiseApertureSigma*S.pixPerDeg);
                o.hNoise.contrast = P.noiseContrast;
                o.hNoise.size = P.dotSize * S.pixPerDeg;
                o.hNoise.speed = P.dotSpeedSigma * S.pixPerDeg / S.frameRate;
@@ -430,15 +431,14 @@ classdef PR_ForageProceduralNoise < protocols.protocol
                      o.NoiseHistory(o.FrameCount,2) = o.hNoise.x(1);  % xposition of first gabor
                      o.NoiseHistory(o.FrameCount,3) = o.hNoise.mypars(2);  
                      
-                 case 5
+                 case 5 % dot spatial noise
                      o.hNoise.afterFrame(); % update parameters
                      o.hNoise.beforeFrame(); % draw
                      
                      %**********
                      o.FrameCount = o.FrameCount + 1;
                      % NOTE: store screen time in "continue_run_trial" after flip
-                     o.NoiseHistory(o.FrameCount,2) = o.hNoise.x(1);  % xposition of first gabor
-                     o.NoiseHistory(o.FrameCount,3) = o.hNoise.y(1); 
+                     o.NoiseHistory(o.FrameCount,2:end) = [o.hNoise.x(1:o.noiseNum) o.hNoise.y(1:o.noiseNum)];  % xposition of first gabor
              end
             %****************
          end
