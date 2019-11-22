@@ -169,7 +169,7 @@ classdef gabornoise < stimuli.stimulus
             end
         end
         
-        function I = getImage(obj, rect)
+        function I = getImage(obj, rect, binSize)
             if nargin < 2
                 rect = obj.position([1 2 1 2]) + [-1 -1 1 1].*obj.radius/2;
             end
@@ -182,8 +182,8 @@ classdef gabornoise < stimuli.stimulus
             % Conversion factor from degrees to radians:
             deg2rad = 3.141592654 / 180.0;
             
-            xax = rect(1):(rect(3)-1);
-            yax = rect(2):(rect(4)-1);
+            xax = rect(1):binSize:(rect(3)-binSize);
+            yax = rect(2):binSize:(rect(4)-binSize);
             
             [xx, yy] = meshgrid(xax,yax);
             
