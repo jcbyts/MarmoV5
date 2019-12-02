@@ -70,7 +70,7 @@ P.faceTime = 0.1;  % duration of flashed face, in ms
 S.faceTime = 'Duration of Face Flash (s):';
 
 %************** Probe properties
-P.proberadius = 2.5;  % radius of target is dva
+P.proberadius = 1.0;  % radius of target is dva
 S.proberadius = 'Size of Target(dva):';
 P.probecon = 0.50; 
 S.probecon = 'Transparency of Probe (1-none, 0-gone):';
@@ -166,7 +166,7 @@ switch P.noisetype
         %*************
         
     case 4 % Garborium noise (based off "ProceduralGarboriumDemo")
-        P.spfmin = 1;  % will be [0.5 1 2 4 8 16]
+        P.spfmin = 2;  % will be [0.5 1 2 4 8 16]
         S.spfmin = 'Minimum spat freq (cyc/deg):';
         
         P.noiseCenterX = 0;
@@ -178,32 +178,32 @@ switch P.noisetype
         P.noiseRadius = 20;
         S.noiseRadius = 'width of the noise patch (d.v.a):';
         
-        P.numGabors = 100;
+        P.numGabors = 500;
         S.numGabors = 'Number of Gabors:';
         
-        P.spfrange = 5;   % use log spacing
+        P.spfrange = 15;   % use log spacing
         S.spfrange = 'Rnage of spat freqs (cyc/deg):';
         
-        P.noiseFrameRate = 60;
+        P.noiseFrameRate = 120;
         S.noiseFrameRate = 'frame rate of the noise background:';
         
-        P.noiseContrast = .15;
+        P.noiseContrast = 2.0;
         S.noiseContrast = 'Contrast of the noise (0-1):';
         
         P.minScale = .1;
         S.minScale = 'minimum width (stdev) of gabors (d.v.a):';
         
-        P.scaleRange = 1;
+        P.scaleRange = .15;
         S.scaleRange = 'range of stdevs (d.v.a):';
         
     case 5 % spatial noise dots (using DrawDots)
-        P.numDots = 500;
+        P.numDots = 1500;
         S.numDots = 'number of dots to show on each frame:';
         
-        P.dotSize = .1;
+        P.dotSize = .05;
         S.dotSize = 'individual dot size (d.v.a):';
         
-        P.noiseContrast = .2;
+        P.noiseContrast = 1.0;
         S.noiseContrast = 'contrast of the dot noise:';
         
         P.noiseFrameRate = 60;
@@ -211,3 +211,5 @@ switch P.noisetype
         
 end
 
+% P.dontsync = 1;
+% S.dontsync = 'async Frame Control';
