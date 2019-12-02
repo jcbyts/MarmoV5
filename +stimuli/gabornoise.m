@@ -170,6 +170,10 @@ classdef gabornoise < stimuli.stimulus
         end
         
         function I = getImage(obj, rect, binSize)
+            if nargin < 3
+                binSize = 1;
+            end
+            
             if nargin < 2
                 rect = obj.position([1 2 1 2]) + [-1 -1 1 1].*obj.radius/2;
             end
