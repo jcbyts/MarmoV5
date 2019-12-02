@@ -93,11 +93,28 @@ classdef dotspatialnoise < stimuli.dotsbase
             
             [xx, yy] = meshgrid(xax,yax);
             
-            posx = xx(:) - obj.x - obj.position(1);
-            posy = yy(:) + (obj.y - obj.position(2));
+            x = xax([1 end])' - obj.x - obj.position(1);
+            y = yax([1 end])' + (obj.y - obj.position(2));
+            
+            ix = x(1,:) < 0 & x(2,:) > 0;
+            ix = ix & (y(1,:) < 0 & y(2,:) > 0);
+%             figure(1); clf; 
+%             plot(x(1,:), y(1,:), '.'); hold on
+%             plot(x(1,ix), y(1,ix), '.'); hold on
+%             plot(x(2,:), y(2,:), '.'); hold on
+%             plot(xax, yax, 'r')
+%             
+%             bad = (x > rect(3) | x < rect(1)) | (y > rect(4) | y < rect(2));
+%             ix = ~bad;
+            if ~any(ix)
+                I = zeros(size(xx));
+                return
+            end
+            posx = xx(:) - obj.x(ix) - obj.position(1);
+            posy = yy(:) + (obj.y(ix) - obj.position(2));
             
             I = double(sqrt(posx.^2 + posy.^2) < obj.size/2);
-            c = mean(obj.color) - 127;
+            c = mean(obj.color(ix)) - 127;
             I = I.*c;
             
 %             I = fliplr(I);
