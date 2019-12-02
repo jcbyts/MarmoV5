@@ -50,11 +50,11 @@ classdef eyetrack_ddpi < handle
             ddpiM('setP1BoundingBoxSize', 64);
             ddpiM('setP4BoundingBoxSize', 32);
             ddpiM('setP4Template', [o.p4intensity, o.p4radius]);
-            ddpiM('setROI', [20, 20, 600, 450]); % exclude regions
+            ddpiM('setROI', [20, 20, 640, 450]); % exclude regions
 %             ddpiM('setP1roi', [20, 20, 600, 450]); % exclude regions
-            ddpiM('start');
-            o.timeLastSample = GetSecs();
             
+            o.timeLastSample = GetSecs();
+            ddpiM('start');
 
 
         end
@@ -101,7 +101,7 @@ classdef eyetrack_ddpi < handle
 %             [o.p1, o.p4] = o.capture;
             % only take the last sample TODO: need to store x,y,time
             % somehow
-            x = -(ret(2).x - ret(1).x); %o.p4.x(end) - o.p1.x(end);
+            x = (ret(2).x - ret(1).x); %o.p4.x(end) - o.p1.x(end);
             y = -(ret(2).y - ret(1).y);  % -(o.p4.y(end)-o.p1.y(end)); % NEED TO INVERT SO ++ IS UP
 %             tnow = GetSecs();
 % %             o.time = linspace(o.timeLastSample, tnow, numel(x));
