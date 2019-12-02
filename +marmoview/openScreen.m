@@ -15,7 +15,7 @@ Screen('CloseAll');
 PsychImaging('PrepareConfiguration');
 
 % PsychImaging('AddTask', 'General', 'FloatingPoint16Bit');
-PsychImaging('AddTask','General','FloatingPoint32BitIfPossible');
+PsychImaging('AddTask','General','FloatingPoint32BitIfPossible', 'disableDithering',1);
 
 % Applies a simple power-law gamma correction
 PsychImaging('AddTask','FinalFormatting','DisplayColorCorrection','SimpleGamma');
@@ -37,3 +37,14 @@ A.priorityLevel = MaxPriority(A.window);
 
 % set alpha blending/antialiasing etc.
 Screen(A.window,'BlendFunction',GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
+
+% some propixx specific commands
+
+if isfield(S, 'DataPixx') && S.DataPixx 
+    if Datapixx('IsPropixx')
+        Datapixx('Open');
+        Datapixx('EnablePropixxRearProjection');
+        Datapixx('EnablePropixxLampLed');
+        Datapixx('RegWr');
+    end
+end
