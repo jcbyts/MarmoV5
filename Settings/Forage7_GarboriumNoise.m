@@ -178,13 +178,13 @@ switch P.noisetype
         P.noiseRadius = 20;
         S.noiseRadius = 'width of the noise patch (d.v.a):';
         
-        P.numGabors = 500;
+        P.numGabors = 800;
         S.numGabors = 'Number of Gabors:';
         
         P.spfrange = 15;   % use log spacing
         S.spfrange = 'Rnage of spat freqs (cyc/deg):';
         
-        P.noiseFrameRate = 120;
+        P.noiseFrameRate = 60;
         S.noiseFrameRate = 'frame rate of the noise background:';
         
         P.noiseContrast = 2.0;
