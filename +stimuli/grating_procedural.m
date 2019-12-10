@@ -179,10 +179,84 @@ classdef grating_procedural < stimuli.stimulus
        end
     end
     
-%     function I = gratingImage(o, rect)
-%         
-% %         I = modulatecolor * contrast * contrastPreMultiplicator * sin(x*2*pi*freq + phase) + Offset;
-%     end
+    function I = getImage(o, rect, binSize)
+        
+        if nargin < 3
+            binSize = 1;
+        end
+        
+        if nargin < 2
+            if isinf(o.radius)
+                rect = o.screenRect;
+            else
+                rect = o.position([1 2 1 2]) + [-1 -1 1 1].*o.radius/2;
+            end
+        end
+        
+        % use values from our openGL shaders
+        twopi = 2.0 * 3.141592654;
+        deg2rad = 3.141592654 / 180.0;
+        
+        % build axes
+        xax = rect(1):binSize:(rect(3)-binSize);
+        yax = rect(2):binSize:(rect(4)-binSize);
+        
+        [xx, yy] = meshgrid(xax,yax);
+        
+        % offset the texture center
+        X = xx - o.position(1);
+        Y = yy - o.position(2);
+        
+        if isinf(o.radius)
+            el = ones(size(X));
+        else
+            % Create the gaussian (e1)
+            % Find diameter
+            rPix = floor(o.radius);
+            dPix = 2*rPix+1;
+            % Standard deviation of gaussian (e1)
+            sigma = dPix/8;
+            e1 = exp(-.5*(X.^2 + Y.^2)/sigma^2);
+        end
+        
+        maxRadians = twopi * o.cpd / o.pixperdeg/2;
+        
+        % Create the sinusoid
+        pha = (o.phase - 0) * deg2rad;
+        ori = (90 - o.orientation)*deg2rad;
+        
+        gx = cos(ori) * (maxRadians*X) + sin(ori) * (maxRadians*Y) + pha;
+        s1 = cos(gx);
+        %*********
+        % Filter for square wave
+        if (o.square)
+            s1( s1 > 0 ) = 1;
+            s1( s1 < 0 ) = -1;
+        end
+        if ~isinf(o.radius)
+            if (o.square)
+                e1( e1 > 0.01) = 1;
+                e1( e1 <= 0.01) = 0;
+            end
+            
+            %***** Gauss window
+            if (o.gauss)
+                g1 = s1.*e1;
+            else
+                g1 = s1 .* (e1 > 0.01);
+            end
+        else
+            
+            g1 = s1;
+        end
+        
+        % Convert the gabor (g1) to uint8
+        g1 = (o.bkgd + g1 * o.range * o.transparent);
+        
+        I = g1;
+        
+        % %         I = modulatecolor * contrast * contrastPreMultiplicator * sin(x*2*pi*freq + phase) + Offset;
+    end
     
   end % methods
   

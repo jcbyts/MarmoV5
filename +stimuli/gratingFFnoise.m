@@ -161,9 +161,12 @@ classdef gratingFFnoise < stimuli.stimulus
             end
         end
         
-        function I = getImage(obj, rect)
+        function I = getImage(obj, rect, binSize)
             % GETIMAGE returns the image that was shown without calling PTB
             % I = getImage(obj, rect)
+            if nargin < 3
+                binSize = 1;
+            end
             
             % compute image without PTB running ... follow exact steps
             
@@ -172,8 +175,8 @@ classdef gratingFFnoise < stimuli.stimulus
             deg2rad = 3.141592654 / 180.0;
             
             % build support
-            xx = rect(1):(rect(3)-1);
-            yy = rect(2):(rect(4)-1);
+            xx = rect(1):binSize:(rect(3)-binSize);
+            yy = rect(2):binSize:(rect(4)-binSize);
             
             [X,Y] = meshgrid(xx,yy);
             
