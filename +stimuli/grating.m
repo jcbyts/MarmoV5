@@ -14,18 +14,18 @@ classdef grating < stimuli.stimulus
   % 14-08-2018 - Jude Mitchell
   
   properties (Access = public)
-    position@double = [0.0, 0.0]; % [x,y] (pixels)
-    radius@double = 50; % (pixels)
-    orientation@double = 0;  % horizontal
-    cpd@double = 2; % cycles per degree
-    cpd2@double = NaN; % default not used, else composite stim
-    phase@double = 0;  % (radians)
-    square@logical = false;  
-    bkgd@double = 127;  
-    range@double = 127;
-    gauss@logical = true;  %gaussian aperture
-    transparent@double = 0.5;  % from 0 to 1, how transparent
-    pixperdeg@double = 0;  % set non-zero to use for CPD computation
+    position double = [0.0, 0.0]; % [x,y] (pixels)
+    radius double = 50; % (pixels)
+    orientation double = 0;  % horizontal
+    cpd double = 2; % cycles per degree
+    cpd2 double = NaN; % default not used, else composite stim
+    phase double = 0;  % (radians)
+    square logical = false;  
+    bkgd double = 127;  
+    range double = 127;
+    gauss logical = true;  %gaussian aperture
+    transparent double = 0.5;  % from 0 to 1, how transparent
+    pixperdeg double = 0;  % set non-zero to use for CPD computation
     screenRect = [];   % if radius Inf, then fill whole area
   end
         
@@ -180,7 +180,9 @@ classdef grating < stimuli.stimulus
        rim(:,:,4) = uint8(t1);
        % Create the gabor texture 
        if o.winPtr ~=0
-       o.tex = Screen('MakeTexture',o.winPtr,rim);
+           o.tex = Screen('MakeTexture',o.winPtr,rim);
+       else
+           o.tex = rim;
        end
        
        % Determine the texture placement
@@ -193,7 +195,7 @@ classdef grating < stimuli.stimulus
        end
     end
     
-    function CloseUp(o),
+    function CloseUp(o)
        if ~isempty(o.tex)
            Screen('Close',o.tex);
            o.tex = [];
@@ -218,6 +220,76 @@ classdef grating < stimuli.stimulus
        end
     end
     
+    function varargout = getImage(o, rect, binsize)
+        
+        if o.winPtr~=0
+            warning('gaussimages: getImage: only works if you constructed the object with winPtr=0')
+        end
+        
+        if nargin < 3
+            binsize = 1;
+        end
+        
+        if nargin < 2
+            rect = o.position([1 2 1 2]) + [-1 -1 1 1].*o.radius/2;
+        end
+        
+        
+        I = double(o.tex);
+        alpha = double(squeeze(I(:,:,4)))./127;
+        I(:,:,4) = [];
+        
+        texrect = kron([1,1],o.position) + kron(o.radius,[-1, -1, +1, +1]);
+        I = imresize(I, [texrect(4)-texrect(2) texrect(3)-texrect(1)]);
+        alpha = imresize(alpha, [texrect(4)-texrect(2) texrect(3)-texrect(1)]);
+        
+        % -- try to be a little quicker
+        Iscreen = zeros(1920,1080);
+        Iscreen(texrect(2):texrect(4)-1, texrect(1):texrect(3)-1) = (mean(I,3) - o.bkgd).*alpha;
+        Ascreen = zeros(1920,1080);
+        Ascreen(texrect(2):texrect(4)-1, texrect(1):texrect(3)-1) = alpha;
+        
+        tmprect = rect;
+        tmprect(3) = rect(3)-rect(1)-binsize;
+        tmprect(4) = rect(4)-rect(2)-binsize;
+        
+        im = imcrop(Iscreen, tmprect); % requires the imaging processing toolbox
+        alpha = imcrop(Ascreen, tmprect);
+        
+        if binsize~=1
+            im = im(1:binsize:end,1:binsize:end);
+            alpha = alpha(1:binsize:end,1:binsize:end);
+        end
+        
+        
+        
+        
+        %         % -- works, but you have to draw
+        %         texax = texrect(1):binsize:texrect(3);
+        %         texay = texrect(2):binsize:texrect(4);
+        %
+        %
+        %         figure(9999); clf
+        %         if binsize ~=1
+        %             I = imresize(I, 1./binsize);
+        %         end
+        %         imagesc(texax, texay, I)
+        %         xlim([rect(1) rect(3)])
+        %         ylim([rect(2) rect(4)])
+        %
+        %         frame = getframe(gca);
+        %         im = frame.cdata;
+        %         %
+        
+        if nargout > 0
+            varargout{1} = im;
+        end
+        
+        if nargout > 1
+            varargout{2} = alpha;
+        end
+        
+    end
   end % methods
   
 end % classdef

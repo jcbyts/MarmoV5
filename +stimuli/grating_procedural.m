@@ -118,12 +118,14 @@ classdef grating_procedural < stimuli.stimulus
        modulateColor = [0 0 0 0]; %  zeros means don't offset the background (depends on blend function)
        contrastPreMultiplicator = 0.5; % 0.5 scales max response to contrast is interpretable
 
-       if o.square % TODO: this has not been tested
-           o.tex = CreateProceduralSquareWaveGrating(o.winPtr,res, res, modulateColor, o.radius);
-       elseif o.gauss % gabor
-           o.tex = CreateProceduralGabor(o.winPtr, res, res, [], modulateColor, disableNormalization,contrastPreMultiplicator);
-       else
-           o.tex = CreateProceduralSineGrating(o.winPtr, res, res, modulateColor, o.radius, contrastPreMultiplicator);
+       if o.winPtr ~= 0
+           if o.square % TODO: this has not been tested
+               o.tex = CreateProceduralSquareWaveGrating(o.winPtr,res, res, modulateColor, o.radius);
+           elseif o.gauss % gabor
+               o.tex = CreateProceduralGabor(o.winPtr, res, res, [], modulateColor, disableNormalization,contrastPreMultiplicator);
+           else
+               o.tex = CreateProceduralSineGrating(o.winPtr, res, res, modulateColor, o.radius, contrastPreMultiplicator);
+           end
        end
        
        
