@@ -1,12 +1,10 @@
-classdef PR_Forage2 < handle
-  % Matlab class for running an experimental protocl
+classdef PR_ForageProceduralNoise < protocols.protocol
+  % Forage protocol with procedural background noise
   %
   % The class constructor can be called with a range of arguments:
   %
  
-  properties (Access = public) 
-       Iti double = 1;             % default Iti duration
-       startTime double = 0;       % trial start time
+  properties (Access = public)
        itiStart double = 0;        % start of iti interval
        rewardCount double = 0;     % counter for reward drops
        rewardGap double = 0;       % gap for next target onset
@@ -14,56 +12,46 @@ classdef PR_Forage2 < handle
   end
       
   properties (Access = private)
-    winPtr; % ptb window
-    state double = 0;      % state counter
-    error double = 0;      % error state in trial
-    %*********
-    S;              % copy of Settings struct (loaded per trial start)
-    P;              % copy of Params struct (loaded per trial)
-    trialsList;        % store copy of trial list (not good to keep in S struct)
+    trialsList        % store copy of trial list (not good to keep in S struct)
+    
     %********* stimulus structs for use
-    Faces;             % object that stores face images for use
-    faceTime = 0.1;    % time for showing face stimulus
-    hProbe = [];       % object for foraging stimuli
-    probeNum = 1;      % number of foraging stimuli
-    oriNum = 1;        % number of oriented textures to draw from for probe
-    targOri = 1;       % current orientation of target probe
-    hNoise = [];       % random flashing background grating
-    noiseNum = 1;      % number of oriented textures
-    spatoris = [];     % list of tested orientations
-    spatfreqs = [];    % list of tested spatial freqs
+    Faces             % object that stores face images for use
+    faceTime = 0.1    % time for showing face stimulus
+    hProbe = []       % object for foraging stimuli
+    probeNum = 1      % number of foraging stimuli
+    oriNum = 1        % number of oriented textures to draw from for probe
+    targOri = 1       % current orientation of target probe
+    hNoise = []       % random flashing background grating
+    noiseNum = 1      % number of oriented textures
+    spatoris = []     % list of tested orientations
+    spatfreqs = []    % list of tested spatial freqs
     %******* parameters for Noise History grating stimulus 
-    noisetype = 0;     % type of background noise stimulus
-    NoiseHistory = []; % list of noise frames over trial and their times
-    FrameCount = 0;    % count noise frames
-    ProbeHistory = []; % list of history for probe objects
-    PFrameCount = 0;   % count probe frames (should be same as noise for now)
-    MaxFrame = (120*20); % twenty second maximum
-    TrialDur = 0;      % store internally the trial duration (make less than 20)
+    noisetype = 0     % type of background noise stimulus
+    NoiseHistory = [] % list of noise frames over trial and their times
+    FrameCount = 0    % count noise frames
+    ProbeHistory = [] % list of history for probe objects
+    PFrameCount = 0   % count probe frames (should be same as noise for now)
+    MaxFrame = []     % twenty second maximum
+    TrialDur = 0;     % store internally the trial duration (make less than 20)
     %******** parameters for positioning foraging stimuli
-    PosList = [];      % will be x,y positions of stimuli
-    MovList = [];      % speed vector if a moving item
-    FixTime = 0;      % will be duration item is fixated
-    MovStep = 0;       % vector amplitude motion step if moving probe
+    PosList = []      % will be x,y positions of stimuli
+    MovList = []      % speed vector if a moving item
+    FixTime = 0      % will be duration item is fixated
+    MovStep = 0       % vector amplitude motion step if moving probe
     %*******
-    FixCount = 0;      % count fixation of probe events
-    FixHit = [];       % list of positions where probe hits occured
-    FixMax = 20;        % maximum fixations in any trial
+    FixCount = 0      % count fixation of probe events
+    FixHit = []       % list of positions where probe hits occured
+    FixMax = 20        % maximum fixations in any trial
     %**********************************
-    D = struct;        % store PR data for end plot stats, will store dotmotion array
+    D struct = struct()        % store PR data for end plot stats, will store dotmotion array
   end
   
   methods (Access = public)
-    function o = PR_Forage2(winPtr)
-      o.winPtr = winPtr;
-      o.trialsList = [];  % should be set by generate call
+    function o = PR_ForageProceduralNoise(winPtr)
+        o = o@protocols.protocol(winPtr);
     end
     
-    function state = get_state(o)
-        state = o.state;
-    end
-    
-    function initFunc(o,S,P);
+    function initFunc(o,S,P)
   
        %********** Set-up for trial indexing (required) 
        cors = [0,4];  % count these errors as correct trials
@@ -72,6 +60,7 @@ classdef PR_Forage2 < handle
        %**********
       
        %******* init Noise History with MaxDuration **************
+       o.MaxFrame = ceil(20*S.frameRate);
        o.ProbeHistory = zeros(o.MaxFrame,4);  % x,y,ori,fixated
        
        %******* init reward face for correct trials
@@ -90,7 +79,7 @@ classdef PR_Forage2 < handle
        o.targOri = 1;
        for kk = 1:o.oriNum
            %*******
-           o.hProbe{kk} = stimuli.grating_procedural(o.winPtr);  % grating probe
+           o.hProbe{kk} = stimuli.grating(o.winPtr);  % grating probe
            o.hProbe{kk}.transparent = -P.probecon;  % blend in proportion to gauss
            o.hProbe{kk}.gauss = true;
            o.hProbe{kk}.pixperdeg = S.pixPerDeg;
@@ -126,60 +115,51 @@ classdef PR_Forage2 < handle
        %******* SETUP NOISE BACKGROUND BASED ON TYPE, HARTLEY, SPATIAL, ETC
        o.noisetype = P.noisetype;
        %**********
-       % for o.noisetype == 0 would be no background at all!
-       if (o.noisetype == 0) % no background
-          o.noiseNum = 0;
-          o.hNoise = [];
-       end
-       %**********
-       if (o.noisetype == 1) % use Hartley background
-           %*************
-           o.NoiseHistory = zeros(o.MaxFrame,2);
-           % Make Noise stimulus textures, pre-allocate textures for speed
-           if (P.spfnum > 1) && (P.spfmax > P.spfmin)
-              o.spatfreqs = exp( log(P.spfmin):(log(P.spfmax)-log(P.spfmin))/(P.spfnum-1):log(P.spfmax));
-           else
-              o.spatfreqs = ones(1,P.spfnum) * P.spfmax;
-           end
-           %************
-           o.spatoris = (0:(P.noiseorinum-1))*180/P.noiseorinum; 
-           if (isfield(P,'orioffset'))
-              o.spatoris = o.spatoris + P.orioffset;
-           end
-           o.noiseNum = P.noiseorinum * P.spfnum;
-           o.hNoise = cell(1,o.noiseNum);
-           for k = 1:o.noiseNum
-               o.hNoise{k} = stimuli.grating_procedural(o.winPtr);  % grating probe
-               o.hNoise{k}.position = S.centerPix; 
-               if isinf(P.noiseradius)
-                   o.hNoise{k}.radius = Inf;    %fill entire screen
-                   o.hNoise{k}.screenRect = S.screenRect;
+       
+       switch o.noisetype
+           
+           %***************************************************************
+           % for o.noisetype == 0 would be no background at all!
+           case 0 % no background
+               o.noiseNum = 0;
+               o.hNoise = [];
+               
+           %***************************************************************
+           case 1 % "Hartley" background
+               
+               o.NoiseHistory = zeros(o.MaxFrame,3);
+               
+               % select spatial frequencies
+               if (P.spfnum > 1) && (P.spfmax > P.spfmin)
+                   o.spatfreqs = exp( log(P.spfmin):(log(P.spfmax)-log(P.spfmin))/(P.spfnum-1):log(P.spfmax));
                else
-                   o.hNoise{k}.radius = round(P.noiseradius*S.pixPerDeg);
+                   o.spatfreqs = ones(1,P.spfnum) * P.spfmax;
                end
-               %*********
-               kori = 1 + mod((k-1),P.noiseorinum);
-               kspf = 1 + floor( (k-1)/P.noiseorinum);
-               %*******
-               o.hNoise{k}.orientation = o.spatoris(kori);
-               o.hNoise{k}.phase = 0;
-               o.hNoise{k}.cpd = o.spatfreqs(kspf);   
-               o.hNoise{k}.range = P.noiserange;
-               o.hNoise{k}.square = logical(P.squareWave);
-               o.hNoise{k}.gauss = false;
-               o.hNoise{k}.bkgd = P.bkgd;
-               o.hNoise{k}.transparent = 0.5;
-               o.hNoise{k}.pixperdeg = S.pixPerDeg;
-               o.hNoise{k}.updateTextures();
-           end 
-           %****************
-       end
-       %******** Spatial noise background
-       if (o.noisetype == 2) % use Spatial background
-           o.noiseNum = P.snoisenum * 2;
-           o.NoiseHistory = zeros(o.MaxFrame,(1+(o.noiseNum * 2)));  % store time, then x,y positions
-           o.hNoise = cell(1,o.noiseNum);
-           if (0) % comment for now, using ovals instead
+               
+               % select possible orientations
+               o.spatoris = (0:(P.noiseorinum-1))*180/P.noiseorinum;
+               if (isfield(P,'orioffset'))
+                   o.spatoris = o.spatoris + P.orioffset;
+               end
+               o.noiseNum = P.noiseorinum * P.spfnum;
+               
+               % noise object is created here
+               o.hNoise = stimuli.gratingFFnoise(o.winPtr, 'pixPerDeg', S.pixPerDeg);
+               o.hNoise.numOrientations = P.noiseorinum;
+               o.hNoise.orientations = o.spatoris;
+               o.hNoise.spatialFrequencies = o.spatfreqs;
+               o.hNoise.randomizePhase = P.noiseRandomizePhase;
+               o.hNoise.updateEveryNFrames = ceil(S.frameRate / P.noiseFrameRate);
+               o.hNoise.updateTextures(); % create the procedural texture
+               o.hNoise.contrast = P.noiseContrast;
+               
+               
+           %***************************************************************
+           case 2 % use Spatial reverse correlation background
+               o.noiseNum = P.snoisenum * 2;
+               o.NoiseHistory = zeros(o.MaxFrame,(1+(o.noiseNum * 2)));  % store time, then x,y positions
+               o.hNoise = cell(1,o.noiseNum);
+               
                for k = 1:o.noiseNum
                    o.hNoise{k} = stimuli.grating_procedural(o.winPtr);  % grating probe
                    o.hNoise{k}.radius = round((P.snoisediam/2)*S.pixPerDeg);
@@ -198,48 +178,67 @@ classdef PR_Forage2 < handle
                    o.hNoise{k}.pixperdeg = S.pixPerDeg;
                    o.hNoise{k}.updateTextures();
                end
-           end
-       end
-       %********* CSD will be similar to hartley, but all white (SF=0)
-       %******* and a different on duration of stimulus 
-       %**********
-       if (o.noisetype == 3) % use Hartley background
-           %*************
-           o.NoiseHistory = zeros(o.MaxFrame,2);
-           o.noiseNum = 1;
-           o.hNoise = cell(1,o.noiseNum);
-           for k = 1:o.noiseNum
-               o.hNoise{k} = stimuli.grating_procedural(o.winPtr);  % grating probe
-               o.hNoise{k}.position = S.centerPix; 
-               o.hNoise{k}.radius = Inf;    %fill entire screen
-               o.hNoise{k}.screenRect = S.screenRect;
-               %*********
-               o.hNoise{k}.orientation = 0;
-               o.hNoise{k}.phase = 0;  % white stim
-               o.hNoise{k}.cpd = 0;  % all field   
-               o.hNoise{k}.range = P.noiserange;
-               o.hNoise{k}.square = logical(P.squareWave);
-               o.hNoise{k}.gauss = true;
-               o.hNoise{k}.bkgd = P.bkgd;
-               o.hNoise{k}.transparent = 0.5;
-               o.hNoise{k}.pixperdeg = S.pixPerDeg;
-               o.hNoise{k}.updateTextures();
-           end 
-           %****************
+               
+           %***************************************************************
+           case 3 % CSD flash
+               
+               % CSD will be similar to hartley, but all white (SF=0)
+               % and a different on duration of stimulus
+               
+               o.NoiseHistory = zeros(o.MaxFrame,2);
+               o.noiseNum = 1;
+               o.hNoise = [];
+           
+           %***************************************************************
+           case 4 % Garborium noise
+               o.NoiseHistory = zeros(o.MaxFrame,3);
+               
+               % noise object is created here
+               o.hNoise = stimuli.gabornoise(o.winPtr, 'pixPerDeg', S.pixPerDeg, 'numGabors', P.numGabors);
+               
+               x = P.noiseCenterX*S.pixPerDeg + S.centerPix(1);
+               y = -P.noiseCenterY*S.pixPerDeg + S.centerPix(2);
+               o.hNoise.position = [x y];
+               o.hNoise.radius = P.noiseRadius * S.pixPerDeg;
+               o.hNoise.contrast = P.noiseContrast;
+               o.hNoise.scaleRange = P.scaleRange;
+               o.hNoise.minScale = P.minScale;
+               o.hNoise.minSF = P.spfmin;
+               o.hNoise.sfRange =  P.spfrange;
+               
+               o.hNoise.updateEveryNFrames = ceil(S.frameRate / P.noiseFrameRate);
+               o.hNoise.updateTextures(); % create the procedural texture
+               
+           case 5 % dot spatial noise
+               o.noiseNum = min(P.numDots, 100); % only store up to 500 dots
+               o.NoiseHistory = zeros(o.MaxFrame,(1+(o.noiseNum * 2))); 
+               % noise object is created here
+               o.hNoise = stimuli.dotspatialnoise(o.winPtr, 'numDots', P.numDots, ...
+                   'sigma', P.noiseApertureSigma*S.pixPerDeg);
+               o.hNoise.contrast = P.noiseContrast;
+               o.hNoise.size = P.dotSize * S.pixPerDeg;
+               o.hNoise.speed = P.dotSpeedSigma * S.pixPerDeg / S.frameRate;
+               o.hNoise.updateEveryNFrames = ceil(S.frameRate / P.noiseFrameRate);
+        
+               
        end
        %**********************************************************
        
     end
    
-    function closeFunc(o),
+    function closeFunc(o)
         o.Faces.CloseUp();
         for kk = 1:o.probeNum
            o.hProbe{kk}.CloseUp();
         end
-        for kk = 1:o.noiseNum
-            if ~isempty(o.hNoise{kk})
-               o.hNoise{kk}.CloseUp();
+        if iscell(o.noiseNum) % backwards compatible with old-style noise
+            for kk = 1:o.noiseNum
+                if ~isempty(o.hNoise{kk})
+                    o.hNoise{kk}.CloseUp();
+                end
             end
+        elseif isa(o.hNoise, 'stimuli.stimulus')
+            o.hNoise.CloseUp();
         end
     end
    
@@ -282,7 +281,7 @@ classdef PR_Forage2 < handle
         %**************
     end
     
-    function P = next_trial(o,S,P);
+    function P = next_trial(o,S,P)
           %********************
           o.S = S;
           o.P = P;
@@ -328,6 +327,20 @@ classdef PR_Forage2 < handle
             % rewardCount counts the number of juice pulses, 1 delivered per frame
             o.rewardCount = 0;
             
+            
+            if isa(o.hNoise, 'stimuli.stimulus')
+                
+                if isprop(o.hNoise, 'probBlank')
+                    o.hNoise.probBlank = 1-o.P.probNoise;
+                end
+                
+                if isprop(o.hNoise, 'contrast')
+                    o.hNoise.contrast = o.P.noiseContrast;
+                end
+                
+                o.hNoise.beforeTrial();
+            end
+            
             %******* Plot States Struct (show fix in blue for eye trace)
                       % any special plotting of states, 
                       % FP(1).states = 1:2; FP(1).col = 'b';
@@ -346,75 +359,87 @@ classdef PR_Forage2 < handle
     end
     
     function updateNoise(o,xx,yy,currentTime)
-         if (o.FrameCount < o.MaxFrame)  
-            %*************** 
-            if (o.noisetype == 1) 
-                kk = 0;
-                if (rand < o.P.probNoise)  % fraction of grating noise impulses
-                   kk = randi(o.noiseNum);
-                   if ~isnan(xx) && ~isnan(yy)
-                      o.hNoise{kk}.position = [(o.S.centerPix(1) + round(xx*o.S.pixPerDeg)),(o.S.centerPix(2) - round(yy*o.S.pixPerDeg))];
-                   else
-                      o.hNoise{kk}.position = o.S.centerPix; 
-                   end    
-                   o.hNoise{kk}.beforeFrame();
-                end
-                %**********
-                o.FrameCount = o.FrameCount + 1;
-                % NOTE: store screen time in "continue_run_trial" after flip
-                o.NoiseHistory(o.FrameCount,2) = kk;  % store orientation number
-                %**********
-            end
-            %**************
-            if (o.noisetype == 2)
-                 %******** select random locations in noise circle and draw
-                 nlist = zeros(1,2*o.noiseNum);
-                 for kk = 1:o.noiseNum
-                     sx = (rand - 0.5) * 2 * o.P.snoisewidth;
-                     sy = (rand - 0.5) * 2 * o.P.snoiseheight;
-                     nlist(1,1+(kk-1)*2) = sx;
-                     nlist(1,2+(kk-1)*2) = sy;
-                     %*********
-                     % o.hNoise{kk}.position = [(o.S.centerPix(1) + round(sx*o.S.pixPerDeg)),...
-                     %                         (o.S.centerPix(2) - round(sy*o.S.pixPerDeg))];
-                     % o.hNoise{kk}.beforeFrame();
-                     %***********
-                     if mod((kk-1),2)
-                         col = 127 - o.P.range;
-                     else
-                         col = 127 + o.P.range;
+         if (o.FrameCount < o.MaxFrame)
+             
+             switch o.noisetype
+                 
+                 case 1 % "Hartley" noise
+                     
+                     o.hNoise.afterFrame(); % update parameters
+                     o.hNoise.beforeFrame(); % draw
+                     
+                     %**********
+                     o.FrameCount = o.FrameCount + 1;
+                     % NOTE: store screen time in "continue_run_trial" after flip
+                     o.NoiseHistory(o.FrameCount,2) = o.hNoise.orientation;  % store orientation
+                     o.NoiseHistory(o.FrameCount,3) = o.hNoise.cpd;  % store spatialfrequency
+                     
+                     
+                 case 2 % spatial reverse correlation
+                     %******** select random locations in noise circle and draw
+                     nlist = zeros(1,2*o.noiseNum);
+                     for kk = 1:o.noiseNum
+                         sx = (rand - 0.5) * 2 * o.P.snoisewidth;
+                         sy = (rand - 0.5) * 2 * o.P.snoiseheight;
+                         nlist(1,1+(kk-1)*2) = sx;
+                         nlist(1,2+(kk-1)*2) = sy;
+                         %*********
+                         % o.hNoise{kk}.position = [(o.S.centerPix(1) + round(sx*o.S.pixPerDeg)),...
+                         %                         (o.S.centerPix(2) - round(sy*o.S.pixPerDeg))];
+                         % o.hNoise{kk}.beforeFrame();
+                         %***********
+                         if mod((kk-1),2)
+                             col = 127 - o.P.range;
+                         else
+                             col = 127 + o.P.range;
+                         end
+                         position = [(o.S.centerPix(1) + round(sx*o.S.pixPerDeg)),...
+                             (o.S.centerPix(2) - round(sy*o.S.pixPerDeg))];
+                         r = round((o.P.snoisediam/2)*o.S.pixPerDeg);
+                         rect = kron([1,1],position) + kron(r(:),[-1, -1, +1, +1]);
+                         Screen('FillOval',o.winPtr,[col,col,col],rect');
+                         %**************
                      end
-                     position = [(o.S.centerPix(1) + round(sx*o.S.pixPerDeg)),...
-                                 (o.S.centerPix(2) - round(sy*o.S.pixPerDeg))];
-                     r = round((o.P.snoisediam/2)*o.S.pixPerDeg);
-                     rect = kron([1,1],position) + kron(r(:),[-1, -1, +1, +1]);
-                     Screen('FillOval',o.winPtr,[col,col,col],rect');
-                     %**************
-                 end
-                 %*********
-                 o.FrameCount = o.FrameCount + 1;
-                 o.NoiseHistory(o.FrameCount,:) = [NaN nlist];  % first element time, others x,y positions
-                 %********** 
-            end
-            %**************
-            if (o.noisetype == 3) 
-                kk = 0;
-                step = mod(o.FrameCount,(o.P.noisedur + o.P.noiseoff));
-                if (step >= o.P.noiseoff)
-                   kk = 1;
-                   if ~isnan(xx) && ~isnan(yy)
-                      o.hNoise{kk}.position = [(o.S.centerPix(1) + round(xx*o.S.pixPerDeg)),(o.S.centerPix(2) - round(yy*o.S.pixPerDeg))];
-                   else
-                      o.hNoise{kk}.position = o.S.centerPix; 
-                   end    
-                   o.hNoise{kk}.beforeFrame();
-                end
-                %**********
-                o.FrameCount = o.FrameCount + 1;
-                % NOTE: store screen time in "continue_run_trial" after flip
-                o.NoiseHistory(o.FrameCount,2) = kk;  % store orientation number
-                %**********
-            end
+                     %*********
+                     o.FrameCount = o.FrameCount + 1;
+                     o.NoiseHistory(o.FrameCount,:) = [NaN nlist];  % first element time, others x,y positions
+                     %**********
+                     
+                 case 3 % CSD
+                     kk = 0;
+                     step = mod(o.FrameCount,(o.P.noisedur + o.P.noiseoff));
+                     if (step >= o.P.noiseoff)
+                         kk = 1;
+                         Screen('FillRect', o.winPtr, 127 + o.P.noiserange);
+                     else
+                         Screen('FillRect', o.winPtr, 127);
+                     end
+                     %**********
+                     o.FrameCount = o.FrameCount + 1;
+                     % NOTE: store screen time in "continue_run_trial" after flip
+                     o.NoiseHistory(o.FrameCount,2) = kk;  % store orientation number
+                     %**********
+                 
+                 case 4 % "Garborium" noise
+                     
+                     o.hNoise.afterFrame(); % update parameters
+                     o.hNoise.beforeFrame(); % draw
+                     
+                     %**********
+                     o.FrameCount = o.FrameCount + 1;
+                     % NOTE: store screen time in "continue_run_trial" after flip
+                     o.NoiseHistory(o.FrameCount,2) = o.hNoise.x(1);  % xposition of first gabor
+                     o.NoiseHistory(o.FrameCount,3) = o.hNoise.mypars(2);  
+                     
+                 case 5 % dot spatial noise
+                     o.hNoise.afterFrame(); % update parameters
+                     o.hNoise.beforeFrame(); % draw
+                     
+                     %**********
+                     o.FrameCount = o.FrameCount + 1;
+                     % NOTE: store screen time in "continue_run_trial" after flip
+                     o.NoiseHistory(o.FrameCount,2:end) = [o.hNoise.x(1:o.noiseNum) o.hNoise.y(1:o.noiseNum)];  % xposition of first gabor
+             end
             %****************
          end
     end    
@@ -505,9 +530,9 @@ classdef PR_Forage2 < handle
                    o.ProbeHistory(o.PFrameCount,3) = o.targOri;
                 else
                    if (o.state == 3)
-                      o.ProbeHistory(o.PFrameCount,1) = NaN;  % not being shown
+                      o.ProbeHistory(o.PFrameCount,1) = NaN;
                       o.ProbeHistory(o.PFrameCount,2) = NaN;
-                      o.ProbeHistory(o.PFrameCount,3) = -1;   %indicates face
+                      o.ProbeHistory(o.PFrameCount,3) = -o.Faces.imagenum;   %indicates face
                    else
                       o.ProbeHistory(o.PFrameCount,1) = NaN;  % not being shown
                       o.ProbeHistory(o.PFrameCount,2) = NaN;
@@ -539,7 +564,9 @@ classdef PR_Forage2 < handle
    
     %******************** THIS IS THE BIG FUNCTION *************
     function drop = state_and_screen_update(o,currentTime,x,y) 
-        drop = 0;
+        
+        drop = 0; % initialize
+        
         %******* THIS PART CHANGES WITH EACH PROTOCOL ****************
         if (o.state == 0)
             o.state = 1;  % jump in and plot eye traces
@@ -547,13 +574,16 @@ classdef PR_Forage2 < handle
         if currentTime > o.startTime + o.TrialDur
             o.state = 4;  % time to end trial
             o.itiStart = GetSecs;
+            return
         end
         %***********************
         
         % ALWAYS UPDATE BACKGROUND
         o.updateNoise(NaN,NaN,currentTime);
+        
         % ALWAYS UPDATE THE PROBES
-        [drop,faceitem] = o.updateProbes(x,y,currentTime);
+        [drop,faceitem] = o.updateProbes(x,y,currentTime); %#ok<ASGLU>
+        
         %****** update state by reward events
         if (drop)
             o.rewardTime = currentTime;
@@ -593,7 +623,7 @@ classdef PR_Forage2 < handle
         end
         %****************************************   
         
-        Screen('DrawingFinished', o.winPtr, 2)
+%         Screen('DrawingFinished', o.winPtr);
     end
     
     function Iti = end_run_trial(o)
@@ -627,6 +657,10 @@ classdef PR_Forage2 < handle
         %**** already on each trial in data .... copy parts that are not
         %**** reflected in P at all and generated random per trial
         PR = struct;
+        if isa(o.hNoise, 'stimuli.stimulus')
+            PR.hNoise = copy(o.hNoise); % store noise object
+        end
+        
         PR.error = o.error;
         if o.FrameCount == 0
             PR.NoiseHistory = [];
@@ -654,5 +688,57 @@ classdef PR_Forage2 < handle
     end
     
   end % methods
+  
+  methods (Static)
+      
+      function [Probe, Faces] = regenerateProbes(P,S)
+          %******* init reward face for correct trials
+
+          Faces = stimuli.gaussimages(0,'bkgd',S.bgColour,'gray',false);   % color images
+          Faces.loadimages('MarmosetFaceLibrary.mat');
+          Faces.position = [0,0]*S.pixPerDeg + S.centerPix;
+          Faces.radius = round(P.faceradius*S.pixPerDeg);
+          Faces.imagenum = 1;  % start first face
+          Faces.transparency = -1;  % blend into background
+          
+          %***** create a Gabor target grating
+          oriNum = P.orinum;
+          Probe = cell(1,oriNum);
+          for kk = 1:oriNum
+              %*******
+              Probe{kk} = stimuli.grating(0);  % grating probe
+              Probe{kk}.transparent = -P.probecon;  % blend in proportion to gauss
+              Probe{kk}.gauss = true;
+              Probe{kk}.pixperdeg = S.pixPerDeg;
+              Probe{kk}.radius = round(P.proberadius*S.pixPerDeg);
+              
+              Probe{kk}.range = P.proberange;
+              Probe{kk}.square = false;
+              Probe{kk}.bkgd = P.bkgd;
+              %**************
+              Probe{kk}.position = [S.centerPix(1),S.centerPix(2)];
+              Probe{kk}.phase = P.phase;
+              Probe{kk}.cpd = P.cpd;
+              if (kk < oriNum)
+                  if (kk == 1)
+                      Probe{kk}.orientation = P.prefori;
+                  else
+                      Probe{kk}.orientation = P.nonprefori;
+                      Probe{kk}.cpd = P.noncpd;
+                  end
+                  
+              else
+                  Probe{kk}.orientation = 0;
+                  Probe{kk}.cpd = 0;
+                  Probe{kk}.phase = 0;
+              end
+              %**************
+              Probe{kk}.updateTextures();
+              %****************
+          end
+          
+          
+      end
+  end
     
 end % classdef

@@ -1,22 +1,22 @@
-classdef PR_Forage < handle
+classdef PR_Forage2 < handle
   % Matlab class for running an experimental protocl
   %
   % The class constructor can be called with a range of arguments:
   %
  
-  properties (Access = public) 
-       Iti double = 1;             % default Iti duration
-       startTime double = 0;       % trial start time
-       itiStart double = 0;        % start of iti interval
-       rewardCount double = 0;     % counter for reward drops
-       rewardGap double = 0;       % gap for next target onset
-       rewardTime double = 0;      % store time of last reward
+  properties (Access = public), 
+       Iti@double = 1;             % default Iti duration
+       startTime@double = 0;       % trial start time
+       itiStart@double = 0;        % start of iti interval
+       rewardCount@double = 0;     % counter for reward drops
+       rewardGap@double = 0;       % gap for next target onset
+       rewardTime@double = 0;      % store time of last reward
   end
       
   properties (Access = private)
     winPtr; % ptb window
-    state double = 0;      % state counter
-    error double = 0;      % error state in trial
+    state@double = 0;      % state counter
+    error@double = 0;      % error state in trial
     %*********
     S;              % copy of Settings struct (loaded per trial start)
     P;              % copy of Params struct (loaded per trial)
@@ -28,7 +28,6 @@ classdef PR_Forage < handle
     probeNum = 1;      % number of foraging stimuli
     oriNum = 1;        % number of oriented textures to draw from for probe
     targOri = 1;       % current orientation of target probe
-    noiseStim = 0;     % which noise stim (if long term duration)
     hNoise = [];       % random flashing background grating
     noiseNum = 1;      % number of oriented textures
     spatoris = [];     % list of tested orientations
@@ -55,7 +54,7 @@ classdef PR_Forage < handle
   end
   
   methods (Access = public)
-    function o = PR_Forage(winPtr)
+    function o = PR_Forage2(winPtr)
       o.winPtr = winPtr;
       o.trialsList = [];  % should be set by generate call
     end
@@ -105,8 +104,14 @@ classdef PR_Forage < handle
            o.hProbe{kk}.phase = P.phase;
            o.hProbe{kk}.cpd = P.cpd;
            if (kk < o.oriNum)
-              o.hProbe{kk}.orientation = (kk-1)*180/(o.oriNum-1);
-              o.hProbe{kk}.orientation = o.hProbe{kk}.orientation + P.prefori;
+              if (kk == 1)
+                 o.hProbe{kk}.orientation = P.prefori;
+              else
+                 o.hProbe{kk}.orientation = P.nonprefori;
+                 o.hProbe{kk}.cpd = P.noncpd;
+              end
+              %o.hProbe{kk}.orientation = (kk-1)*180/(o.oriNum-1);
+              %o.hProbe{kk}.orientation = o.hProbe{kk}.orientation + P.prefori;
            else
               o.hProbe{kk}.orientation = 0; 
               o.hProbe{kk}.cpd = 0;
@@ -138,6 +143,9 @@ classdef PR_Forage < handle
            end
            %************
            o.spatoris = (0:(P.noiseorinum-1))*180/P.noiseorinum; 
+           if (isfield(P,'orioffset'))
+              o.spatoris = o.spatoris + P.orioffset;
+           end
            o.noiseNum = P.noiseorinum * P.spfnum;
            o.hNoise = cell(1,o.noiseNum);
            for k = 1:o.noiseNum
@@ -221,76 +229,6 @@ classdef PR_Forage < handle
        end
        %**********************************************************
        
-       %********* CSD will be similar to hartley, but all white (SF=0)
-       %******* and a different on duration of stimulus 
-       %**********
-       if (o.noisetype == 4) % use Hartley background
-           %*************
-           o.NoiseHistory = zeros(o.MaxFrame,2);
-           o.noiseNum = P.noisenum * P.numSpeed;
-           o.hNoise = cell(1,o.noiseNum);
-           if (P.numSpeed > 1)
-               sn = P.numSpeed;
-               smax = P.dotSpeedMax;
-               smin = P.dotSpeedMin;
-               speeds = exp( log(smin):((log(smax)-log(smin))/(sn-1)):log(smax) );
-           else
-               speeds = P.dotSpeed;
-           end
-           for k = 1:o.noiseNum
-               ori_k = mod((k-1),P.noisenum);
-               spd_k = 1 + floor((k-1)/P.noisenum);
-               %*******
-               o.hNoise{k} = stimuli.dots(o.winPtr);
-               o.hNoise{k}.mode=1; % dot distribution
-               o.hNoise{k}.dist=0; % dot distrib
-               o.hNoise{k}.numDots = P.dotNum; % number of dots in dot field 
-               o.hNoise{k}.position = S.centerPix; % where to plot dot field 
-               ango = (ori_k-1) * 360 / P.noisenum;
-               o.hNoise{k}.direction = ango;  % into degrees/ direction of motion 
-               o.hNoise{k}.bandwdth = 1; 
-               o.hNoise{k}.lifetime = P.dotLifeTime; %how long the dots last
-               %************
-               o.hNoise{k}.maxRadius = inf;  % same pixel size as aperture (radius of the dot field)
-               o.hNoise{k}.Xtop = (P.noisewidth * S.pixPerDeg);
-               o.hNoise{k}.Xbot = -(P.noisewidth * S.pixPerDeg);
-               o.hNoise{k}.Ytop = (P.noiseheight * S.pixPerDeg);
-               o.hNoise{k}.Ybot = -(P.noiseheight * S.pixPerDeg);
-               %************
-               o.hNoise{k}.speed = (speeds(spd_k)*S.pixPerDeg)/S.frameRate;   %(speed of dots)
-               o.hNoise{k}.beforeTrial;
-               o.hNoise{k}.colour =(P.bkgd-P.range) * ones(1,3);
-               o.hNoise{k}.size = round(P.dotSize*S.pixPerDeg);   % size of the dots
-               o.hNoise{k}.theta=0;
-               o.hNoise{k}.gaussian = false;
-           end 
-           %****************
-       end
-       %******** Spatial noise background
-       if (o.noisetype == 5) % use Spatial background
-           o.noiseNum = P.snoisenum;
-           o.NoiseHistory = zeros(o.MaxFrame,(1+(o.noiseNum * 4)));  % store time, then x,y,dir,life positions
-           o.hNoise = zeros(5,o.noiseNum);
-           %****** initialize dots and lifetimes
-           for kk = 1:o.noiseNum
-               %*******
-               sx = (rand - 0.5) * 2 * P.snoisewidth;
-               sy = (rand - 0.5) * 2 * P.snoiseheight;
-               o.hNoise(1,kk) = sx;
-               o.hNoise(2,kk) = sy;
-               dir = randi(P.snoisedirs);
-               o.hNoise(5,kk) = dir;
-               ang = (dir-1)*((2*pi)/P.snoisedirs);
-               o.hNoise(3,kk) = (P.snoisespeed / S.frameRate) * cos(ang);
-               o.hNoise(4,kk) = (P.snoisespeed / S.frameRate) * sin(ang);
-               life = mod(kk, P.snoiselife);
-               o.hNoise(6,kk) = life;
-               %***********
-           end      
-           %************
-       end
-       %**********************************************************
-       
     end
    
     function closeFunc(o),
@@ -298,12 +236,10 @@ classdef PR_Forage < handle
         for kk = 1:o.probeNum
            o.hProbe{kk}.CloseUp();
         end
-        if (iscell(o.hNoise))
-          for kk = 1:o.noiseNum
+        for kk = 1:o.noiseNum
             if ~isempty(o.hNoise{kk})
                o.hNoise{kk}.CloseUp();
             end
-          end
         end
     end
    
@@ -363,7 +299,6 @@ classdef PR_Forage < handle
           o.FixCount = 0;
           o.FixMax = floor( o.TrialDur * 3 );
           o.FixHit = nan(2,o.FixMax);
-          o.noiseStim = 0;  % start 0 by default
           %***********
           o.rewardTime = 0;
           o.rewardGap = 0;
@@ -439,6 +374,10 @@ classdef PR_Forage < handle
                      sy = (rand - 0.5) * 2 * o.P.snoiseheight;
                      nlist(1,1+(kk-1)*2) = sx;
                      nlist(1,2+(kk-1)*2) = sy;
+                     %*********
+                     % o.hNoise{kk}.position = [(o.S.centerPix(1) + round(sx*o.S.pixPerDeg)),...
+                     %                         (o.S.centerPix(2) - round(sy*o.S.pixPerDeg))];
+                     % o.hNoise{kk}.beforeFrame();
                      %***********
                      if mod((kk-1),2)
                          col = 127 - o.P.range;
@@ -477,76 +416,6 @@ classdef PR_Forage < handle
                 %**********
             end
             %****************
-            %*************** 
-            if (o.noisetype == 4) 
-                kk = 0;
-                cycle = mod( o.FrameCount, o.P.totCycle );
-                if (cycle == 1)  % set new target
-                    kk = randi(o.noiseNum);  %positive value onset
-                    o.noiseStim = kk;
-                end
-                if (cycle <= o.P.stimCycle)
-                   if (o.noiseStim > 0) 
-                       o.hNoise{o.noiseStim}.beforeFrame();
-                   end
-                else
-                   if (o.noiseStim > 0)
-                       kk = -o.noiseStim;  % negative value for offset
-                       o.noiseStim = 0;  % defines if off
-                   end
-                end
-                %**********
-                o.FrameCount = o.FrameCount + 1;
-                % NOTE: store screen time in "continue_run_trial" after flip
-                o.NoiseHistory(o.FrameCount,2) = kk;  % store orientation number
-                %**********
-            end
-            %***************
-            if (o.noisetype == 5)  
-                %***** update positions for motion
-                nlist = zeros(1,(o.noiseNum * 4)); 
-                for kk = 1:o.noiseNum
-                   o.hNoise(6,kk) = o.hNoise(6,kk) + 1;
-                   if (o.hNoise(6,kk) > o.P.snoiselife)
-                       o.hNoise(6,kk) = 1;  % start new
-                       sx = (rand - 0.5) * 2 * o.P.snoisewidth;
-                       sy = (rand - 0.5) * 2 * o.P.snoiseheight;
-                       o.hNoise(1,kk) = sx;
-                       o.hNoise(2,kk) = sy;
-                       dir = randi(o.P.snoisedirs);
-                       o.hNoise(5,kk) = dir;
-                       ang = (dir-1)*((2*pi)/o.P.snoisedirs);
-                       o.hNoise(3,kk) = (o.P.snoisespeed / o.S.frameRate) * cos(ang);
-                       o.hNoise(4,kk) = (o.P.snoisespeed / o.S.frameRate) * sin(ang);
-                   else
-                       o.hNoise(1,kk) = o.hNoise(1,kk) + o.hNoise(3,kk);
-                       o.hNoise(2,kk) = o.hNoise(2,kk) + o.hNoise(4,kk);
-                   end
-                   %******* build info to store stim info
-                   ikk = (kk-1)*4;
-                   nlist(1,1+ikk) = o.hNoise(1,kk);
-                   nlist(1,2+ikk) = o.hNoise(2,kk);
-                   nlist(1,3+ikk) = o.hNoise(5,kk);
-                   nlist(1,4+ikk) = o.hNoise(6,kk);
-                   %********************
-                end
-                %****** plot dots
-                for kk = 1:o.noiseNum
-                     sx = o.hNoise(1,kk);
-                     sy = o.hNoise(2,kk);
-                     col = 127 + o.P.range;
-                     position = [(o.S.centerPix(1) + round(sx*o.S.pixPerDeg)),...
-                                 (o.S.centerPix(2) - round(sy*o.S.pixPerDeg))];
-                     r = round((o.P.snoisediam/2)*o.S.pixPerDeg);
-                     rect = kron([1,1],position) + kron(r(:),[-1, -1, +1, +1]);
-                     Screen('FillOval',o.winPtr,[col,col,col],rect');
-                     %**************
-                end
-                %*********
-                o.FrameCount = o.FrameCount + 1;
-                o.NoiseHistory(o.FrameCount,:) = [NaN nlist];  % first element time, others x,y positions
-                %********** 
-            end
          end
     end    
     
@@ -664,12 +533,6 @@ classdef PR_Forage < handle
         end
         if (o.PFrameCount)
            o.ProbeHistory(o.PFrameCount,4) = screenTime;     
-        end
-        %**** if a stimulus needs post-frame updating
-        if (o.noisetype == 4)
-            if (o.noiseStim > 0)
-              o.hNoise{o.noiseStim}.afterFrame;
-            end
         end
         %******************************************************
     end

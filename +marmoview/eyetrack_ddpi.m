@@ -25,11 +25,11 @@ classdef eyetrack_ddpi < handle
             % initialise input parser
             p = inputParser;
             p.addParameter('EyeDump',true,@islogical); % default 1, do EyeDump
-            p.addParameter('width', 1440)%640)
-            p.addParameter('height', 1080)%480)
+            p.addParameter('width', 720)%640)
+            p.addParameter('height', 540)%480)
             p.addParameter('downsamplingRate', 1)
-            p.addParameter('frameRateD', 2500000)%601)
-            p.addParameter('frameRateN', 10593)%1)
+            p.addParameter('frameRateD', 539)%601)
+            p.addParameter('frameRateN', 1)%1)
             p.parse(varargin{:});
             
             args = p.Results;
@@ -47,14 +47,14 @@ classdef eyetrack_ddpi < handle
             ddpiM('enableDisplay', true);
             ddpiM('enableTrack', true);
             ddpiM('setP1Threshold', 250);
-            ddpiM('setP1BoundingBoxSize', 128);
+            ddpiM('setP1BoundingBoxSize', 64);
             ddpiM('setP4BoundingBoxSize', 32);
             ddpiM('setP4Template', [o.p4intensity, o.p4radius]);
+            ddpiM('setROI', [20, 20, 640, 450]); % exclude regions
+%             ddpiM('setP1roi', [20, 20, 600, 450]); % exclude regions
             
-            
-            ddpiM('start');
             o.timeLastSample = GetSecs();
-            
+            ddpiM('start');
 
 
         end
@@ -101,7 +101,7 @@ classdef eyetrack_ddpi < handle
 %             [o.p1, o.p4] = o.capture;
             % only take the last sample TODO: need to store x,y,time
             % somehow
-            x = ret(2).x - ret(1).x; %o.p4.x(end) - o.p1.x(end);
+            x = (ret(2).x - ret(1).x); %o.p4.x(end) - o.p1.x(end);
             y = -(ret(2).y - ret(1).y);  % -(o.p4.y(end)-o.p1.y(end)); % NEED TO INVERT SO ++ IS UP
 %             tnow = GetSecs();
 % %             o.time = linspace(o.timeLastSample, tnow, numel(x));

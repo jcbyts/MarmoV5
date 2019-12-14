@@ -2,17 +2,17 @@
 % 8/23/2018 - Jude Mitchell
 
 classdef eyetrack < handle
-    %******* basically is just a wrapper for a dummy eyetracker
-    %
-    
-    properties (SetAccess = private, GetAccess = public)
-        
-    end % properties
-    
-    % dependent properties, calculated on the fly...
-    properties (SetAccess = public, GetAccess = public)
-        EyeDump logical
-    end
+  %******* basically is just a wrapper for a dummy eyetracker
+  % 
+  
+  properties (SetAccess = private, GetAccess = public)
+     
+  end % properties
+
+  % dependent properties, calculated on the fly...
+  properties (SetAccess = public, GetAccess = public)
+    EyeDump@logical;
+  end
     
     methods
         function o = eyetrack_arrington(~,varargin) % h is the handle for the marmoview gui
