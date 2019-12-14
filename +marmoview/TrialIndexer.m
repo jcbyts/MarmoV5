@@ -12,9 +12,9 @@ classdef TrialIndexer < handle
    
   % dependent properties, calculated on the fly...
   properties (SetAccess = public, GetAccess = public)
-    corstates@double;             % correct states to continue trial  
-    repstates@double;             % error states for which to repeat trial
-    RepeatUntilCorrect@double;    % if one, repeat till all trials correct
+    corstates double             % correct states to continue trial  
+    repstates double             % error states for which to repeat trial
+    RepeatUntilCorrect double    % if one, repeat till all trials correct
   end
   
   methods
