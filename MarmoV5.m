@@ -29,10 +29,6 @@ function varargout = MarmoV5(varargin)
 % Last Modified by GUIDE v2.5 23-Sep-2019 17:01:59
 
 % Begin initialization code - DO NOT EDIT
-% Added the next two lines to allow the automatic start up.-GB
-%addpath(genpath('C:/toolbox'));
-%addpath(genpath('C:/Users/riguser/marmov5/Current Version/'));
-% MUST be changed if the location of marmov5 changes. -GB
 gui_Singleton = 1;
 gui_State = struct('gui_Name',       mfilename, ...
                    'gui_Singleton',  gui_Singleton, ...
