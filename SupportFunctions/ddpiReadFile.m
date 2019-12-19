@@ -1,14 +1,5 @@
 function Output = ddpiReadFile(fname)
 % Output = ddpiReadFile(fname)
-fid = fopen(fname);
-fseek(fid, 0, 'eof');
-filesize = ftell(fid);
-fseek(fid, 0, 'bof');
-
-
-buffersize = [13 filesize/8/13];
-Output = fread(fid, buffersize, '*double');
-
 % 1) signalType;
 % 2) time;
 % 3) p1x;
@@ -22,3 +13,12 @@ Output = fread(fid, buffersize, '*double');
 % 11) p4score;
 % 12) tag;
 % 13) message;
+fid = fopen(fname);
+fseek(fid, 0, 'eof');
+filesize = ftell(fid);
+fseek(fid, 0, 'bof');
+
+
+buffersize = [13 filesize/8/13];
+Output = fread(fid, buffersize, '*double');
+

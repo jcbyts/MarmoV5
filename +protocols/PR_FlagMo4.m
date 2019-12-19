@@ -1,34 +1,35 @@
-classdef PR_FlagMo2 < handle
+classdef PR_FlagMo4 < handle
   % Matlab class for running an experimental protocl
   %
   % The class constructor can be called with a range of arguments:
   %
  
-  properties (Access = public)
-       Iti double = 1;            % default Iti duration
-       startTime double = 0;      % trial start time
-       fixStart double = 0;       % fix acquired time
-       itiStart double = 0;       % start of ITI interval
-       fixDur double = 0;         % fixation duration
-       stimStart double = 0;      % stimulus onset 
-       stimOnset double = 0;      % jitter timing of target onset
-       stimTime double = 0;       % mark when stim did onset (state move)
-       stimOffset double = 0;     % mark frame time of stim offset
-       responseStart double = 0;  % response period start time
-       responseEnd double = 0;    % time entering response period
-       dotflip double = 0;        % integer to know dots turn off
-       DropStim double = 0;       % if 1, trial where dots disappear on saccade
-       rewardCount double = 0;    % counter for reward drops
-       RunFixBreakSound double = 0;       % variable to initiate fix break sound (only once)
-       NeverBreakSoundTwice double = 0;   % other variable for fix break sound
-       flashCounter double = 0;   % for flashing fix at start of trial
-       showFix logical = true;    % for flashing fix point to start trial
+  properties (Access = public), 
+       Iti@double = 1;            % default Iti duration
+       startTime@double = 0;      % trial start time
+       fixStart@double = 0;       % fix acquired time
+       itiStart@double = 0;       % start of ITI interval
+       fixDur@double = 0;         % fixation duration
+       stimStart@double = 0;      % stimulus onset 
+       stimOnset@double = 0;      % jitter timing of target onset
+       stimTime@double = 0;       % mark when stim did onset (state move)
+       cueTime@double = 0;
+       stimOffset@double = 0;     % mark frame time of stim offset
+       responseStart@double = 0;  % response period start time
+       responseEnd@double = 0;    % time entering response period
+       dotflip@double = 0;        % integer to know dots turn off
+       DropStim@double = 0;       % if 1, trial where dots disappear on saccade
+       rewardCount@double = 0;    % counter for reward drops
+       RunFixBreakSound@double = 0;       % variable to initiate fix break sound (only once)
+       NeverBreakSoundTwice@double = 0;   % other variable for fix break sound
+       flashCounter@double = 0;   % for flashing fix at start of trial
+       showFix@logical = true;    % for flashing fix point to start trial
   end
       
   properties (Access = private)
     winPtr; % ptb window
-    state double = 0;      % state counter
-    error double = 0;      % error state in trial
+    state@double = 0;      % state counter
+    error@double = 0;      % error state in trial
    %*********
     S;              % copy of Settings struct (loaded per trial start)
     P;              % copy of Params struct (loaded per trial)
@@ -41,12 +42,11 @@ classdef PR_FlagMo2 < handle
     hReward;           % use Gauss blobs as reward cues 
     targnum;           % number of graphics targets (1 is the rewarded target)
     hProbe = [];       % object for Dot Motion stimuli
+    hBack = [];        % background motion (full field noise)
     target_item;       % 1 is when reward is in RF, otherwise other locs
-    target_null;       % 0 if none, but otherwise the target number (no reward)
     last_item;         % record last chosen location, or NaN if none
     gotTarget;         % within same trial, target choosen
     chooseTarget;      % target identity chosen by saccade
-    chooseTargetFirst; % target confirmation at least target confirm time
     targ_x;            % target x locations
     targ_y;            % target y locations
     targ_motion;       % target directions (start of trial)
@@ -56,12 +56,13 @@ classdef PR_FlagMo2 < handle
     targori;           % orientation of target per trial
     changori;          % orientation of change target per trial
     deltaOri;          % change in ori across saccade
+    catchtrial;        % if a catch trial, show simple stim discrim
     %****************
     D = struct;        % store PR data for end plot stats, will store dotmotion array
   end
   
   methods (Access = public)
-    function o = PR_FlagMo2(winPtr)
+    function o = PR_FlagMo4(winPtr)
       o.winPtr = winPtr;
       o.trialsList = [];  % should be set by generate call
     end
@@ -82,6 +83,7 @@ classdef PR_FlagMo2 < handle
        end
        o.error = 0;
        o.last_item = NaN;
+       o.catchtrial = 0;
        
        %******* init reward face for correct trials
        o.Faces = stimuli.gaussimages(o.winPtr,'bkgd',S.bgColour,'gray',false);   % color images
@@ -146,6 +148,33 @@ classdef PR_FlagMo2 < handle
            end
        end
        
+       %******* setup a full field dot noise stimulus, if include
+       if (P.motionback > 0)
+           o.hBack = stimuli.dots(o.winPtr);
+           o.hBack.mode=1; % dot distribution
+           o.hBack.dist=0; % dot distrib
+           o.hBack.numDots = P.dotNumBack; % number of dots in dot field 
+           o.hBack.position = S.centerPix; % where to plot dot field 
+           o.hBack.direction = 0;  % into degrees/ direction of motion 
+           o.hBack.bandwdth = 360;  % totally random motion 
+           o.hBack.lifetime = 6; %how long the dots last
+           %************
+           o.hBack.maxRadius = inf;  % same pixel size as aperture (radius of the dot field)
+           o.hBack.Xtop = (P.noisewidth * S.pixPerDeg);
+           o.hBack.Xbot = -(P.noisewidth * S.pixPerDeg);
+           o.hBack.Ytop = (P.noiseheight * S.pixPerDeg);
+           o.hBack.Ybot = -(P.noiseheight * S.pixPerDeg);
+           %************
+           o.hBack.speed = (P.dotSpeedBack * S.pixPerDeg)/S.frameRate;   %(speed of dots)
+           o.hBack.beforeTrial;
+           o.hBack.colour=repmat((P.bkgd - P.rangeBack),1,3); 
+           o.hBack.size= round(P.dotSize*S.pixPerDeg);   % size of the dots
+           o.hBack.theta=0;
+           o.hBack.gaussian = false;
+       else
+           o.hBack = [];
+       end
+       
        %********** load in a fixation error sound ************
        [y,fs] = audioread(['SupportData',filesep,'gunshot_sound.wav']);
        y = y(1:floor(size(y,1)/3),:);  % shorten it, very long sound
@@ -163,6 +192,9 @@ classdef PR_FlagMo2 < handle
         end
         for kk = 1:2
            o.hReward{kk}.CloseUp(); 
+        end
+        if ~isempty(o.hBack)
+            o.hBack.CloseUp();
         end
     end
    
@@ -197,36 +229,34 @@ classdef PR_FlagMo2 < handle
                      %******************
                      o.P = P;  % set to most current
             end
-            %**********
-            o.deltaOri = (P.postori - P.ori);  % change in dir
-            if (o.deltaOri < -180)
-                o.deltaOri = o.deltaOri + 360;
-            end
-            if (o.deltaOri > 180)
-                o.deltaOri = o.deltaOri - 360;
-            end
-            %******** force it to be 90 deg change
-            if (o.deltaOri ~= 0)
-                if (o.deltaOri < 0)
-                    o.deltaOri = -90;
-                else
-                    o.deltaOri = 90;
+            o.deltaOri = 0;
+            if ~isnan(P.postori)
+                o.deltaOri = (P.postori - P.ori);  % change in dir
+                % o.deltaOri = 0; % no change or blank for now
+                if (o.deltaOri < -180)
+                    o.deltaOri = o.deltaOri + 360;
                 end
+                if (o.deltaOri > 180)
+                    o.deltaOri = o.deltaOri - 360;
+                end
+                %******** force it to be 90 deg change
+                if (o.deltaOri ~= 0)
+                   if (o.deltaOri < 0)
+                    o.deltaOri = -90;
+                   else
+                    o.deltaOri = 90;
+                   end
+                end
+                %***************
             end
-            %***************
-                
-%             o.deltaOri = 0;
-%             if ~isnan(P.postori)
-%                 o.deltaOri = (P.postori - P.ori);  % change in dir
-%                 if (o.deltaOri < -180)
-%                     o.deltaOri = o.deltaOri + 360;
-%                 end
-%                 if (o.deltaOri > 180)
-%                     o.deltaOri = o.deltaOri - 360;
-%                 end
-%             end
+            %******* decide if this is a catch trial then
+            if (rand < o.P.catchprob )
+                o.catchtrial = 1;  % note, if o.catch = 1 then no trial memory
+            else
+                o.catchtrial = 0;
+            end
             
-            %******** make sure the new target is not the last one
+            %****** based on selected xDeg, yDeg, determine targ item
             bestdist = Inf;
             for zk = 1:o.targnum
                 %***** rotate appropriate for target
@@ -244,44 +274,37 @@ classdef PR_FlagMo2 < handle
                     bestdist = dist;
                 end
             end            
-            if (o.target_item == o.last_item)  % problem, cueing last choosen
-               % ignore the trial list then, and pick another location
-               % and pick such that last item is not selected, other equal
-               % chance
-               it = randi((o.targnum-1));
-               if (it >= o.last_item)
+ 
+            %******** make sure the new target is not the last one
+            if (o.catchtrial == 0)
+              if (o.target_item == o.last_item)  % problem, cueing last choosen
+                % ignore the trial list then, and pick another location
+                % and pick such that last item is not selected, other equal
+                % chance
+                it = randi((o.targnum-1));
+                if (it >= o.last_item)
                    it = it + 1;
-               end
-               %***** recover the location and reset the target
-               xps = P.RF_X; % P.xDeg;
-               yps = P.RF_Y; % P.yDeg;
-               ango = 2*pi*(it-1)/o.targnum;  % shift the position
-               o.P.xDeg = (cos(ango) * xps) + (sin(ango) * yps);
-               o.P.yDeg = (-sin(ango) * xps) + (cos(ango) * yps);
-               P.xDeg = o.P.xDeg;
-               P.yDeg = o.P.yDeg;
-               o.target_item = it;
+                end
+                %***** recover the location and reset the target
+                xps = P.RF_X; % P.xDeg;
+                yps = P.RF_Y; % P.yDeg;
+                ango = 2*pi*(it-1)/o.targnum;  % shift the position
+                o.P.xDeg = (cos(ango) * xps) + (sin(ango) * yps);
+                o.P.yDeg = (-sin(ango) * xps) + (cos(ango) * yps);
+                P.xDeg = o.P.xDeg;
+                P.yDeg = o.P.yDeg;
+                o.target_item = it;
+              end
+              xpcatch = NaN;
+              ypcatch = NaN;
+            else
+                xps = P.xDeg;
+                yps = P.yDeg;
+                ango = pi/o.targnum;  % shift the position
+                xpcatch = (cos(ango) * xps) + (sin(ango) * yps);
+                ypcatch = (-sin(ango) * xps) + (cos(ango) * yps);
             end
-            %*************      
-            
-            %********************
-            o.target_null = 0;  % alternate target is null by default
-            if (rand < o.P.probNull)
-                 igo = randi(o.targnum);
-                 alto = NaN;
-                 while (isnan(alto))
-                     if (igo ~= o.target_item) && (igo ~= o.last_item)
-                        alto = igo 
-                     else
-                        igo = igo + 1;
-                        if (igo > o.targnum)
-                            igo = 1;
-                        end
-                     end
-                 end
-                 o.target_null = alto;
-            end
-            %*********************
+            %*************
             
             %******* set state for DropStim
             o.DropStim = 0;  % keep target same
@@ -295,15 +318,22 @@ classdef PR_FlagMo2 < handle
             o.Faces.imagenum = randi(length(o.Faces.tex));  % pick any at random
             % Set location of face reward
             if (P.fixation == 0)
-               o.Faces.position = [o.P.xDeg,-o.P.yDeg]*S.pixPerDeg + S.centerPix;
+                if (o.catchtrial == 1)  % rotate targ position
+                   o.Faces.position = [xpcatch,-ypcatch]*S.pixPerDeg + S.centerPix;              
+                else
+                   o.Faces.position = [o.P.xDeg,-o.P.yDeg]*S.pixPerDeg + S.centerPix;
+                end
             else
                o.Faces.position = S.centerPix;  % fixation trial, reward at center
             end
 
             %******* set cue point for target location
             o.hPoint.sigma1 = P.sigma1;
-            o.hPoint.UpdateTextures(o.P.xDeg,o.P.yDeg);
-            
+            if (o.catchtrial == 0)
+               o.hPoint.UpdateTextures(o.P.xDeg,o.P.yDeg);
+            else
+               o.hPoint.UpdateTextures(xpcatch,ypcatch);    
+            end
             % Make Gabor stimulus texture
             o.targori = P.ori;
             o.changori = P.postori;
@@ -319,13 +349,25 @@ classdef PR_FlagMo2 < handle
                 xps = P.RF_X; % P.xDeg;
                 yps = P.RF_Y; % P.yDeg;
                 ango = 2*pi*(zk-1)/o.targnum;  % shift the position
+                if (o.catchtrial == 1)
+                    ango = ango + (pi/o.targnum);  % if catch, shift in between position
+                end
                 xp = (cos(ango) * xps) + (sin(ango) * yps);
                 yp = (-sin(ango) * xps) + (cos(ango) * yps);
                 %***********************************
-                if (zk == 1)
-                    ori = P.ori;
+                if (o.catchtrial == 1)
+                    if (zk == o.target_item)
+                        ori = P.ori;
+                    else
+                        ori = NaN;
+                    end
                 else
+                  %******* otherwise select motion as before
+                  if (zk == 1)
+                    ori = P.ori;
+                  else
                     ori = ((randi(o.P.orinum)-1) * 360 / o.P.orinum);  % random  
+                  end
                 end
                 %****** store essential stimulus information
                 o.targ_x = [o.targ_x ; xp];
@@ -343,38 +385,60 @@ classdef PR_FlagMo2 < handle
                     o.hProbe{zk}.dist=0; % gaussian
                     o.hProbe{zk}.numDots=P.dotNum; % number of dots in dot field 
                     o.hProbe{zk}.position = [(S.centerPix(1) + round(xp*S.pixPerDeg)),(S.centerPix(2) - round(yp*S.pixPerDeg))];
-                    o.hProbe{zk}.direction = ori;  % into degrees/ direction of motion 
-                    o.hProbe{zk}.bandwdth=1; 
+                    if (isnan(ori))
+                      o.hProbe{zk}.direction = rand * 360;
+                      o.hProbe{zk}.bandwdth = 180;
+                      o.hProbe{zk}.colour=repmat((P.bkgd - P.range),1,3); 
+                    else
+                      o.hProbe{zk}.direction = ori;  % into degrees/ direction of motion 
+                      o.hProbe{zk}.bandwdth=1; 
+                      o.hProbe{zk}.colour=repmat((P.bkgd - P.range),1,3); 
+                    end
                     o.hProbe{zk}.lifetime=6; %how long the dots last
                     o.hProbe{zk}.maxRadius = (P.radius * S.pixPerDeg);  % same pixel size as aperture (radius of the dot field)
                     o.hProbe{zk}.speed= (P.dotSpeed*S.pixPerDeg)/S.frameRate;   %(speed of dots)
                     o.hProbe{zk}.beforeTrial;
-                    %******* gray out the stimulus if null target
-                    if (zk == o.target_null)
-                        o.hProbe{zk}.colour=repmat(P.bkgd,1,3);                         
-                    else
-                        o.hProbe{zk}.colour=repmat((P.bkgd - P.range),1,3); 
-                    end
-                    %*******
                     o.hProbe{zk}.size= round(P.dotSize*S.pixPerDeg);   % size of the dots
                     o.hProbe{zk}.theta=0;
-                    o.hProbe{zk}.gaussian = true;   
+                    o.hProbe{zk}.gaussian = true;      
                 else
                     o.hProbe{zk}.position = [(S.centerPix(1) + round(xp*S.pixPerDeg)),(S.centerPix(2) - round(yp*S.pixPerDeg))];
                     o.hProbe{zk}.radius = round(P.radius*S.pixPerDeg);
-                    o.hProbe{zk}.orientation = ori; % vertical for the right
+                    %******* here is the trick ... go from ori into stim
+                    %******* type:
+                      if ~isnan(ori)  
+                          stim = floor( ori / (360/P.orinum) ) + 1;
+                          if (stim <= P.baseori)
+                            sf = P.cpd;
+                            ori = (stim-1) * (180/P.baseori);
+                          else
+                            oro = round( P.oripref / (180/P.baseori));
+                            ori = oro * (180/P.baseori);
+                            mido = floor( (P.baseori + P.orinum)/2);
+                            if (stim <= mido )
+                                sf = P.cpd * (sqrt(3)^(stim-mido-1));
+                            else
+                                sf = P.cpd * (sqrt(3)^(stim-mido));
+                            end                    
+                          end
+                      end
+                    %*****
+                    if isnan(ori)
+                       o.hProbe{zk}.orientation = 0;
+                       o.hProbe{zk}.cpd = 0;
+                       o.hProbe{zk}.range = floor(P.range/2);
+                    else
+                       o.hProbe{zk}.orientation = ori; % vertical for the right
+                       o.hProbe{zk}.cpd = sf;
+                       o.hProbe{zk}.range = P.range;
+                    end
+                    %**********
                     o.hProbe{zk}.phase = P.phase;
-                    o.hProbe{zk}.cpd = P.cpd;
                     o.hProbe{zk}.cpd2 = P.cpd2;
-                    o.hProbe{zk}.range = P.range;
+                    
                     o.hProbe{zk}.square = logical(P.squareWave);
                     o.hProbe{zk}.bkgd = P.bkgd;
                     o.hProbe{zk}.transparent = -P.probecon;
-                    %******* gray out the stimulus if null target
-                    if (zk == o.target_null)
-                        o.hProbe{zk}.range = 0;
-                    end
-                    %*******                
                     o.hProbe{zk}.updateTextures();
                 end
             end
@@ -383,42 +447,43 @@ classdef PR_FlagMo2 < handle
                 %*********
                 xp = o.targ_x(zk);
                 yp = o.targ_y(zk);
+                ori = o.targ_motion(zk);
                 if (o.P.motionStimulus)
                     o.hProbe{o.targnum+zk}.mode=1; % gaussian
                     o.hProbe{o.targnum+zk}.dist=0; % gaussian
                     o.hProbe{o.targnum+zk}.numDots=P.dotNum; % number of dots in dot field 
                     o.hProbe{o.targnum+zk}.position = [(S.centerPix(1) + round(xp*S.pixPerDeg)),(S.centerPix(2) - round(yp*S.pixPerDeg))];
-                    if isnan(P.postori)
-                       o.hProbe{o.targnum+zk}.direction = 0; % not seen actually
+                    if (isnan(ori))
+                      o.hProbe{o.targnum+zk}.direction = o.hProbe{zk}.direction;
+                      o.hProbe{o.targnum+zk}.bandwdth = o.hProbe{zk}.bandwdth;
+                      o.hProbe{o.targnum+zk}.colour = o.hProbe{zk}.colour;
                     else
-                       o.hProbe{o.targnum+zk}.direction = o.hProbe{zk}.direction + o.deltaOri;  % into degrees/ direction of motion  
+                       if isnan(P.postori)
+                         o.hProbe{o.targnum+zk}.direction = 0; % not seen actually
+                       else
+                         o.hProbe{o.targnum+zk}.direction = o.hProbe{zk}.direction + o.deltaOri;  % into degrees/ direction of motion  
+                       end
+                       o.hProbe{o.targnum+zk}.bandwdth=1; 
+                       if isnan(P.postori)
+                          o.hProbe{o.targnum+zk}.colour = repmat(P.bkgd,1,3);       
+                       else
+                          o.hProbe{o.targnum+zk}.colour=repmat((P.bkgd - P.range),1,3); 
+                       end
                     end
-                    o.hProbe{o.targnum+zk}.bandwdth=1; 
                     o.hProbe{o.targnum+zk}.lifetime=6; %how long the dots last
                     o.hProbe{o.targnum+zk}.maxRadius = (P.radius * S.pixPerDeg);  % same pixel size as aperture (radius of the dot field)
-                    o.hProbe{o.targnum+zk}.speed= (P.dotSpeed*S.pixPerDeg)/S.frameRate;   %(speed of dots)
+                    o.hProbe{o.targnum+zk}.speed = o.hProbe{zk}.speed; % (speed of dots)
                     o.hProbe{o.targnum+zk}.beforeTrial;
-                    if isnan(P.postori)
-                        o.hProbe{o.targnum+zk}.colour = repmat(P.bkgd,1,3);       
-                    else
-                        %******* gray out the stimulus if null target
-                        if (zk == o.target_null)
-                           o.hProbe{o.targnum+zk}.colour=repmat(P.bkgd,1,3);                         
-                        else
-                           o.hProbe{o.targnum+zk}.colour=repmat((P.bkgd - P.range),1,3); 
-                        end
-                        %*******
-                    end
                     o.hProbe{o.targnum+zk}.size= round(P.dotSize*S.pixPerDeg);   % size of the dots
                     o.hProbe{o.targnum+zk}.theta=0;
                     o.hProbe{o.targnum+zk}.gaussian = true;      
                 else
-                    o.hProbe{o.targnum+zk}.position = [(S.centerPix(1) + round(P.xDeg*S.pixPerDeg)),(S.centerPix(2) - round(P.yDeg*S.pixPerDeg))];
+                    o.hProbe{o.targnum+zk}.position = [(S.centerPix(1) + round(xp*S.pixPerDeg)),(S.centerPix(2) - round(yp*S.pixPerDeg))];
                     o.hProbe{o.targnum+zk}.radius = round(P.radius*S.pixPerDeg);
                     o.hProbe{o.targnum+zk}.phase = P.phase;
-                    o.hProbe{o.targnum+zk}.cpd = P.cpd;
+                    o.hProbe{o.targnum+zk}.cpd = o.hProbe{zk}.cpd; % P.cpd;
                     o.hProbe{o.targnum+zk}.cpd2 = P.cpd2;
-                    o.hProbe{o.targnum+zk}.range = P.range;
+                    o.hProbe{o.targnum+zk}.range = o.hProbe{zk}.range;
                     o.hProbe{o.targnum+zk}.square = logical(P.squareWave);
                     o.hProbe{o.targnum+zk}.bkgd = P.bkgd;
                     o.hProbe{o.targnum+zk}.transparent = -P.probecon;
@@ -430,11 +495,6 @@ classdef PR_FlagMo2 < handle
                         o.hProbe{o.targnum+zk}.cpd2 = NaN;
                         o.hProbe{o.targnum+zk}.range = 0; % lowest con, hardly visible? 
                     end
-                     %******* gray out the stimulus if null target
-                    if (zk == o.target_null)
-                        o.hProbe{o.targnum+zk}.range = 0;
-                    end
-                    %*******     
                     o.hProbe{o.targnum+zk}.updateTextures();
                 end
             end
@@ -454,7 +514,6 @@ classdef PR_FlagMo2 < handle
             o.flashCounter = 0;
             o.gotTarget = 0;
             o.chooseTarget = 0;
-            o.chooseTargetFirst = 0;
             
             % WHAT TO DO HERE ... direct communication out to the eyetrack
             % for sending out commands .... need a way to do this ...   THIS SHOULD NOT BE NECESSARY, REBUILD ANALYSIS! 
@@ -484,6 +543,7 @@ classdef PR_FlagMo2 < handle
             % Error 3 -- Failure to initiate a saccade to leave fixation window
             % Error 4 -- Failure to saccade to the stimulus
             % Error 5 -- Failure to hold the stimulus once selected
+            % Error 6 -- Failure by saccade to blank region between stimuli
             o.error = 0;
             %********* Cued says if the spatial cue occured or he went early
             % showFix is a flag to check whether to show the fixation spot or not while
@@ -585,6 +645,7 @@ classdef PR_FlagMo2 < handle
 
          if o.state == 3 && currentTime > o.stimStart + o.stimOnset
             o.state = 4; % show stim, marmoset can go
+            o.cueTime = GetSecs;
             o.stimTime = GetSecs;
             if (o.P.fixation == 1)
                 o.state = 7;
@@ -609,88 +670,63 @@ classdef PR_FlagMo2 < handle
 
         %%%%% STATE 5 -- IN FLIGHT %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         % Give the saccade time to finish flight
-%         if o.state == 5 && currentTime > o.responseStart + o.P.flightDur
-%             %******* determine if a stimulus is select by saccade
-%             if (o.chooseTarget == 0)
-%                 bestdist = Inf;
-%                 for zk = 1:o.targnum
-%                     dist = norm([x-o.targ_x(zk),y-o.targ_y(zk)]);
-%                     if (dist < o.P.choiceRadius)
-%                        if (dist < bestdist) 
-%                          o.chooseTarget = zk;
-%                          bestdist = dist;
-%                        end
-%                     end
-%                 end
-%             end
-%             %******* no state transition till you choose a target 
-%             if (o.chooseTarget > 0)
-%                 if (o.chooseTarget ~= o.last_item)
-%                     o.state = 6; % Move to hold stimulus
-%                     o.responseEnd = GetSecs;
-%                    % Otherwise the response failed to select the stimulus
-%                 else
-%                     o.gotTarget = o.chooseTarget;  % mark where they went
-%                     o.state = 6; % Move to iti -- inter-trial interval
-%                     o.error = 4; % Error 4 is failure to select good stimulus.
-%                     o.responseEnd = GetSecs;
-%                 end
-%             end
-%             %*************
-%         end
-%       *******************
-
         if o.state == 5 && currentTime > o.responseStart + o.P.flightDur
             %******* determine if a stimulus is select by saccade
-            if (o.chooseTargetFirst == 0)
-                bestdist = Inf;
-                for zk = 1:o.targnum
-                    dist = norm([x-o.targ_x(zk),y-o.targ_y(zk)]);
-                    if (dist < o.P.choiceRadius)
-                       if (dist < bestdist) 
-                         o.chooseTargetFirst = zk;
-                         bestdist = dist;
-                       end
-                    end
-                end
-            end
-        end
-        if o.chooseTargetFirst > 0
-          if o.state == 5 && currentTime > o.responseStart + o.P.flightDur + o.P.flightConfirm
-            %***************************************
             if (o.chooseTarget == 0)
                 bestdist = Inf;
                 for zk = 1:o.targnum
-                    dist = norm([x-o.targ_x(zk),y-o.targ_y(zk)]);
+                    %*******
+                    tx = o.targ_x(zk);
+                    ty = o.targ_y(zk);
+                    dist = norm([x-tx,y-ty]);
                     if (dist < o.P.choiceRadius)
                        if (dist < bestdist) 
-                          bestdist = dist;
-                          if (o.chooseTargetFirst == zk)  % got same target twice
-                              o.chooseTarget = zk;
-                          else
-                              o.chooseTargetFirst = zk;
-                          end
+                         o.chooseTarget = zk;
+                         bestdist = dist;
                        end
                     end
+                    %***** test locs in null space
+                    ango = (pi/o.targnum);
+                    ttx = cos(ango)*tx + sin(ango)*ty;
+                    tty = -sin(ango)*tx + cos(ango)*ty;
+                    dist = norm([x-ttx,y-tty]);
+                    if (dist < o.P.choiceRadius)
+                       if (dist < bestdist) 
+                         o.chooseTarget = o.targnum + zk;
+                         bestdist = dist;
+                       end
+                    end
+                    %*********
                 end
             end
             %******* no state transition till you choose a target 
             if (o.chooseTarget > 0)
-                if (o.chooseTarget ~= o.last_item)
-                    o.state = 6; % Move to hold stimulus
-                    o.responseEnd = GetSecs;
-                   % Otherwise the response failed to select the stimulus
-                else
-                    o.gotTarget = o.chooseTarget;  % mark where they went
-                    o.state = 6; % Move to iti -- inter-trial interval
-                    o.error = 4; % Error 4 is failure to select good stimulus.
-                    o.responseEnd = GetSecs;
+                if (o.catchtrial == 1)  % only reward correct item
+                   if (o.chooseTarget == o.target_item)
+                     o.state = 6; % Move to hold stimulus
+                     o.responseEnd = GetSecs;
+                     % Otherwise the response failed to select the stimulus
+                   else
+                     o.gotTarget = o.chooseTarget;  % mark where they went
+                     o.state = 6; % Move to iti -- inter-trial interval
+                     o.error = 4; % Error 4 is failure to select good stimulus.
+                     o.responseEnd = GetSecs;    
+                   end
+                else 
+                   if (o.chooseTarget ~= o.last_item)
+                     o.state = 6; % Move to hold stimulus
+                     o.responseEnd = GetSecs;
+                     % Otherwise the response failed to select the stimulus
+                   else
+                     o.gotTarget = o.chooseTarget;  % mark where they went
+                     o.state = 6; % Move to iti -- inter-trial interval
+                     o.error = 4; % Error 4 is failure to select good stimulus.
+                     o.responseEnd = GetSecs;
+                   end
                 end
             end
             %*************
-          end
         end
-        %*********
         if o.state == 5 && currentTime > o.responseStart + o.P.flightWait
            o.state = 7;
            o.error = 4;
@@ -704,15 +740,11 @@ classdef PR_FlagMo2 < handle
             o.itiStart = GetSecs;
             if (o.chooseTarget == o.target_item)
                 o.P.rewardNumber = o.P.rewardNumber * 2;  % double reward 
-            else
-               if (o.chooseTarget == o.target_null)
-                  o.P.rewardNumber = 0;  % no rewards for null! 
-               end
             end
             o.gotTarget = o.chooseTarget;    
         end
         % If the eye leaves before hold duration, no reward
-        if o.state == 6 && (o.chooseTarget > 0)
+        if o.state == 6 && (o.chooseTarget > 0) && (o.chooseTarget <= o.targnum)
             %**** check if eye still held in same target
             zk = o.chooseTarget;
             dist = norm([x-o.targ_x(zk),y-o.targ_y(zk)]);
@@ -722,6 +754,11 @@ classdef PR_FlagMo2 < handle
                 o.error = 5; % Error 5 is failure to hold the stimulus
                 o.itiStart = GetSecs;
             end
+        end
+        if o.state == 6 && (o.chooseTarget > o.targnum)  % transition if wrong targ
+           o.state = 8;
+           o.error = 6;  % saccade to non-target region
+           o.itiStart = GetSecs;   % failed to find any target, goofing off
         end
 
         if o.state == 7
@@ -773,12 +810,10 @@ classdef PR_FlagMo2 < handle
                 
             case 2
 
-                % continue to hold fixation   
-                if (o.P.fixation == 0) && (o.P.cue_contrast)
-                   if (o.P.showCue == 1)
-                      o.hPoint.beforeFrame(1);  % cue direction briefly
-                   end
-                end
+                % continue to hold fixation  
+                % if (o.P.showcue == 1) && (o.P.fixation == 0)
+                %   o.hPoint.beforeFrame(1);  % cue direction briefly
+                % end
                 o.hFix.beforeFrame(1);  % very brief, in case were at
                 
             case 3    % show gaze cue
@@ -786,40 +821,62 @@ classdef PR_FlagMo2 < handle
                 % continue to hold fixation   
                 o.hFix.beforeFrame(1);  % very brief, in case were at
                 
+%                 if (currentTime < o.stimTime + o.P.stimDur)                
+%                         %****** also show other targets
+%                         for k = 1:o.targnum
+%                            o.hProbe{k}.beforeFrame();
+%                         end
+%                         %******
+%                 else
+%                        if (o.stimOffset == 0)
+%                            o.stimOffset = GetSecs; % will be off next frame flip
+%                        end
+%                 end
+                
+                    
             case 4    % waiting for him to leave fixation 
                 % Disappear the fixation spot 
 
                 % show grating target
                 if (o.P.fixation == 0)
+                    
+                    % continue to hold fixation  
+                    if (currentTime < o.cueTime + o.P.cueDur)
+                       if (o.P.showcue == 1)
+                            o.hPoint.beforeFrame(1);  % cue direction briefly
+                       end
+                       o.hFix.beforeFrame(1);  % very brief, in case were at
+                    end
+                
                     if (currentTime < o.stimTime + o.P.stimDur)                
                         %****** also show other targets
                         for k = 1:o.targnum
                            o.hProbe{k}.beforeFrame();
                         end
-                        %******
                     else
                        if (o.stimOffset == 0)
                            o.stimOffset = GetSecs; % will be off next frame flip
                        end
                     end
+                    %*************
+                    if ~isempty(o.hBack)
+                       o.hBack.beforeFrame();
+                    end
+                    %**************
                 end
 
             case 5    % saccade in flight, dim fixation, just in case not done before
                              
+                % Disappear the last face
                 if (o.P.fixation == 0)
-                    %****** swap to new target immediately in flight
-                    for k = 1:o.targnum
-                              o.hProbe{o.targnum+k}.beforeFrame();
-                    end
-                    %****** older code did not swap till state 6
-                    %****** and thus had in flight blank
-                    
-                    %****** don't show any targets once in flight
-                    % for k = 1:o.targnum
+                    %****** also show other targets
+                    %for k = 1:o.targnum
                     %   o.hProbe{k}.beforeFrame();
-                    % end
+                    %end
+                    if ~isempty(o.hBack)
+                        o.hBack.beforeFrame();
+                    end
                     %******
-                    
                 end
 
             case {6 7} % once saccade landed, reappear stimulus,  show correct option
@@ -832,18 +889,15 @@ classdef PR_FlagMo2 < handle
                               if (o.chooseTarget == o.target_item)
                                   o.Faces.beforeFrame();
                               else
-                                 %****** show dark Gauss if null target
-                                 if (o.chooseTarget == o.target_null)
-                                    o.hReward{2}.position = o.hProbe{o.chooseTarget}.position;
-                                    o.hReward{2}.beforeFrame();                               
-                                 else   % show light Gauss (no face) if null target OK
+                                 %****** show light Guass (no face)
+                                 if (o.chooseTarget <= o.targnum)
                                    o.hReward{1}.position = o.hProbe{o.chooseTarget}.position;
                                    o.hReward{1}.beforeFrame();
                                  end
                               end
                            else
                               %**** show black Gauss (wrong, repeat)
-                              if (o.chooseTarget)
+                              if (o.chooseTarget <= o.targnum)
                                  o.hReward{2}.position = o.hProbe{o.chooseTarget}.position;
                                  o.hReward{2}.beforeFrame();
                               end
@@ -852,6 +906,9 @@ classdef PR_FlagMo2 < handle
                            %******
                            for k = 1:o.targnum
                               o.hProbe{o.targnum+k}.beforeFrame();
+                           end
+                           if ~isempty(o.hBack)
+                               o.hBack.beforeFrame();
                            end
                            %******
                        end
@@ -871,14 +928,20 @@ classdef PR_FlagMo2 < handle
         end
         %***********
         if (o.P.motionStimulus == 1)
-           if (o.state < 5)
+           if (o.state < 6)  % <= 7)  % < 6)
               for k = 1:o.targnum
                  o.hProbe{k}.afterFrame;
+              end
+              if ~isempty(o.hBack)
+                 o.hBack.afterFrame();
               end
            else
               for k = 1:o.targnum
                  o.hProbe{o.targnum+k}.afterFrame;
-              end    
+              end
+              if ~isempty(o.hBack)
+                 o.hBack.afterFrame();
+              end
            end
         end
         %******** if sound, do here
@@ -934,12 +997,15 @@ classdef PR_FlagMo2 < handle
         PR.DropStim = o.DropStim;
         PR.targori = o.targori;
         PR.target_item = o.target_item;
-        PR.target_null = o.target_null;
         PR.last_item = o.last_item;
         PR.chooseTarget = o.chooseTarget;
         PR.gotTarget = o.gotTarget;
-        if (o.gotTarget)
-          o.last_item = o.gotTarget;  % store for next trial
+        if (o.catchtrial == 0)  % only update last item if not a catch trial
+          if (o.gotTarget)
+            o.last_item = o.gotTarget;  % store for next trial
+          end
+        else
+          o.last_item = NaN;  % otherwise forget history constraint
         end
         PR.changori = o.changori;
         PR.deltaOri = o.deltaOri;
@@ -947,24 +1013,23 @@ classdef PR_FlagMo2 < handle
         PR.targ_x = o.targ_x;
         PR.targ_y = o.targ_y;
         PR.targ_motion = o.targ_motion;
+        PR.catchtrial = o.catchtrial;
         %******* this is also where you could store Gabor Flash Info
         
         %%%% Record some data %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         %%%% It is advised not to store things too large here, like eye movements, 
         %%%% that would be very inefficient as the experiment progresses
-        
-        %********** UPDATE ERROR, if Line Cue correct is standard
-        if (o.error == 0)  % reward was given, but is it line cue correct?
-          if (o.chooseTarget == o.target_item)
-            o.D.error(A.j) = 0; %o.error;
-          else
-            o.D.error(A.j) = 4; % wrong target
-          end
-        else
-            o.D.error(A.j) = o.error;
+        o.D.error(A.j) = o.error;
+        %****** measure by cue line error also, face error
+        ferror = o.error;
+        if (ferror == 0)
+           if (o.chooseTarget ~= o.target_item)
+             ferror = 4;
+             disp('Changed ferror state');
+           end
         end
-        
-        %********
+        o.D.ferror(A.j) = ferror;
+        %*******
         o.D.fixDur(A.j) = o.fixDur;
         if (P.fixation == 1)
            o.D.x(A.j) = 0;  % fixation trial
@@ -974,7 +1039,14 @@ classdef PR_FlagMo2 < handle
            o.D.y(A.j) = P.yDeg;
         end
         o.D.delay(A.j) = 0; % not used anymore, P.delay;
-        o.D.targloc(A.j) = o.target_item;
+        
+        % convert from location to integer 1 to 8
+        ango = angle( complex(o.targ_x(o.target_item),o.targ_y(o.target_item)) );
+        if (ango < 0)
+            ango = (2*pi) + ango;
+        end         
+        o.D.targloc(A.j) = 1 + floor(ango/(pi/4));
+        %*********
         o.D.fixation(A.j) = P.fixation;
         
         %%%% Plot results %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -1009,7 +1081,9 @@ classdef PR_FlagMo2 < handle
         if ~isempty(locs)
           labels = cell(1,nlocs);
           fcXxy = zeros(1,nlocs);
+          pcXxy = zeros(1,nlocs);
           Fraction = zeros(1, nlocs);
+          PFraction = zeros(1, nlocs);
           for i = 1:nlocs
             ti = locs(i); 
             Ncorrect = sum(o.D.targloc == ti & o.D.error == 0 & o.D.fixation == 0);
@@ -1019,13 +1093,31 @@ classdef PR_FlagMo2 < handle
                 fcXxy(i) = Ncorrect/Ntotal;
                 Fraction(i) = fcXxy(i);
             end
+            
+            %****** compute same but using ferror
+            FNcorrect = sum(o.D.targloc == ti & o.D.ferror == 0 & o.D.fixation == 0);
+            FNtotal = sum(o.D.targloc == ti & o.D.fixation == 0 & ...
+                         (o.D.ferror == 0 | o.D.ferror > 1.5 & o.D.ferror < 6 ));
+            if  FNtotal > 0
+                pcXxy(i) = FNcorrect/FNtotal;
+                PFraction(i) = pcXxy(i);
+            end
+            %******************* 
+            
             %   Constructs labels based on the 8 locations
             if (ti>=1) && (ti<=8)
               labelsloaded = 1;
               labels{i} = lablist{ti};
             end
           end
-          bar(A.DataPlot2,1:nlocs,fcXxy);
+          zcXxy = fcXxy - pcXxy;
+          bar_y = [pcXxy ; zcXxy];  % plot stacked, cued correct, plus reward
+    
+          if (nlocs > 1)
+            bar(A.DataPlot2,1:nlocs,bar_y','stacked'); 
+          else
+            bar(A.DataPlot2,1:nlocs,fcXxy);     
+          end
           title(A.DataPlot2,'By Location (Pred)');
           ylabel(A.DataPlot2,'Fraction Correct');
           if (labelsloaded)

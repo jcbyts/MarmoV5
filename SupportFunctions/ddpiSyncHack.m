@@ -1,6 +1,6 @@
 
 %% 
-fname = 'FaceCal_Logan_250919_01';
+fname = 'Acuity_Logan_300919_00';
 % fname = 'BackImage_Artificial_240919_05';
 M = load(fullfile('Output', [fname 'z.mat']));
 D = ddpiReadFile(fullfile('Output', [fname '.ddpi']));
@@ -139,6 +139,7 @@ idx = dstruct.time > t0 & dstruct.time < t1;
 
 gazex = (dstruct.gazex(idx)-tcx)./(tdx*ppd);
 gazey = (dstruct.gazey(idx)-tcy)./(tdy*ppd);
+gazex = sgolayfilt(gazex, 1, 5);
 hold off
 plot(dstruct.time(idx) - t0, gazex, '-'); hold on
 plot(dstruct.time(idx) - t0, gazey, '-')
@@ -164,10 +165,10 @@ idx = 1:numel(gazex);
 t = dstruct.time(idx) - t0;
 
 % x = (gazex(idx)-mean(gazex(idx)))*(60/0.74);
-x = ( (gazex(idx)-mean(gazex(idx)))*60);
-y = ( (gazey(idx)-mean(gazey(idx)))*60);
+x = ( (gazex(idx)-nanmean(gazex(idx)))*60);
+y = ( (gazey(idx)-nanmean(gazey(idx)))*60);
 rms(x)
-toff = 60880;
+toff = 0;
 plot(t*1e3 - toff, x); hold on
 plot(t*1e3 - toff, y)
 ylabel('arcmin')

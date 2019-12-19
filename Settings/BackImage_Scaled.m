@@ -1,4 +1,4 @@
-function [S,P] = BackImage
+function [S,P] = BackImage_Scaled()
 
 %%%%% NECESSARY VARIABLES FOR GUI %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % LOAD THE RIG SETTINGS, THESE HOLD CRUCIAL VARIABLES SPECIFIC TO THE RIG,
@@ -11,7 +11,7 @@ S = MarmoViewRigSettings;
 S.MarmoViewVersion = '3';
 
 % PARAMETER DESCRIBING TRIAL NUMBER TO STOP TASK
-S.finish = 40;
+S.finish = 100;
 
 % PROTOCOL PREFIXS
 S.protocol = 'BackImage';
@@ -65,4 +65,15 @@ P.imageDur = 10;
 S.imageDur = 'Duration to display image (s):';
 P.iti = 2;
 S.iti = 'Duration of intertrial interval (s):';
+
+% Image size settings
+P.imageSizes = 2.^(2:5);
+S.imageSizes = 'width of image in d.v.a. (must be changed in Settings file)';
+P.imageCtrX = 0;
+S.imageCtrX = 'X center of image in d.v.a (relative to center of screen)';
+P.imageCtrY = 0;
+S.imageCtrY = 'Y center of image in d.v.a (relative to center of screen)';
+P.GrayScale = 0;
+S.GrayScale = 'Flag whether the stimulus is drawn in color or grayscale';
+
     

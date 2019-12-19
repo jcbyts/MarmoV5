@@ -36,6 +36,8 @@ classdef FrameControl < handle
      c;          % struct that holds eye calibration data, center
      dx;         %   eye calib x scale
      dy;         %   eye calib y scale
+     dontclear   % Screen('Flip') argument. 0=clear the buffer (default) 1=don't clear
+     dontsync    % Screen('Flip') argument. 0=synchronize with vertical retrace, 1-2=don't synchronize
      FMAX;       % Max screen flips in any trial
      FIELDS;     % Max number of fields to store in eye data
      eyeColor;   % for ShowEye of eye position tracker
@@ -63,13 +65,15 @@ classdef FrameControl < handle
       %*************
       o.TimeSensitive = [];  %no states time sensitive by default
       %*************
-      o.FMAX = 3000;  %capped at a Max of 3000 screen flips
-      o.FIELDS = 6;
+      o.FMAX = 5000;  %capped at a Max of 5000 screen flips
+      o.FIELDS = 9;
       o.FData = nan(o.FMAX,o.FIELDS);   %per trial data storage
       o.FCount = 0;
       o.c  = [0,0];
       o.dx = 1;
       o.dy = 1;
+      o.dontclear = 0;
+      o.dontsync = 0;
       %**************
       o.FP = [];
     end
@@ -96,12 +100,24 @@ classdef FrameControl < handle
         o.dy = C.dy;
         %**************
         o.frameRate = S.frameRate;
+        o.FMAX = ceil(20*o.frameRate); % max trial is 20 seconds, regardless of framerate
         o.centerPix = S.centerPix;
         o.pixPerDeg = S.pixPerDeg;
+        
+        if isfield(P, 'dontclear')
+            o.dontclear = P.dontclear;
+        else
+            o.dontclear = 0;
+        end
+        
+        if isfield(P, 'dontsync')
+            o.dontsync = P.dontsync;
+        else
+            o.dontsync = 0;
+        end
         %*************
         
         % initialise input parser
-%         args = varargin;
         p = inputParser;
         p.KeepUnmatched = true;
         p.StructExpand = true;
@@ -169,19 +185,23 @@ classdef FrameControl < handle
      function CL = prep_run_trial(o,eyepos,pupil)
           %*************
           o.FData(:,:) = NaN;  % set all to NaN at start
-          o.FData(1:5,1) = GetSecs;  % column 1 timelock on eye pos
-          %*************
           o.FCount = 5;   % flip counter, why at 5 though? 
+          o.FData(1:o.FCount,1) = GetSecs;  % column 1 timelock on eye pos
+          %*************
+          
           % Setup first frame
           Screen('FillRect',o.winPtr,o.Bkgd);
           % when flipping, store time in eyeData
-          FStart = Screen('Flip',o.winPtr,GetSecs);
+          [vbl, stimOnset, FlipTimestamp, Missed] = Screen('Flip',o.winPtr,0);
           %***** Get initial into *************
-          o.FData(1:5,2) = eyepos(1);
-          o.FData(1:5,3) = eyepos(2); 
-          o.FData(1:5,4) = pupil; 
-          o.FData(1:5,5) = 0;    %default, start state = 0
-          o.FData(1:5,6) = FStart; 
+          o.FData(1:o.FCount,2) = eyepos(1);
+          o.FData(1:o.FCount,3) = eyepos(2); 
+          o.FData(1:o.FCount,4) = pupil; 
+          o.FData(1:o.FCount,5) = 0;    %default, start state = 0
+          o.FData(1:o.FCount,6) = vbl; 
+          o.FData(1:o.FCount,7) = stimOnset;
+          o.FData(1:o.FCount,8) = FlipTimestamp;
+          o.FData(1:o.FCount,9) = Missed;
           %******* Store the Clock Sixlet ***********
           CL = fix(clock);
           CL(1) = CL(1) - 2000;
@@ -190,6 +210,9 @@ classdef FrameControl < handle
     
     function [currentTime,x,y] = grabeye_run_trial(o,state,eyepos,pupil)
           currentTime = GetSecs;
+%           Datapixx('EnablePropixxLampLed');
+%           Datapixx('RegWr'); 
+%           WaitSecs(.001);
           % GET EYE POSITION
           o.FCount = o.FCount + 1;
           k = o.FCount;
@@ -204,9 +227,12 @@ classdef FrameControl < handle
           end
           x = (eyepos(1)-o.c(1)) / (o.dx*o.pixPerDeg);
           y = (eyepos(2)-o.c(2)) / (o.dy*o.pixPerDeg);
+          
+           
     end
     
-    function [updateGUI,screenTime] = screen_update_run_trial(o,state)  
+    function [updateGUI,vblTime] = screen_update_run_trial(o,state) 
+        
        % OTHER DRAWS
        eyeI = o.FCount;
        if o.showEye
@@ -221,10 +247,41 @@ classdef FrameControl < handle
        end
       
        % FLIP SCREEN NOW
-       screenTime = Screen('Flip',o.winPtr,GetSecs);
-       o.FData(eyeI,6) = screenTime;
+       
+       if o.dontsync
+           Screen('DrawingFinished', o.winPtr, 0, 1);
+           %                   WaitSecs('YieldSecs', 0.002);
+           
+           beampos = 1000;
+           while beampos > 5 %abs(beampos - winRect(4)/2) > 5
+               beampos = Screen('GetWindowInfo', o.winPtr, 1);
+           end
+           
+           % Flip immediately without sync to vertical retrace, do clear
+           % backbuffer after flip for visualization purpose:
+           vblTime = GetSecs;
+           stimOnset = nan;
+           FlipTimestamp = nan;
+           Missed = nan;
+           Screen('Flip', o.winPtr, vblTime, 0, 2, 0);
+           
+%            % Above flip won't return a 'beampos' in non-VSYNC'ed mode,
+%            % so we query it manually:
+%            beampos = Screen('GetWindowInfo', win, 1);
+           
+       else
+            Screen('DrawingFinished', o.winPtr);
+            ifi = 1./o.frameRate;
+            [vblTime,stimOnset, FlipTimestamp, Missed] = Screen('Flip',o.winPtr,o.FData(eyeI-1,6)+ifi/2,o.dontclear);
+       end
+
+%        o.FData(eyeI,5) = state; 
+        o.FData(eyeI,6) = vblTime;
+        o.FData(eyeI,7) = stimOnset;
+        o.FData(eyeI,8) = FlipTimestamp;
+        o.FData(eyeI,9) = Missed;
        % Reset the screen
-       Screen('FillRect',o.winPtr,o.Bkgd);
+%        Screen('FillRect',o.winPtr,o.Bkgd);
     
        %********* if not time sensitive state, allow GUI updating
        if (~ismember(state,o.TimeSensitive))
