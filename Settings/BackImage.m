@@ -19,7 +19,7 @@ S.protocol_class = ['protocols.PR_',S.protocol];
 S.ImageDirectory = 'Backgrounds';  % default is Backgrounds directory
                                    % but you can easily choose another
                                    % and place it under SupportData
-                                   
+  
 % Define Banner text to identify the experimental protocol
 S.protocolTitle = 'Foraging full screen images';
 
@@ -65,4 +65,7 @@ P.imageDur = 10;
 S.imageDur = 'Duration to display image (s):';
 P.iti = 2;
 S.iti = 'Duration of intertrial interval (s):';
+
+% P.dontsync = 1;
+% S.dontsync = 'async Frame Control';
     
