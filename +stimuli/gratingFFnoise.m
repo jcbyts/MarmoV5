@@ -194,7 +194,7 @@ classdef gratingFFnoise < stimuli.stimulus
             gx = cos(ori) * (maxRadians*X) + sin(ori) * (maxRadians*Y) + pha;
             
             I = cos( gx );
-            I = 127 + round(I * obj.contrast * obj.contrastPreMultiplicator * 255);
+            I = round(I * obj.contrast * obj.contrastPreMultiplicator * 255);
             
         end
         
