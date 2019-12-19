@@ -14,7 +14,6 @@ classdef (Abstract) dotsbase < stimuli.stimulus
     %   visible    - flag to toggle dot visibility (default: true)
     
     % 2017-06-04 - Shaun L. Cloherty <s.cloherty@ieee.org>
-    
     properties (Access = public)
         size double % pixels
         speed double % pixels/s

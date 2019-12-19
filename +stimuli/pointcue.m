@@ -13,14 +13,14 @@ classdef pointcue < handle
   
   % 14-08-2018 - Jude Mitchell
   
-  properties (Access = public),
-      FixN@double = 8;   % frames of cue extending out
-      pixPerDeg@double = 30;  % pixels per deg
-      bkgd@double = 127;   % background
-      sigma1@double = 2;   %dva
-      width1@double = 0.4; %dva
-      cue_contrast@double = 1; %0 to 1
-      centerPix@double = [0,0];
+  properties (Access = public)
+      FixN double = 8;   % frames of cue extending out
+      pixPerDeg double = 30;  % pixels per deg
+      bkgd double = 127;   % background
+      sigma1 double = 2;   %dva
+      width1 double = 0.4; %dva
+      cue_contrast double = 1; %0 to 1
+      centerPix double = [0,0];
   end
         
   properties (Access = private)

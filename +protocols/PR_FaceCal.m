@@ -4,16 +4,16 @@ classdef PR_FaceCal < handle
   % The class constructor can be called with a range of arguments:
   %
   
-  properties (Access = public),    
-       Iti@double = 1;        % default Iti duration
-       startTime@double = 0;  % trial start time
-       faceOff@double = 0;    % trial face offset time
+  properties (Access = public)   
+       Iti double = 1;        % default Iti duration
+       startTime double = 0;  % trial start time
+       faceOff double = 0;    % trial face offset time
   end
       
   properties (Access = private)
     winPtr; % ptb window
-    state@double = 0;      % state counter
-    error@double = 0;      % error state in trial
+    state double = 0;      % state counter
+    error double = 0;      % error state in trial
     %************
     S;      % copy of Settings struct (loaded per trial start)
     P;      % copy of Params struct (loaded per trial)
@@ -34,20 +34,20 @@ classdef PR_FaceCal < handle
         state = o.state;
     end
     
-    function initFunc(o,S,P);
+    function initFunc(o,S,P)
         o.Faces = stimuli.gaussimages(o.winPtr,'bkgd',S.bgColour,'gray',false);   % color images
         o.Faces.loadimages('./SupportData/MarmosetFaceLibrary.mat');
     end
    
-    function closeFunc(o),
+    function closeFunc(o)
         o.Faces.CloseUp();
     end
    
-    function generate_trialsList(o,S,P)
+    function generate_trialsList(o,S,P) %#ok<*INUSD>
            % nothing for this protocol
     end
     
-    function P = next_trial(o,S,P);
+    function P = next_trial(o,S,P)
           %********************
           o.S = S;
           o.P = P;       
@@ -89,7 +89,7 @@ classdef PR_FaceCal < handle
     function [FP,TS] = prep_run_trial(o)
         % Setup the state
         o.state = 0; % Showing the face
-        Iti = o.P.iti;   % set ITI interval from P struct stored in trial
+        Iti = o.P.iti;   %#ok<*PROP> % set ITI interval from P struct stored in trial
         %*******
         FP(1).states = 0;  % any special plotting of states, 
         FP(1).col = 'b';   % FP(1).states = 1:2; FP(1).col = 'b';

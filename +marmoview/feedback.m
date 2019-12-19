@@ -16,7 +16,7 @@ classdef (Abstract) feedback < handle & matlab.mixin.Copyable
   % The class constructor can be called with a range of arguments:
   
   properties (GetAccess = public, SetAccess = protected)
-  log@double=[]
+  log=[]
   end
   
   properties (Access = protected)

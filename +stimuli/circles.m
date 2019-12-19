@@ -11,10 +11,10 @@ classdef circles < handle
   % 14-06-2016 - Shaun L. Cloherty <s.cloherty@ieee.org>
   
   properties (Access = public),
-    size@double = 0; % pixels
-    weight@double = 2; % pixels
-    colour@double = ones([1,3]); % clut index or [r,g,b]
-    position@double = [0.0, 0.0]; % [x,y] (pixels)
+    size double = 0; % pixels
+    weight double = 2; % pixels
+    colour double = ones([1,3]); % clut index or [r,g,b]
+    position double = [0.0, 0.0]; % [x,y] (pixels)
   end
         
   properties (Access = private)
@@ -34,14 +34,14 @@ classdef circles < handle
       p = inputParser;
 %       p.KeepUnmatched = true;
       p.StructExpand = true;
-      p.addParamValue('size',o.size,@isfloat); % pixels
-      p.addParamValue('weight',o.weight,@isfloat); % pixels
-      p.addParamValue('colour',o.colour,@isfloat); % clut index or [r,g,b]
-      p.addParamValue('position',o.position,@isfloat); % [x,y] (pixels)
+      p.addParameter('size',o.size,@isfloat); % pixels
+      p.addParameter('weight',o.weight,@isfloat); % pixels
+      p.addParameter('colour',o.colour,@isfloat); % clut index or [r,g,b]
+      p.addParameter('position',o.position,@isfloat); % [x,y] (pixels)
                   
       try
         p.parse(args{:});
-      catch,
+      catch
         warning('Failed to parse name-value arguments.');
         return;
       end
@@ -54,7 +54,7 @@ classdef circles < handle
       o.position = args.position;
     end
         
-    function beforeTrial(o), % marmoview's nextCmd?
+    function beforeTrial(o) % marmoview's nextCmd?
     end
     
     function beforeFrame(o) % Run?
@@ -72,13 +72,13 @@ classdef circles < handle
   end % methods
     
   methods (Access = public)        
-    function drawCircles(o),
+    function drawCircles(o)
       r = floor(o.size./2); % radius in pixels
       
       rect = kron([1,1],o.position) + kron(r(:),[-1, -1, +1, +1]);
-      if o.weight > 0,
+      if o.weight > 0
         Screen('FrameOval',o.winPtr,o.colour,rect',o.weight);
-      else,
+      else
         Screen('FillOval',o.winPtr,o.colour,rect');
       end
       

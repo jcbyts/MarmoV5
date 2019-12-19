@@ -43,7 +43,7 @@ classdef grating < stimuli.stimulus
       o.texRect = [];
       o.goRect = [];
       
-      if nargin == 1,
+      if nargin == 1
         return
       end
 
@@ -52,7 +52,7 @@ classdef grating < stimuli.stimulus
       p = inputParser;
       p.StructExpand = true;
       
-      p.addParameter('position',o.position,@isfloat); % [x,y] (pixels)
+      p.addParameter('position',o.position, @isfloat); % [x,y] (pixels)
       p.addParameter('radius',o.radius,@isfloat);
       p.addParameter('orientation',o.orientation,@isfloat);
       p.addParameter('cpd',o.cpd,@isfloat);

@@ -4,7 +4,7 @@
 
 classdef sound < marmoview.feedback
   properties (SetAccess = private, GetAccess = private)
-    s@audioplayer;
+    s audioplayer
   end 
   
   properties (Constant, Access = private)
@@ -12,7 +12,7 @@ classdef sound < marmoview.feedback
   end
   
   methods
-    function o = sound(h,varargin),
+    function o = sound(h,varargin)
 %       fprintf(1,'marmoview.sound()\n');
 
       o = o@marmoview.feedback(h,varargin{:}); % call parent constructor
@@ -21,11 +21,11 @@ classdef sound < marmoview.feedback
       o.s = audioplayer(randn(size(t)).*exp(-((t-0.015)./0.002).^2),o.fs);
     end
     
-    function deliver(o,varargin),
+    function deliver(o,varargin)
       o.s.play();
     end
     
-    function r = report(o),
+    function r = report(~)
       r = [];
     end
   end % methods

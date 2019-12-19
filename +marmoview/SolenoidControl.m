@@ -19,7 +19,7 @@ classdef SolenoidControl < handle % marmoview.liquid
   end % properties
 
    properties (Dependent, SetAccess = public, GetAccess = public)
-     volume@double = 0;   % dispensing volume (mL)
+     volume double %= 0   % dispensing volume (mL)
    end
 
    %% Public
