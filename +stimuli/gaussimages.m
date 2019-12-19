@@ -68,7 +68,11 @@ classdef gaussimages < stimuli.stimulus % inherit stimulus to have tracking / ra
        F = load(filename);
        images = fields(F);
        n = length(images);
-       o.tex = nan(n,1);
+       if o.winPtr==0
+           o.tex = cell(n,1);
+       else
+           o.tex = nan(n,1);
+       end
        o.texDim = nan(n,1);
        for i = 1:n
           imo = F.(images{i});
@@ -97,6 +101,8 @@ classdef gaussimages < stimuli.stimulus % inherit stimulus to have tracking / ra
           % Create the gauss texture 
           if o.winPtr ~= 0
             o.tex(i) = Screen('MakeTexture',o.winPtr,rim);
+          else
+            o.tex{i} = rim;
           end
           
           %**** initialize default radius based on last loaded image size
@@ -137,6 +143,81 @@ classdef gaussimages < stimuli.stimulus % inherit stimulus to have tracking / ra
            Screen('DrawTexture',o.winPtr,o.tex(imagenum),texrect,rect,0);
          end
        end
+    end
+    
+    function varargout = getImage(o, rect, binsize)
+        
+        if o.winPtr~=0
+            warning('gaussimages: getImage: only works if you constructed the object with winPtr=0')
+        end
+        
+        if nargin < 3
+            binsize = 1;
+        end
+        
+        if nargin < 2
+            rect = o.position([1 2 1 2]) + [-1 -1 1 1].*o.radius/2;
+        end
+        
+        
+        
+        I = o.tex{o.imagenum};
+        alpha = squeeze(I(:,:,4))./255;
+        I(:,:,4) = [];
+        for i = 1:3
+            I(:,:,i) = I(:,:,i).*alpha + 127.*(1-alpha);
+        end
+        
+        texrect = kron([1,1],o.position) + kron(o.radius,[-1, -1, +1, +1]);
+        I = imresize(I, [texrect(4)-texrect(2) texrect(3)-texrect(1)]);
+        alpha = imresize(alpha, [texrect(4)-texrect(2) texrect(3)-texrect(1)]);
+        
+        % -- try to be a little quicker
+        Iscreen = o.bkgd * ones(1920,1080);
+        Iscreen(texrect(2):texrect(4)-1, texrect(1):texrect(3)-1) = mean(I,3);
+        Ascreen = zeros(1920,1080);
+        Ascreen(texrect(2):texrect(4)-1, texrect(1):texrect(3)-1) = alpha;
+        
+        tmprect = rect;
+        tmprect(3) = rect(3)-rect(1)-binsize;
+        tmprect(4) = rect(4)-rect(2)-binsize;
+        
+        im = imcrop(Iscreen, tmprect); % requires the imaging processing toolbox
+        alpha = imcrop(Ascreen, tmprect);
+        
+        if binsize~=1
+            im = im(1:binsize:end,1:binsize:end);
+            alpha = alpha(1:binsize:end,1:binsize:end);
+        end
+        
+
+        
+        
+%         % -- works, but you have to draw
+%         texax = texrect(1):binsize:texrect(3);
+%         texay = texrect(2):binsize:texrect(4);
+%         
+%         
+%         figure(9999); clf
+%         if binsize ~=1
+%             I = imresize(I, 1./binsize);
+%         end
+%         imagesc(texax, texay, I)
+%         xlim([rect(1) rect(3)])
+%         ylim([rect(2) rect(4)])
+%         
+%         frame = getframe(gca);
+%         im = frame.cdata;
+%         %
+        
+        if nargout > 0
+            varargout{1} = im;
+        end
+        
+        if nargout > 1
+            varargout{2} = alpha;
+        end
+        
     end
     
   end % methods

@@ -87,10 +87,18 @@ set(handles.SettingsFile,'String',handles.settingsFile);
 % could be if two subjects had substantially different eye position gains
 handles.calibFile = 'MarmoViewLastCalib.mat';
 set(handles.CalibFilename,'String',handles.calibFile);
-tmp = load([handles.supportPath handles.calibFile]);
-handles.C.dx = tmp.dx;
-handles.C.dy = tmp.dy;
-handles.C.c = tmp.c;
+
+if exist(handles.calibFile, 'file')
+    tmp = load([handles.supportPath handles.calibFile]);
+    handles.C.dx = tmp.dx;
+    handles.C.dy = tmp.dy;
+    handles.C.c = tmp.c;
+else
+    handles.C.dx = .1;
+    handles.C.dy = .1;
+    handles.C.c = [0 0];
+end
+
 handles.eyeTraceRadius = 15;
 % This C structure is never changed until a protocol is cleared or
 % MarmoV5 is exited, until then, it may be reset to the C values using
@@ -147,12 +155,12 @@ handles.A.outputFile = 'none';
 % OPEN UP COMMUNICATION WITH THE PUMP FOR REWARD DELIVERY -- THIS IS DONE
 % IMMEDIATELY USING THE RIG SETTINGS, SO THAT JUICE IS AVAILABLE TO THE
 % MARMOSET WHILE NO PROTOCOLS ARE LOADED
-if handles.S.newera, % create an @newera object for delivering liquid reward
+if handles.S.newera % create an @newera object for delivering liquid reward
   handles.reward = marmoview.newera('port',S.pumpCom,'diameter',S.pumpDiameter,'volume',S.pumpDefVol,'rate',S.pumpRate);
 %   handles.reward = marmoview.newera('port',S.pumpCom,'diameter',S.pumpDiameter,'volume',S.pumpDefVol,'rate',S.pumpRate, 'baud', 9600);
 %   handles.reward.open();
 %   handles.reward.diameter = S.pumpDiameter;
-else, % no syringe pump? use the @dbgreward object object instead
+else % no syringe pump? use the @dbgreward object object instead
   if handles.S.solenoid
      handles.reward = marmoview.SolenoidControl(S.pumpCom); 
      S.pumpDefVol = handles.reward.volume;
@@ -1075,16 +1083,18 @@ guidata(hObject,handles);
 function JuiceVolumeEdit_CreateFcn(hObject, eventdata, handles) %#ok<*INUSD>
 function JuiceVolumeEdit_Callback(hObject, eventdata, handles)
 vol = get(hObject,'String'); % volume is entered in microliters!!
-volML = str2double(vol); %/1e3; % milliliters
+
+volUL = str2double(vol); % microliters
+
 % fprintf(handles.A.pump,['0 VOL ' volML]);
-handles.reward.volume = volML; % milliliters
+handles.reward.volume = volUL; % milliliters
 if handles.S.solenoid
   set(handles.JuiceVolumeText,'String',[vol ' ms']); % displayed in microliters!!
 else
   set(handles.JuiceVolumeText,'String',[vol ' ul']);   
 end
 set(hObject,'String',''); % why?
-handles.A.juiceVolume = volML; % <-- A.juiceVolume should *always* be in milliliters!
+handles.A.juiceVolume = volUL; % <-- A.juiceVolume should *always* be in milliliters!
 guidata(hObject,handles);
 
 

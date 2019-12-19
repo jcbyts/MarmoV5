@@ -191,14 +191,26 @@ classdef gabornoise < stimuli.stimulus
             
             [xx, yy] = meshgrid(xax,yax);
             
-            Angle = (obj.orientation) * deg2rad;
-            Phase = (-obj.mypars(1,:) + 90) * deg2rad;
-            FreqTwoPi = obj.mypars(2,:) * twopi;
-            SpaceConstant = obj.mypars(3,:);
+            % only analyze gabors that are within the ROI
+            x_ = xax([1 end])' - obj.x;
+            y_ = yax([1 end])' - obj.y;
+            ix = x_(1,:) < 0 & x_(2,:) > 0;
+            ix = ix & (y_(1,:) < 0 & y_(2,:) > 0);
+%             sum(ix)
+%             
+%             figure(1); clf; 
+%             plot(x_(1,:), y_(1,:), '.'); hold on
+%             plot(x_(1,ix), y_(1,ix), '.'); hold on
+%             plot(x_(2,:), y_(2,:), '.'); hold on
+            
+            Angle = (obj.orientation(ix)) * deg2rad;
+            Phase = (-obj.mypars(1,ix) + 90) * deg2rad;
+            FreqTwoPi = obj.mypars(2,ix) * twopi;
+            SpaceConstant = obj.mypars(3,ix);
             Expmultiplier = -0.5 ./ SpaceConstant.^2;
             
-            posx = xx(:) - obj.x;
-            posy = yy(:) - obj.y;
+            posx = xx(:) - obj.x(ix);
+            posy = yy(:) - obj.y(ix);
             
             % Compute (x,y) distance weighting coefficients, based on rotation angle:
             % Note that this is a constant for all fragments, but we can not do it in
@@ -216,7 +228,7 @@ classdef gabornoise < stimuli.stimulus
             % Multiply/Modulate base color and alpha with calculated sine/gauss
             % values, add some constant color/alpha Offset, assign as final fragment
             % output color:
-            I = reshape(sum((ev .* sv),2), size(xx))*127 + 127;
+            I = reshape(sum((ev .* sv),2), size(xx))*127;
             
             
         end

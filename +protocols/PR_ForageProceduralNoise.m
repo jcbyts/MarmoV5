@@ -5,10 +5,10 @@ classdef PR_ForageProceduralNoise < protocols.protocol
   %
  
   properties (Access = public)
-       itiStart@double = 0;        % start of iti interval
-       rewardCount@double = 0;     % counter for reward drops
-       rewardGap@double = 0;       % gap for next target onset
-       rewardTime@double = 0;      % store time of last reward
+       itiStart double = 0;        % start of iti interval
+       rewardCount double = 0;     % counter for reward drops
+       rewardGap double = 0;       % gap for next target onset
+       rewardTime double = 0;      % store time of last reward
   end
       
   properties (Access = private)
@@ -79,7 +79,7 @@ classdef PR_ForageProceduralNoise < protocols.protocol
        o.targOri = 1;
        for kk = 1:o.oriNum
            %*******
-           o.hProbe{kk} = stimuli.grating_procedural(o.winPtr);  % grating probe
+           o.hProbe{kk} = stimuli.grating(o.winPtr);  % grating probe
            o.hProbe{kk}.transparent = -P.probecon;  % blend in proportion to gauss
            o.hProbe{kk}.gauss = true;
            o.hProbe{kk}.pixperdeg = S.pixPerDeg;
@@ -530,9 +530,9 @@ classdef PR_ForageProceduralNoise < protocols.protocol
                    o.ProbeHistory(o.PFrameCount,3) = o.targOri;
                 else
                    if (o.state == 3)
-                      o.ProbeHistory(o.PFrameCount,1) = NaN;  % not being shown
+                      o.ProbeHistory(o.PFrameCount,1) = NaN;
                       o.ProbeHistory(o.PFrameCount,2) = NaN;
-                      o.ProbeHistory(o.PFrameCount,3) = -1;   %indicates face
+                      o.ProbeHistory(o.PFrameCount,3) = -o.Faces.imagenum;   %indicates face
                    else
                       o.ProbeHistory(o.PFrameCount,1) = NaN;  % not being shown
                       o.ProbeHistory(o.PFrameCount,2) = NaN;
@@ -688,5 +688,57 @@ classdef PR_ForageProceduralNoise < protocols.protocol
     end
     
   end % methods
+  
+  methods (Static)
+      
+      function [Probe, Faces] = regenerateProbes(P,S)
+          %******* init reward face for correct trials
+
+          Faces = stimuli.gaussimages(0,'bkgd',S.bgColour,'gray',false);   % color images
+          Faces.loadimages('MarmosetFaceLibrary.mat');
+          Faces.position = [0,0]*S.pixPerDeg + S.centerPix;
+          Faces.radius = round(P.faceradius*S.pixPerDeg);
+          Faces.imagenum = 1;  % start first face
+          Faces.transparency = -1;  % blend into background
+          
+          %***** create a Gabor target grating
+          oriNum = P.orinum;
+          Probe = cell(1,oriNum);
+          for kk = 1:oriNum
+              %*******
+              Probe{kk} = stimuli.grating(0);  % grating probe
+              Probe{kk}.transparent = -P.probecon;  % blend in proportion to gauss
+              Probe{kk}.gauss = true;
+              Probe{kk}.pixperdeg = S.pixPerDeg;
+              Probe{kk}.radius = round(P.proberadius*S.pixPerDeg);
+              
+              Probe{kk}.range = P.proberange;
+              Probe{kk}.square = false;
+              Probe{kk}.bkgd = P.bkgd;
+              %**************
+              Probe{kk}.position = [S.centerPix(1),S.centerPix(2)];
+              Probe{kk}.phase = P.phase;
+              Probe{kk}.cpd = P.cpd;
+              if (kk < oriNum)
+                  if (kk == 1)
+                      Probe{kk}.orientation = P.prefori;
+                  else
+                      Probe{kk}.orientation = P.nonprefori;
+                      Probe{kk}.cpd = P.noncpd;
+                  end
+                  
+              else
+                  Probe{kk}.orientation = 0;
+                  Probe{kk}.cpd = 0;
+                  Probe{kk}.phase = 0;
+              end
+              %**************
+              Probe{kk}.updateTextures();
+              %****************
+          end
+          
+          
+      end
+  end
     
 end % classdef

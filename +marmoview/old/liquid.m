@@ -16,11 +16,11 @@ classdef (Abstract) liquid < marmoview.feedback
   % The class constructor can be called with a range of arguments:
   
   properties (Abstract)
-    volume@double; % must be declared by the concrete subclass
+    volume double % must be declared by the concrete subclass
   end
   
   methods
-    function o = liquid(h,varargin),
+    function o = liquid(h,varargin)
       o = o@marmoview.feedback(h,varargin{:});
     end
   end

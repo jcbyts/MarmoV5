@@ -8,22 +8,22 @@
 % 30-05-2016 - Shaun L. Cloherty <s.cloherty@ieee.org>
 
 classdef dbgreward < marmoview.liquid & marmoview.sound
-  properties,
-    volume@double = 0.0;
-  end
-  
-  methods
-    function o = dbgreward(h,varargin),
-      o = o@marmoview.liquid(h);
-      o = o@marmoview.sound(h);
+    properties
+        volume double = 0.0
     end
     
-    function deliver(o),
-      o.deliver@marmoview.sound();
+    methods
+        function o = dbgreward(h,varargin)
+            o = o@marmoview.liquid(h);
+            o = o@marmoview.sound(h);
+        end
+        
+        function deliver(o)
+            o.deliver@marmoview.sound();
+        end
+        
+        function r = report(o)
+            r = struct([]);
+        end
     end
-    
-    function r = report(o),
-      r = struct([]);
-    end
-  end
 end
