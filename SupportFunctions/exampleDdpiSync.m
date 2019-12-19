@@ -1,7 +1,7 @@
 
 %% find all files from a particular session
 subject = 'Logan';
-date = '301019';
+date = '151119';
 dataDir = '/home/marmorig/Documents/MATLAB/MarmoV5/Output';
 
 % find all files for subject and date
@@ -151,37 +151,37 @@ dstruct.time = ddpi2marmo(dstruct.time);
 %% plot outcome
 
 figure(1); clf
-plot(dstruct.time, dstruct.gazex, '.'); hold on
-plot(mstruct.time, mstruct.gazex, '.')
+plot(dstruct.time, dstruct.gazex, '.-'); hold on
+plot(mstruct.time, mstruct.gazex, '.-')
 
-%% check actual latency (including any overhead from marmoview)
-nTimestamps = numel(mstruct.time);
-totallatency = nan(nTimestamps, 1);
-% loop over all timestamps in marmoview
-for i = 1:nTimestamps
-    
-    if isnan(mstruct.time(i))
-        continue
-    end
-    
-    % find the corresponding sample in the ddpi
-    tdiff = dstruct.time - mstruct.time(i);
-    id = find(tdiff <= 0, 1, 'last'); % find the last sample less than zero
-    
-    inds = id + (-20:0);
-    inds(inds < 1) = [];
-    thisSample = inds(dstruct.gazex(inds) == mstruct.gazex(i));
-    if isempty(thisSample)
-        continue
-    end
-    totallatency(i) = mstruct.time(i) - dstruct.time(thisSample(end));
-end
-
-figure(2); clf
-histogram(totallatency*1e3)
-xlabel('ddpi latency (ms)')
-title('Total Latency (including MarmoView)')
-ylabel('Count')
+% %% check actual latency (including any overhead from marmoview)
+% nTimestamps = numel(mstruct.time);
+% totallatency = nan(nTimestamps, 1);
+% % loop over all timestamps in marmoview
+% for i = 1:nTimestamps
+%     
+%     if isnan(mstruct.time(i))
+%         continue
+%     end
+%     
+%     % find the corresponding sample in the ddpi
+%     tdiff = dstruct.time - mstruct.time(i);
+%     id = find(tdiff <= 0, 1, 'last'); % find the last sample less than zero
+%     
+%     inds = id + (-20:0);
+%     inds(inds < 1) = [];
+%     thisSample = inds(dstruct.gazex(inds) == mstruct.gazex(i));
+%     if isempty(thisSample)
+%         continue
+%     end
+%     totallatency(i) = mstruct.time(i) - dstruct.time(thisSample(end));
+% end
+% 
+% figure(2); clf
+% histogram(totallatency*1e3)
+% xlabel('ddpi latency (ms)')
+% title('Total Latency (including MarmoView)')
+% ylabel('Count')
 
 %%
 
@@ -202,15 +202,27 @@ t0 = dstruct.time(1);
 gazex = (dstruct.gazex-tcx)./(tdx*ppd);
 gazey = (dstruct.gazey-tcy)./(tdy*ppd);
 
+gazex = gazex - nanmedian(gazex);
+gazey = gazey - nanmedian(gazey);
 % % % scale
 gazex = gazex * (60);
 gazey = gazey * (60);
-% gazex = sgolayfilt(gazex, 1, 5);
-% gazey = sgolayfilt(gazey, 1, 5);
+% gazex = sgolayfilt(gazex, 2, 5);
+% gazey = sgolayfilt(gazey, 2, 5);
 idx = 1:numel(gazex);
-plot(gazex); hold on
-plot(gazey)
+t = dstruct.time - t0;
+plot(t, gazex, '-o', 'MarkerSize', 2); hold on
+plot(t, gazey)
+xlabel('Time (sec)')
+ylabel('Arcmin')
 % 
+
+%%
+win = [101.2 101.8];
+ix = t > win(1) & t < win(2);
+figure(1); clf
+plot(gazex(ix) - mean(gazex(ix)))
+% spectrogram(gazex(ix) - mean(gazex(ix)), [], [], [], 540)
 % return
 %%
 clf

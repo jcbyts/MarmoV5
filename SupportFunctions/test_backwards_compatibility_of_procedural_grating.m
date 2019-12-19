@@ -5,7 +5,7 @@ sca % clear any open windows
 [S,P] = Forage2();
 A = marmoview.openScreen(S, struct());
 
-
+winPtr = A.window;
 %% Update 
 P.snoisediam = inf; % diameter of noise
 P.range = 127;
@@ -20,7 +20,8 @@ ori = 30;
 phi = 180;
 gauss = true;
 
-
+%%
+P.snoisediam = 5;
 % match the two gratings
 grat.screenRect = S.screenRect;
 gratpro.screenRect = S.screenRect;
@@ -56,26 +57,27 @@ gratpro.updateTextures();
 
 grat.position = [700 360];
 gratpro.position = [700 460];
-
+%%
 grat.drawGrating()
 gratpro.drawGrating();
 % 
 rect = CenterRectOnPointd([0 0 gratpro.pixperdeg gratpro.pixperdeg]*P.snoisediam, gratpro.position(1), gratpro.position(2));
-rect([2 4]) = rect([2 4]) + gratpro.pixperdeg*3;
-Screen('FillRect', winPtr, 0, rect);
-
+% rect([2 4]) = rect([2 4]) + gratpro.pixperdeg*3;
+% Screen('FillRect', winPtr, 0, rect);
+% 
 Screen('Flip', winPtr, 0);
 
 
 %% test gratpro fast
 t0 = GetSecs;
 while GetSecs < t0 +5
-    if rand < .5
+    if rand < .25
         Screen('FillRect', winPtr, 127);
-    gratpro.orientation = rand*360;
-    gratpro.drawGrating();
+        gratpro.orientation = rand*360;
+        
     end
     
+    gratpro.drawGrating();
     
     %
     rect = CenterRectOnPointd([0 0 gratpro.pixperdeg gratpro.pixperdeg]*P.snoisediam, gratpro.position(1), gratpro.position(2));
@@ -86,6 +88,34 @@ while GetSecs < t0 +5
     Screen('FillRect', winPtr, 127);
 %     Screen('Flip', winPtr, 127);
 end
+
+%% test grat pro reconstruction
+gratpro.position = [500 504];
+gratpro.phase = 180;
+gratpro.gauss = false;
+gratpro.orientation = gratpro.orientation + 1;
+gratpro.drawGrating();
+Screen('Flip', winPtr);
+rect = [0 0 1270 720];
+rect = CenterRectOnPointd([0 0 gratpro.pixperdeg gratpro.pixperdeg]*P.snoisediam, gratpro.position(1), gratpro.position(2));
+rect = round(rect);
+%
+% gratpro.phase = 186+3;
+I = gratpro.getImage(rect, 1);
+
+I1 = Screen('GetImage', winPtr, rect);
+I1 = mean(I1, 3);
+figure(1); clf;
+subplot(1,3,1)
+imagesc(I)
+subplot(1,3,2)
+imagesc(I1)
+subplot(1,3,3)
+imagesc(I1 - I, [-10 10])
+
+
+
+
 %% close textures
 grat.CloseUp
 gratpro.CloseUp

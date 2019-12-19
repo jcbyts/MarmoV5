@@ -107,7 +107,7 @@ switch RigName
         S.screenRect = [0 0 1920 1080];     % Screen dimensions in pixels
         S.screenWidth = 70;                 % Width of screen (cm)
         S.centerPix =  [960 540];           % Pixels of center of the screen
-        S.guiLocation = [500 100 890 660];
+        S.guiLocation = [200 100 890 660];
         S.bgColour = 127; %127; %186;  % use 127 if gamma corrected
         S.gamma = 1;
         S.screenDistance = 79;              % Distance of eye to screen (cm)
@@ -134,7 +134,7 @@ switch RigName
         S.gamma = 1;
         S.screenDistance = 79;              % Distance of eye to screen (cm)
         S.pixPerDeg = PixPerDeg(S.screenDistance,S.screenWidth,S.screenRect(3));
-        
+
     otherwise % laptop development
         S.newera = false;
         S.solenoid = false;

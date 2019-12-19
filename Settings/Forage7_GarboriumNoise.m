@@ -182,7 +182,7 @@ switch P.noisetype
         S.numGabors = 'Number of Gabors:';
         
         P.spfrange = 15;   % use log spacing
-        S.spfrange = 'Rnage of spat freqs (cyc/deg):';
+        S.spfrange = 'Range of spat freqs (cyc/deg):';
         
         P.noiseFrameRate = 60;
         S.noiseFrameRate = 'frame rate of the noise background:';
