@@ -34,7 +34,7 @@ classdef PR_BackImage < handle
         state = o.state;
     end
     
-    function initFunc(o,S,~)
+    function initFunc(o,S,P)
         o.ImoScreen = [];
         o.ImageDirectory = S.ImageDirectory;
         if isfield(P, 'useGrayScale')
