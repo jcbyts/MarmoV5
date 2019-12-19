@@ -75,7 +75,7 @@ classdef PR_FixCalib < handle
             
             %***** select a set of fixPts random locations
             o.winRects = zeros(4,o.P.fixPts);
-            o.faceConfig = zeros(o.P.fixPts,3); % x and y locs of stims, on or off
+            o.faceConfig = zeros(o.P.fixPts,4); % x and y locs of stims, on or off
             fr = round(o.P.faceRadius*o.S.pixPerDeg);
             cp = o.S.centerPix;
             %******
@@ -100,6 +100,7 @@ classdef PR_FixCalib < handle
             o.texRects = zeros(4,o.P.fixPts);
             for i = 1:o.P.fixPts
                 o.texRects(3:4,i) = zeros(2,1) + o.Faces.texDim(fset(i));
+                o.faceConfig(i,4) = fset(i);  % store image number
             end
         end
         
