@@ -168,15 +168,23 @@ classdef gratingFFnoise < stimuli.stimulus
                 binSize = 1;
             end
             
+            % build support
+            xx = rect(1):binSize:(rect(3)-binSize);
+            yy = rect(2):binSize:(rect(4)-binSize);
+            
             % compute image without PTB running ... follow exact steps
+            if obj.cpd==0
+                nx = numel(xx);
+                ny = numel(yy);
+                I = zeros(ny, nx);
+                return
+            end
             
             % use values from our openGL shaders
             twopi = 2.0 * 3.141592654;
             deg2rad = 3.141592654 / 180.0;
             
-            % build support
-            xx = rect(1):binSize:(rect(3)-binSize);
-            yy = rect(2):binSize:(rect(4)-binSize);
+            
             
             [X,Y] = meshgrid(xx,yy);
             
