@@ -1,4 +1,4 @@
-classdef PR_FixFlash < handle
+classdef PR_FixRsvpStim < handle
   % Matlab class for running an experimental protocl
   %
   % The class constructor can be called with a range of arguments:
@@ -17,7 +17,10 @@ classdef PR_FixFlash < handle
        RunFixBreakSound double = 0;       % variable to initiate fix break sound (only once)
        NeverBreakSoundTwice double = 0;   % other variable for fix break sound
        BlackFixation double = 6;          % frame to see black fixation, before reward
-       GABcounter double = 1;             % counter for Gabor flashing stimuli
+       ImCounter double = 1;             % counter for Gabor flashing stimuli
+       updateEveryNFrames double = 5
+       ImSequence = 1:60
+       GazeContingent logical = false
   end
       
   properties (Access = private)
@@ -30,7 +33,6 @@ classdef PR_FixFlash < handle
     %********* stimulus structs for use
     Faces;             % object that stores face images for use
     hFix;              % object for a fixation point
-    hGabor = [];       % object for Gabor stimuli
     fixbreak_sound;    % audio of fix break sound
     fixbreak_sound_fs; % sampling rate of sound
     %*********
@@ -42,7 +44,7 @@ classdef PR_FixFlash < handle
   end
   
   methods (Access = public)
-    function o = PR_FixFlash(winPtr)
+    function o = PR_FixRsvpStim(winPtr)
       o.winPtr = winPtr;     
     end
     
@@ -53,7 +55,7 @@ classdef PR_FixFlash < handle
     function initFunc(o,S,P)
  
         o.Faces = stimuli.gaussimages(o.winPtr,'bkgd',S.bgColour,'gray',false);   % color images
-        o.Faces.loadimages('./SupportData/MarmosetFaceLibrary.mat');
+        o.Faces.loadimages('./SupportData/rsvpFixStim.mat');
         o.Faces.position = [0,0]*S.pixPerDeg + S.centerPix;
         o.Faces.radius = round(P.faceRadius*S.pixPerDeg);
    
@@ -70,34 +72,8 @@ classdef PR_FixFlash < handle
         %**********************************
    
         %******** store history of flashed gratings
-        o.NoiseHistory = zeros(o.MaxFrame,4);   %time, x, y, ori
-        %*** Build a set of 8 oriented gratings
-        for k = 1:P.OriNum
-           ori = (((k-1)*180)/P.OriNum);
-           %********* assign a random start position (not too close to fix)
-           ampo = P.gabMinRadius + (P.gabMaxRadius-P.gabMinRadius)*rand;
-           ango = rand*2*pi;
-           dx = cos(ango)*ampo;
-           dy = sin(ango)*ampo;
-           cX = S.centerPix(1)+ round( S.pixPerDeg * dx);
-           cY = S.centerPix(2)+ round( S.pixPerDeg * dy);   %
-           %*****************
-           o.hGabor{k} = stimuli.grating(o.winPtr);
-           o.hGabor{k}.position = [cX cY];  
-           o.hGabor{k}.radius = round(P.gabRadius*S.pixPerDeg);
-           o.hGabor{k}.orientation = ori; 
-           o.hGabor{k}.phase = 0;
-           o.hGabor{k}.cpd = P.cpd;
-           o.hGabor{k}.range = floor( (P.GaborContrast/100)*127 );
-           o.hGabor{k}.square = false;
-           o.hGabor{k}.bkgd = P.bkgd;
-           o.hGabor{k}.updateTextures();
-           %****** store starting locations, set time as NaN
-           o.FrameCount = o.FrameCount + 1;
-           o.NoiseHistory(o.FrameCount,:) = [NaN,dx,dy,k];
-           %*********************
-        end
-   
+        o.NoiseHistory = nan(o.MaxFrame,4);   %time, x, y, id
+        
         %********** load in a fixation error sound ************
         [y,fs] = audioread(['SupportData',filesep,'gunshot_sound.wav']);
         y = y(1:floor(size(y,1)/3),:);  % shorten it, very long sound
@@ -109,9 +85,6 @@ classdef PR_FixFlash < handle
     function closeFunc(o)
         o.Faces.CloseUp();
         o.hFix.CloseUp();
-        for k = 1:length(o.hGabor) 
-           o.hGabor{k}.CloseUp;
-        end
     end
    
     function generate_trialsList(o,S,P)
@@ -178,7 +151,7 @@ classdef PR_FixFlash < handle
           o.RunFixBreakSound =0;
           o.NeverBreakSoundTwice = 0;  
           o.BlackFixation = 6;  % frame to see black fixation, before reward
-          o.GABcounter = 1;
+          o.ImCounter = 1;
           % Setup the state
           o.state = 0; % Showing the face
           o.error = 0; % Start with error as 0
@@ -243,14 +216,20 @@ classdef PR_FixFlash < handle
             cX = o.S.centerPix(1)+ round( o.S.pixPerDeg * dx);
             cY = o.S.centerPix(2)+ round( o.S.pixPerDeg * dy);   %
             %****** update one of the Gabor's locations
-            o.hGabor{o.GABcounter}.position = [cX cY];
             %****** store starting locations, set time as NaN
             o.FrameCount = o.FrameCount + 1;
-            o.NoiseHistory(o.FrameCount,:) = [NaN,dx,dy,o.GABcounter];
+            if mod(o.FrameCount, o.updateEveryNFrames)==0
+                o.ImCounter = o.ImCounter + 1;
+                o.Faces.imagenum = o.ImSequence(o.ImCounter);
+                if o.GazeContingent
+                    o.Faces.position = [o.S.centerPix(1)+x, o.S.centerPix(2)+y];
+                end
+            end
+            o.NoiseHistory(o.FrameCount,:) = [NaN,o.Faces.position,o.Faces.imagenum];
             %*********************
-            o.GABcounter = o.GABcounter + 1;
-            if (o.GABcounter > o.P.OriNum)
-                o.GABcounter = 1;
+            
+            if (o.ImCounter > numel(o.ImSequence))
+                o.ImCounter = 1;
             end
         end
     
@@ -308,11 +287,8 @@ classdef PR_FixFlash < handle
             case 1
                 o.hFix.beforeFrame(1);
             case 2    
-                o.hFix.beforeFrame(1);
-                %***** then display all P.OriNum of the Gabors
-                for k = 1:o.P.OriNum 
-                    o.hGabor{k}.beforeFrame();  % draw Gabor
-                end      
+%                 o.hFix.beforeFrame(1);
+                o.Faces.beforeFrame();
             case 3
                 if ~o.error
                     if (o.BlackFixation)
@@ -329,7 +305,7 @@ classdef PR_FixFlash < handle
         end
 
         %******** if sound, do here
-        if (o.RunFixBreakSound == 1) & (o.NeverBreakSoundTwice == 0)  
+        if (o.RunFixBreakSound == 1) && (o.NeverBreakSoundTwice == 0)  
            sound(o.fixbreak_sound,o.fixbreak_sound_fs);
            o.NeverBreakSoundTwice = 1;
         end
@@ -384,10 +360,10 @@ classdef PR_FixFlash < handle
         y = 0.15*max(ylim);
 
         h = [];
-        for ii = 1:size(errors,2),
+        for ii = 1:size(errors,2)
           axes(A.DataPlot1);
           h(ii) = text(x(ii),y,sprintf('%i',errors(2,ii)),'HorizontalAlignment','Center');
-          if errors(2,ii) > 2*y,
+          if errors(2,ii) > 2*y
             set(h(ii),'Color','w');
           end
         end
