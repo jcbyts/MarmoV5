@@ -27,7 +27,7 @@ classdef eyetrack_ddpi < handle
             p.addParameter('EyeDump',true,@islogical); % default 1, do EyeDump
             p.addParameter('width', 720)%640)
             p.addParameter('height', 540)%480)
-            p.addParameter('downsamplingRate', 1)
+            p.addParameter('downsamplingRate', .5)
             p.addParameter('frameRateD', 539)%601)
             p.addParameter('frameRateN', 1)%1)
             p.parse(varargin{:});
@@ -50,7 +50,7 @@ classdef eyetrack_ddpi < handle
             ddpiM('setP1BoundingBoxSize', 64);
             ddpiM('setP4BoundingBoxSize', 32);
             ddpiM('setP4Template', [o.p4intensity, o.p4radius]);
-            ddpiM('setROI', [20, 20, 640, 450]); % exclude regions
+%             ddpiM('setROI', [20, 20, 640, 450]); % exclude regions
 %             ddpiM('setP1roi', [20, 20, 600, 450]); % exclude regions
             
             o.timeLastSample = GetSecs();

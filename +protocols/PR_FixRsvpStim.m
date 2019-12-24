@@ -18,7 +18,7 @@ classdef PR_FixRsvpStim < handle
        NeverBreakSoundTwice double = 0;   % other variable for fix break sound
        BlackFixation double = 6;          % frame to see black fixation, before reward
        ImCounter double = 1;             % counter for Gabor flashing stimuli
-       updateEveryNFrames double = 5
+       updateEveryNFrames double = 12
        ImSequence = 1:60
        GazeContingent logical = false
   end
@@ -220,6 +220,9 @@ classdef PR_FixRsvpStim < handle
             o.FrameCount = o.FrameCount + 1;
             if mod(o.FrameCount, o.updateEveryNFrames)==0
                 o.ImCounter = o.ImCounter + 1;
+                if (o.ImCounter > numel(o.ImSequence))
+                    o.ImCounter = 1;
+                end
                 o.Faces.imagenum = o.ImSequence(o.ImCounter);
                 if o.GazeContingent
                     o.Faces.position = [o.S.centerPix(1)+x, o.S.centerPix(2)+y];
@@ -228,9 +231,7 @@ classdef PR_FixRsvpStim < handle
             o.NoiseHistory(o.FrameCount,:) = [NaN,o.Faces.position,o.Faces.imagenum];
             %*********************
             
-            if (o.ImCounter > numel(o.ImSequence))
-                o.ImCounter = 1;
-            end
+            
         end
     
         % If fixation is held for the fixation duration, then reward

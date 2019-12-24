@@ -50,7 +50,7 @@ S.calibFilename = 'MarmoViewLastCalib.mat';
 % THEY ALSO MUST INCLUDE DESCRIPTION OF THE VALUE IN THE SETTINGS ARRAY
 
 % Stimulus settings
-P.faceRadius = 1.0;
+P.faceRadius = 0.75;
 S.faceRadius = 'Aperture radius (degrees):';
 P.eyeRadius = 2.0;
 S.eyeRadius = 'Gaze indicator radius (degrees):';
@@ -64,7 +64,7 @@ S.bkgd = 'Choose the background color (0-255):';
 % Trial timing
 P.faceDur = 4;
 S.faceDur = 'Duration to display faces (s):';
-P.fixGrid = 9;  % number of X,Y locs (odd number, centered at origin)
+P.fixGrid = 5;  % number of X,Y locs (odd number, centered at origin)
 S.fixGrid = 'Number of locations to sample on an axis';
 P.fixStep = 3;
 S.fixStep = 'Size in dva between sampled locations';

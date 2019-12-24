@@ -127,7 +127,7 @@ if (P.noisetype == 1)
     P.spfmax = 16;   % use log spacing
     S.spfmax = 'Minimum spat freq (cyc/deg):';
     %********* parameters for noise stimulus following gaze
-    P.probNoise = 0.10;  % fraction of frames with orientation instead of blank
+    P.probNoise = 0.50;  % fraction of frames with orientation instead of blank
     S.probNoise = 'Fraction frames no blank: ';
     P.noiseradius = Inf; %4.0;  % diameter of target is dva
     S.noiseradius = 'Size of Face(dva):';
