@@ -159,7 +159,7 @@ classdef gaussimages < stimuli.stimulus % inherit stimulus to have tracking / ra
             rect = o.position([1 2 1 2]) + [-1 -1 1 1].*o.radius/2;
         end
         
-        
+
         
         I = o.tex{o.imagenum};
         alpha = squeeze(I(:,:,4))./255;
