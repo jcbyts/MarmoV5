@@ -186,6 +186,11 @@ if isfield(handles.S, 'eyetracker') && ischar(handles.S.eyetracker)
             handles.eyetrack = marmoview.eyetrack_arrington(hObject,'EyeDump',S.EyeDump);
         case 'ddpi'
             handles.eyetrack = marmoview.eyetrack_ddpi(hObject,'EyeDump',S.EyeDump);
+        case 'eyelink'
+            % if EYELINK, you must wait until initializing the protocol to setup
+            % the eye tracker .... for now, set it to a default object
+            handles.eyetrack = marmoview.eyetrack();
+            handles.S.eyelink = true;
         otherwise
             handles.eyetrack = marmoview.eyetrack();
     end
@@ -193,10 +198,15 @@ else % dump to the old version
     
     if handles.S.arrington % create an @arrington eyetrack object for eye position
         handles.eyetrack = marmoview.eyetrack_arrington(hObject,'EyeDump',S.EyeDump);
+    elseif handles.S.eyelink
+        % if EYELINK, you must wait until initializing the protocol to setup
+        % the eye tracker .... for now, set it to a default object
+        handles.eyetrack = marmoview.eyetrack();
     else % no eyetrack, use @eyetrack object instead that uses mouse pointer
         handles.eyetrack = marmoview.eyetrack();
     end
 end
+
 %********************************************************
 
 %********* add the task controller for storing eye movements, flipping
@@ -378,6 +388,26 @@ while exist([handles.outputPath handles.A.outputFile],'file')
     i = i+1; handles.outputSuffix = num2str(i,'%.2d');
     handles.A.outputFile = strcat(handles.outputPrefix,'_',handles.outputSubject,...
         '_',handles.outputDate,'_',handles.outputSuffix,'.mat');
+end
+
+
+
+% FOR EYELINK, you cannot setup until you have screen pointer and each
+% edf file is created per opening the screen
+if handles.S.eyelink,
+    if handles.S.EyeDump
+               eyeFile = sprintf('%s_%s_%s_%s', ...
+                              handles.outputPrefix, ...
+                              handles.outputSubject, ...
+                              handles.outputDate, ...
+                              handles.outputSuffix);
+               eyePath = handles.outputPath;
+    else
+               eyeFile = [];
+               eyePath = [];
+    end
+    handles.eyetrack = marmoview.eyetrack_eyelink(hObject,handles.A.window,eyeFile,eyePath,...
+                         'EyeDump',handles.S.EyeDump,'screen', handles.S.screenNumber); 
 end
 
 %*********** ADDED VIA SHAUN
