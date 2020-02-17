@@ -63,14 +63,14 @@ handles.output = hObject;
 
 % GET SOME CRUCIAL DIRECTORIES -- THESE DIRECTORIES MUST EXIST!!
 % Present working directory, location of all GUIs
-handles.taskPath = sprintf('%s/',pwd);
+handles.taskPath = [fullfile(pwd) filesep];
 % Settings directory, settings files should be kept here
-handles.settingsPath = sprintf('%s/Settings/',pwd);
+handles.settingsPath = fullfile(pwd, ['Settings' filesep]);
 % Output directory, all data will be saved here!
-handles.outputPath = sprintf('%s/Output/',pwd);
+handles.outputPath = fullfile(pwd, ['Output' filesep]);
 % Support data directory, data to support MarmoV5 or its protocols can be
 % kept here unintrusively (e.g. eye calibration values or marmoset images)
-handles.supportPath = sprintf('%s/SupportData/',pwd);
+handles.supportPath = fullfile(pwd, ['SupportData' filesep]);
 %****** start with no settings file
 handles.settingsFile = 'none';
 set(handles.SettingsFile,'String',handles.settingsFile);
