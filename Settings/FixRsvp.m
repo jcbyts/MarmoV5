@@ -11,7 +11,7 @@ S = MarmoViewRigSettings;
 S.MarmoViewVersion = '2';
 
 % PARAMETER DESCRIBING TRIAL NUMBER TO STOP TASK
-S.finish = 40;
+S.finish = 100;
 
 % PROTOCOL PREFIX
 S.protocol = 'FixRsvpStim';

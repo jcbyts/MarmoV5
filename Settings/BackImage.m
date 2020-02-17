@@ -11,7 +11,7 @@ S = MarmoViewRigSettings;
 S.MarmoViewVersion = '3';
 
 % PARAMETER DESCRIBING TRIAL NUMBER TO STOP TASK
-S.finish = 40;
+S.finish = 80;
 
 % PROTOCOL PREFIXS
 S.protocol = 'BackImage';

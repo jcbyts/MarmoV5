@@ -1,7 +1,7 @@
 
 %% find all files from a particular session
-subject = 'Logan';
-date = '151119';
+subject = 'test';
+date = '271219';
 dataDir = '/home/marmorig/Documents/MATLAB/MarmoV5/Output';
 
 % find all files for subject and date
@@ -35,7 +35,7 @@ mstruct = struct('time', [], ...
     'gazey', []);
 
 % loop over files and extract times / data
-for iFile = 1%:nFilePairs
+for iFile = 1:nFilePairs
    ddpiFile = fullfile(dataDir, ddpiFiles{iFile});
    mvFile = fullfile(dataDir, strrep(ddpiFiles{iFile}, '.ddpi', 'z.mat'));
    
@@ -207,12 +207,12 @@ gazey = gazey - nanmedian(gazey);
 % % % scale
 gazex = gazex * (60);
 gazey = gazey * (60);
-% gazex = sgolayfilt(gazex, 2, 5);
-% gazey = sgolayfilt(gazey, 2, 5);
+gazex = sgolayfilt(gazex, 3, 7);
+gazey = sgolayfilt(gazey, 3, 7);
 idx = 1:numel(gazex);
 t = dstruct.time - t0;
-plot(t, gazex, '-o', 'MarkerSize', 2); hold on
-plot(t, gazey)
+plot(gazex, '-', 'MarkerSize', 2); hold on
+% plot(t, gazey)
 xlabel('Time (sec)')
 ylabel('Arcmin')
 % 
@@ -247,3 +247,10 @@ plot(t*1e3 - toff, y)
 ylabel('arcmin')
 xlabel('ms')
 legend({'x', 'y'})
+
+%%
+p1x = dstruct.p1x;
+p1xf = imgaussfilt(p1x, 10);
+figure(1); clf
+plot(p1x); hold on
+plot(p1xf)
