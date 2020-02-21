@@ -117,10 +117,10 @@ switch P.noisetype
     case 666 % static lines
 
         % Manually code conditions
-        P.darkBarWidths = [1];
+        P.darkBarWidths = [1]; % how many pixels wide are the black lines
 %         P.darkBarWidths = [1 2 4 1];
         S.darkBarWidths  = "cannot be changed from GUI";
-        P.lightBarWidths = [1];
+        P.lightBarWidths = [1]; % how many pixels wide are the white lines
 %         P.lightBarWidths = [1 2 1 4];
         S.lightBarWidths = "cannot be changed from GUI";
         

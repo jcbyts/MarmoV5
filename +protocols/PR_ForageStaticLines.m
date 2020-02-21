@@ -146,7 +146,7 @@ classdef PR_ForageStaticLines < protocols.protocol
                 I = (I - .5) * P.linesContrast * 255 + S.bgColour;
                 
                 % build texture
-                I = uint8(repmat(I, 1, 1, 3));
+                I = uint8(repmat(I', 1, 1, 3));
                 o.imTex{iCond} = Screen('MakeTexture', o.winPtr, I);
                end
                
@@ -419,7 +419,7 @@ classdef PR_ForageStaticLines < protocols.protocol
    
     %******************** THIS IS THE BIG FUNCTION *************
     function drop = state_and_screen_update(o,currentTime,x,y) 
-        disp([o.state currentTime-o.startTime o.TrialDur])
+%         disp([o.state currentTime-o.startTime o.TrialDur])
         drop = 0; % initialize
         
         %******* THIS PART CHANGES WITH EACH PROTOCOL ****************
