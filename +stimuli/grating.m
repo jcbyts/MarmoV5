@@ -244,14 +244,17 @@ classdef grating < stimuli.stimulus
         alpha = imresize(alpha, [texrect(4)-texrect(2) texrect(3)-texrect(1)]);
         
         % -- try to be a little quicker
-        Iscreen = zeros(1920,1080);
+        if isempty(o.screenRect)
+            o.screenRect = [0 0 1920 1080]; % default resolution
+        end
+        Iscreen = zeros(o.screenRect(4),o.screenRect(3));
         Iscreen(texrect(2):texrect(4)-1, texrect(1):texrect(3)-1) = (mean(I,3) - o.bkgd).*alpha;
-        Ascreen = zeros(1920,1080);
+        Ascreen = zeros(o.screenRect(4),o.screenRect(3));
         Ascreen(texrect(2):texrect(4)-1, texrect(1):texrect(3)-1) = alpha;
         
         tmprect = rect;
-        tmprect(3) = rect(3)-rect(1)-binsize;
-        tmprect(4) = rect(4)-rect(2)-binsize;
+        tmprect(3) = rect(3)-rect(1);
+        tmprect(4) = rect(4)-rect(2);
         
         im = imcrop(Iscreen, tmprect); % requires the imaging processing toolbox
         alpha = imcrop(Ascreen, tmprect);
