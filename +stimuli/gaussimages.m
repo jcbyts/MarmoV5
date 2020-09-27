@@ -162,6 +162,7 @@ classdef gaussimages < stimuli.stimulus % inherit stimulus to have tracking / ra
 
         
         I = o.tex{o.imagenum};
+        I = double(I);
         alpha = squeeze(I(:,:,4))./255;
         I(:,:,4) = [];
         for i = 1:3
@@ -174,7 +175,7 @@ classdef gaussimages < stimuli.stimulus % inherit stimulus to have tracking / ra
         
         % -- try to be a little quicker
         Iscreen = o.bkgd * ones(1920,1080);
-        Iscreen(texrect(2):texrect(4)-1, texrect(1):texrect(3)-1) = mean(I,3);
+        Iscreen(texrect(2):texrect(4)-1, texrect(1):texrect(3)-1) = mean(I(:,:,1:3),3);
         Ascreen = zeros(1920,1080);
         Ascreen(texrect(2):texrect(4)-1, texrect(1):texrect(3)-1) = alpha;
         
