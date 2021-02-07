@@ -152,7 +152,7 @@ classdef gratingFFnoise < stimuli.stimulus
                 
                 [sourceFactorOld, destinationFactorOld] = Screen('BlendFunction', obj.winPtr, GL_ONE, GL_ONE);
                 
-                freq = obj.cpd/obj.pixPerDeg/2;
+                freq = obj.cpd/obj.pixPerDeg;
                 sigma = inf; % drawing a gabor with an infinite sigma
                 
                 Screen('DrawTexture', obj.winPtr, obj.tex, obj.texRect, [obj.texRect], 90+obj.orientation, [], [], [], [], kPsychDontDoRotation, [-obj.phase+90, freq, sigma, obj.contrast, 1, 0, 0, 0]);
@@ -193,7 +193,7 @@ classdef gratingFFnoise < stimuli.stimulus
             Y = Y - obj.texRect(4)/2;
            
             % scale by cpd
-            maxRadians = twopi * obj.cpd / obj.pixPerDeg/2;
+            maxRadians = twopi * obj.cpd / obj.pixPerDeg;
             
             % Create the sinusoid
             pha = (obj.phase - 0) * deg2rad;

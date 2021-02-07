@@ -162,7 +162,7 @@ classdef grating_procedural < stimuli.stimulus
              dPix = 2*rPix+1;
              sigma = dPix / 8; % apply sigma
              
-             freq = o.cpd/o.pixperdeg/2;
+             freq = o.cpd/o.pixperdeg;
              % Procedural gabor textures blend using shaders, so we want
              % them to sum, instead of doing complicated alpha-blending
              % switch to GL_ONE, GL_ONE and store the old blend function
@@ -173,7 +173,7 @@ classdef grating_procedural < stimuli.stimulus
              
          else 
              [sourceFactorOld, destinationFactorOld] = Screen('BlendFunction', o.winPtr, GL_ONE, GL_ONE);
-             freq = o.cpd/o.pixperdeg/2;
+             freq = o.cpd/o.pixperdeg;
              Screen('DrawTexture', o.winPtr, o.tex, [], rect, 90-o.orientation, [], [], [], [], [], [o.phase, freq, o.transparent, 0]);
              Screen('BlendFunction', o.winPtr, sourceFactorOld, destinationFactorOld);
          end
@@ -221,7 +221,7 @@ classdef grating_procedural < stimuli.stimulus
             e1 = exp(-.5*(X.^2 + Y.^2)/sigma^2);
         end
         
-        maxRadians = twopi * o.cpd / o.pixperdeg/2;
+        maxRadians = twopi * o.cpd / o.pixperdeg;
         
         % Create the sinusoid
         pha = (o.phase - 0) * deg2rad;

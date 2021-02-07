@@ -174,14 +174,15 @@ classdef gaussimages < stimuli.stimulus % inherit stimulus to have tracking / ra
         alpha = imresize(alpha, [texrect(4)-texrect(2) texrect(3)-texrect(1)]);
         
         % -- try to be a little quicker
-        Iscreen = o.bkgd * ones(1920,1080);
+        Iscreen = o.bkgd * ones(1080,1920); % bad that screensize is hardcoded
         Iscreen(texrect(2):texrect(4)-1, texrect(1):texrect(3)-1) = mean(I(:,:,1:3),3);
-        Ascreen = zeros(1920,1080);
+        Ascreen = zeros(1080,1920);
         Ascreen(texrect(2):texrect(4)-1, texrect(1):texrect(3)-1) = alpha;
         
         tmprect = rect;
-        tmprect(3) = rect(3)-rect(1)-binsize;
-        tmprect(4) = rect(4)-rect(2)-binsize;
+        tmprect(3) = rect(3)-rect(1)-1;
+        tmprect(4) = rect(4)-rect(2)-1;
+        
         
         im = imcrop(Iscreen, tmprect); % requires the imaging processing toolbox
         alpha = imcrop(Ascreen, tmprect);

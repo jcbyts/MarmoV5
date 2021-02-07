@@ -97,8 +97,8 @@ gratpro.orientation = gratpro.orientation + 1;
 gratpro.drawGrating();
 Screen('Flip', winPtr);
 rect = [0 0 1270 720];
-rect = CenterRectOnPointd([0 0 gratpro.pixperdeg gratpro.pixperdeg]*P.snoisediam, gratpro.position(1), gratpro.position(2));
-rect = round(rect);
+% rect = CenterRectOnPointd([0 0 gratpro.pixperdeg gratpro.pixperdeg]*P.snoisediam, gratpro.position(1), gratpro.position(2));
+% rect = round(rect);
 %
 % gratpro.phase = 186+3;
 I = gratpro.getImage(rect, 1);
