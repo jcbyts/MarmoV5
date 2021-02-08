@@ -114,7 +114,7 @@ classdef dotspatialnoise < stimuli.dotsbase
             posy = yy(:) + (obj.y(ix) - obj.position(2));
             
             I = double(sqrt(posx.^2 + posy.^2) < obj.size/2);
-            c = mean(obj.color(ix)) - 127;
+            c = (obj.color(ix)) - 127;
             I = I.*c;
             
 %             I = fliplr(I);

@@ -94,7 +94,7 @@ classdef gabornoise < stimuli.stimulus
                 obj.mypars(1,:) = rnd(2,:)*180; % phase
                 
                 % frequency (convert to pixels/cycle)
-                obj.mypars(2,:) = (rnd(3,:)*obj.sfRange + obj.minSF)/obj.pixPerDeg/2; % frequency
+                obj.mypars(2,:) = (rnd(3,:)*obj.sfRange + obj.minSF)/obj.pixPerDeg; % frequency
                 
                 % scale
                 obj.mypars(3,:) = rnd(4,:)*obj.scaleRange + obj.minScale;
@@ -132,7 +132,7 @@ classdef gabornoise < stimuli.stimulus
            
             obj.mypars = zeros(8, obj.numGabors);
             
-            obj.mypars(2,:) = obj.minSF/obj.pixPerDeg/2;
+            obj.mypars(2,:) = obj.minSF/obj.pixPerDeg;
             obj.mypars(3,:) = (2*obj.minScale*obj.pixPerDeg+1)/4;
             obj.mypars(4,:) = obj.contrast;
             obj.mypars(5,:) = 1.0; % aspect ratio
@@ -229,7 +229,6 @@ classdef gabornoise < stimuli.stimulus
             % values, add some constant color/alpha Offset, assign as final fragment
             % output color:
             I = reshape(sum((ev .* sv),2), size(xx))*127;
-            
             
         end
         

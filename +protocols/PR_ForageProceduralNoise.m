@@ -11,7 +11,7 @@ classdef PR_ForageProceduralNoise < protocols.protocol
        rewardTime double = 0;      % store time of last reward
   end
       
-  properties (Access = private)
+  properties (Access = public)
     trialsList        % store copy of trial list (not good to keep in S struct)
     
     %********* stimulus structs for use
@@ -691,10 +691,13 @@ classdef PR_ForageProceduralNoise < protocols.protocol
   
   methods (Static)
       
-      function [Probe, Faces] = regenerateProbes(P,S)
+      function [Probe, Faces] = regenerateProbes(P,S,winPtr)
           %******* init reward face for correct trials
-
-          Faces = stimuli.gaussimages(0,'bkgd',S.bgColour,'gray',false);   % color images
+          if ~exist('winPtr', 'var')
+              winPtr = 0;
+          end
+          
+          Faces = stimuli.gaussimages(winPtr,'bkgd',S.bgColour,'gray',false);   % color images
           Faces.loadimages('MarmosetFaceLibrary.mat');
           Faces.position = [0,0]*S.pixPerDeg + S.centerPix;
           Faces.radius = round(P.faceradius*S.pixPerDeg);
@@ -706,7 +709,7 @@ classdef PR_ForageProceduralNoise < protocols.protocol
           Probe = cell(1,oriNum);
           for kk = 1:oriNum
               %*******
-              Probe{kk} = stimuli.grating(0);  % grating probe
+              Probe{kk} = stimuli.grating(winPtr);  % grating probe
               Probe{kk}.transparent = -P.probecon;  % blend in proportion to gauss
               Probe{kk}.gauss = true;
               Probe{kk}.pixperdeg = S.pixPerDeg;

@@ -121,9 +121,9 @@ classdef grating < stimuli.stimulus
           % Convert cycles to max radians (s1)
        end
        if (o.pixperdeg > 0)
-           maxRadians = pi * o.cpd /o.pixperdeg;
+           maxRadians = 2 * pi * o.cpd /o.pixperdeg;
        else
-           maxRadians = pi * o.cpd / 20;
+           maxRadians = 2 * pi * o.cpd / 20;
        end   
        % Create the sinusoid (s1)
        pha = o.phase * pi/180;
@@ -132,9 +132,9 @@ classdef grating < stimuli.stimulus
        %********** composite grating with two CPD
        if ~isnan(o.cpd2)
            if (o.pixperdeg > 0)
-               maxRadians2 = pi * o.cpd2 /o.pixperdeg;
+               maxRadians2 = 2 * pi * o.cpd2 /o.pixperdeg;
            else
-               maxRadians2 = pi * o.cpd2 / 20;
+               maxRadians2 = 2 * pi * o.cpd2 / 20;
            end   
            s2 = cos( cos(o.orientation*pi/180) * (maxRadians2*Y) + ...
                      sin(o.orientation*pi/180) * (maxRadians2*X) + pha);
@@ -244,14 +244,17 @@ classdef grating < stimuli.stimulus
         alpha = imresize(alpha, [texrect(4)-texrect(2) texrect(3)-texrect(1)]);
         
         % -- try to be a little quicker
-        Iscreen = zeros(1920,1080);
+        if isempty(o.screenRect)
+            o.screenRect = [0 0 1920 1080]; % default resolution
+        end
+        Iscreen = zeros(o.screenRect(4),o.screenRect(3));
         Iscreen(texrect(2):texrect(4)-1, texrect(1):texrect(3)-1) = (mean(I,3) - o.bkgd).*alpha;
-        Ascreen = zeros(1920,1080);
+        Ascreen = zeros(o.screenRect(4),o.screenRect(3));
         Ascreen(texrect(2):texrect(4)-1, texrect(1):texrect(3)-1) = alpha;
         
         tmprect = rect;
-        tmprect(3) = rect(3)-rect(1)-binsize;
-        tmprect(4) = rect(4)-rect(2)-binsize;
+        tmprect(3) = rect(3)-rect(1)-1;
+        tmprect(4) = rect(4)-rect(2)-1;
         
         im = imcrop(Iscreen, tmprect); % requires the imaging processing toolbox
         alpha = imcrop(Ascreen, tmprect);
