@@ -14,7 +14,7 @@ S = MarmoViewRigSettings;
 S.MarmoViewVersion = '5';
 
 % PARAMETER DESCRIBING TRIAL NUMBER TO STOP TASK
-S.finish = 10;
+S.finish = 20;
 
 % PROTOCOL PREFIX
 S.protocol = 'ForageProceduralNoise';
@@ -70,11 +70,11 @@ P.faceTime = 0.1;  % duration of flashed face, in ms
 S.faceTime = 'Duration of Face Flash (s):';
 
 %************** Probe properties
-P.proberadius = 1.0;  % radius of target is dva
+P.proberadius = 2.0; %1.0  % radius of target is dva
 S.proberadius = 'Size of Target(dva):';
 P.probecon = 0.50; 
 S.probecon = 'Transparency of Probe (1-none, 0-gone):';
-P.proberange = 48; %a bit brighter
+P.proberange = 64; %48; %a bit brighter
 S.proberange = 'Luminance range of grating (1-127):';
 P.stimEcc = 3.0;
 S.stimEcc = 'Ecc of stimulus (degrees):';
@@ -86,7 +86,7 @@ P.orinum = 3;
 S.orinum = 'Orientations to sample of stimulus';
 P.prefori = 40;
 S.prefori = 'Preferred orientation (degs):';
-P.cpd = 4;  
+P.cpd = 2; %4 
 S.cpd = 'Probe Spatial Freq (cyc/deg)';
 %*****
 P.nonprefori = 130;  

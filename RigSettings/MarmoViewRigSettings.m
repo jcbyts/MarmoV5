@@ -18,13 +18,14 @@ function S = MarmoViewRigSettings
 % monitor related variables here.
 % 
 % RigName = 'propixx';
-% RigName = 'propixx240';
-RigName = 'test240';
+RigName = 'propixx240';
+% RigName = 'test240';
 
 switch RigName
     case 'Rig3'
         S.newera = true;         % use Newera juice pump
         S.eyetracker = 'arrington';
+        S.eyelink = false;
         S.arrington = true;      % use Arrington eye tracker
         S.DummyEye = false;       % use mouse instead of eye tracker
         S.solenoid = false;      % use solenoid juice delivery
@@ -47,6 +48,7 @@ switch RigName
     case 'ddpi'
         S.newera = false;         % use Newera juice pump
         S.eyetracker = 'ddpi';
+        S.eyelink = false;
         S.arrington = false;      % use Arrington eye tracker
         S.DummyEye = false;       % use mouse instead of eye tracker
         S.solenoid = false;      % use solenoid juice delivery
@@ -70,6 +72,7 @@ switch RigName
     case 'propixx240'
         S.newera = true;         % use Newera juice pump
         S.eyetracker = 'ddpi';
+        S.eyelink = false;
         S.arrington = true;      % use Arrington eye tracker
         S.DummyEye = false;       % use mouse instead of eye tracker
         S.solenoid = false;      % use solenoid juice delivery
@@ -92,6 +95,7 @@ switch RigName
     case 'propixx'
         S.newera = true;         % use Newera juice pump
         S.pumpCom = 'COM3'; 
+        S.eyelink = false;
         S.eyetracker = 'none'; %'ddpi';
         S.arrington = true;      % use Arrington eye tracker
         S.DummyEye = true;       % use mouse instead of eye tracker
@@ -116,6 +120,7 @@ switch RigName
     case 'test240'
         S.newera = true;         % use Newera juice pump
         S.arrington = false;      % use Arrington eye tracker
+        S.eyelink = false;
         S.DummyEye = true;       % use mouse instead of eye tracker
         S.solenoid = false;      % use solenoid juice delivery
         S.DummyScreen = false;   % don't use a Dummy Display
@@ -138,6 +143,7 @@ switch RigName
     otherwise % laptop development
         S.newera = false;
         S.solenoid = false;
+        S.eyelink = false;
         S.arrington = false;
         S.DummyEye = true; % switch on if you want a small PTB window
         S.DummyScreen = true;
