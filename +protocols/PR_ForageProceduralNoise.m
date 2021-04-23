@@ -219,6 +219,35 @@ classdef PR_ForageProceduralNoise < protocols.protocol
                o.hNoise.size = P.dotSize * S.pixPerDeg;
                o.hNoise.speed = P.dotSpeedSigma * S.pixPerDeg / S.frameRate;
                o.hNoise.updateEveryNFrames = ceil(S.frameRate / P.noiseFrameRate);
+           
+           %***************************************************************
+           case 6 % Drifting grating background
+               
+               o.NoiseHistory = zeros(o.MaxFrame,4); % time, orientation, cpd, phase
+               
+               % select spatial frequencies
+               if (P.spfnum > 1) && (P.spfmax > P.spfmin)
+                   o.spatfreqs = exp( log(P.spfmin):(log(P.spfmax)-log(P.spfmin))/(P.spfnum-1):log(P.spfmax));
+               else
+                   o.spatfreqs = ones(1,P.spfnum) * P.spfmax;
+               end
+               
+               % select possible directions
+               o.spatoris = (0:(P.noiseorinum-1))*360/P.noiseorinum;
+               if (isfield(P,'orioffset'))
+                   o.spatoris = o.spatoris + P.orioffset;
+               end
+               o.noiseNum = P.noiseorinum * P.spfnum;
+               
+               % noise object is created here
+               o.hNoise = stimuli.gratingFFnoise(o.winPtr, 'pixPerDeg', S.pixPerDeg);
+               o.hNoise.numOrientations = P.noiseorinum;
+               o.hNoise.orientations = o.spatoris;
+               o.hNoise.spatialFrequencies = o.spatfreqs;
+               o.hNoise.randomizePhase = P.noiseRandomizePhase;
+               o.hNoise.updateEveryNFrames = ceil(S.frameRate / P.noiseFrameRate);
+               o.hNoise.updateTextures(); % create the procedural texture
+               o.hNoise.contrast = P.noiseContrast;
         
                
        end

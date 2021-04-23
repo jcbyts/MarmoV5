@@ -15,13 +15,13 @@ gratpro = stimuli.grating_procedural(winPtr);
 grat = stimuli.grating(winPtr);
 
 % set paramters
-cpd = 5;
-ori = 30;
+cpd = 1;
+ori = 0;
 phi = 180;
 gauss = true;
 
 %%
-P.snoisediam = 5;
+P.snoisediam = inf;
 % match the two gratings
 grat.screenRect = S.screenRect;
 gratpro.screenRect = S.screenRect;
@@ -55,11 +55,16 @@ gratpro.pixperdeg = S.pixPerDeg;
 grat.updateTextures();
 gratpro.updateTextures();
 
-grat.position = [700 360];
-gratpro.position = [700 460];
+grat.position = [400 260];
+gratpro.position = [400 360];
 %%
-grat.drawGrating()
+% grat.orientation = 0;
+% grat.drawGrating()
+gratpro.transparent = .05;
+gratpro.orientation = 90;
+gratpro.phase = gratpro.phase - 30;
 gratpro.drawGrating();
+
 % 
 rect = CenterRectOnPointd([0 0 gratpro.pixperdeg gratpro.pixperdeg]*P.snoisediam, gratpro.position(1), gratpro.position(2));
 % rect([2 4]) = rect([2 4]) + gratpro.pixperdeg*3;
