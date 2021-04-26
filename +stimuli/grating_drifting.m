@@ -33,6 +33,7 @@ classdef grating_drifting < stimuli.stimulus
         
         directions double       % list of directions
         speeds double
+        speed=0
         spatialFrequencies double % list of spatial frequencies
         randomizePhase logical
         durationOn double  % duration a grating is on (frames)
@@ -45,13 +46,14 @@ classdef grating_drifting < stimuli.stimulus
         tex         % the texture object
         texRect     % texture object rect
         screenRect
+        frameRate
         pixPerDeg double
-        orientation % orientation of current grating
-        cpd % cycles per degree of current grating
-        contrast % contrast of current grating
+        orientation=0 % orientation of current grating
+        cpd=0 % cycles per degree of current grating
+        contrast=0 % contrast of current grating
         frameUpdate % counter for updating the frame
-        phase % phase of the current grating
-        dphase % current phase step
+        phase=0 % phase of the current grating
+        dphase=0 % current phase step
         
     end
     
@@ -69,6 +71,7 @@ classdef grating_drifting < stimuli.stimulus
             ip.addParameter('numDirections', 16)
             ip.addParameter('speeds', 5) % phase shift per frame
             ip.addParameter('pixPerDeg', [])
+            ip.addParameter('frameRate', [])
             ip.addParameter('position', [500 500])
             ip.addParameter('diameter', inf) % inf = fullfield
             ip.addParameter('durationOn', 10)
@@ -89,6 +92,11 @@ classdef grating_drifting < stimuli.stimulus
             if isempty(obj.pixPerDeg)
                 warning('gabornoise: I need the pixPerDeg to be accurate')
                 obj.pixPerDeg = 37.5048;
+            end
+            
+            if isempty(obj.frameRate)
+                warning('gabornoise: I need the frameRate to be accurate')
+                obj.frameRate = 60;
             end
             
             obj.frameUpdate = 0;
@@ -137,11 +145,12 @@ classdef grating_drifting < stimuli.stimulus
                     % orientation
                     obj.orientation = randsample(obj.rng, obj.directions, 1)+90; % orientation is 90° from direction
                     
-                    if numel(obj.speeds)==1
-                        obj.dphase = obj.speeds;
-                    else
-                        obj.dphase = randsample(obj.rng, obj.speeds);
-                    end
+%                     if numel(obj.speeds)==1
+%                         obj.dphase = obj.speeds*obj.cpd*360;
+%                     else
+                    obj.speed = randsample(obj.rng, obj.speeds, 1);
+                    obj.dphase = obj.speed/obj.frameRate*obj.cpd*360;
+%                     end
                     
                     % phase
                     if obj.randomizePhase % randomize initial phase of grating
@@ -150,11 +159,9 @@ classdef grating_drifting < stimuli.stimulus
                     
                     obj.frameUpdate = obj.durationOn;
                     
-                    if numel(obj.contrasts) > 1
-                        obj.contrast = randsample(obj.rng, obj.contrasts);
-                    else
-                        obj.contrast = obj.contrasts(1);
-                    end
+
+                    obj.contrast = randsample(obj.rng, obj.contrasts, 1);
+
                 end
                 
                 obj.tex.cpd = obj.cpd;
@@ -202,7 +209,7 @@ classdef grating_drifting < stimuli.stimulus
           
         function CloseUp(obj)
             if ~isempty(obj.tex)
-                Screen('Close',obj.tex);
+%                 Screen('Close',obj.tex);
                 obj.tex = [];
             end
         end

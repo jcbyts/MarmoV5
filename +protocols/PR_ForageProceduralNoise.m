@@ -222,32 +222,32 @@ classdef PR_ForageProceduralNoise < protocols.protocol
            
            %***************************************************************
            case 6 % Drifting grating background
+        
+               o.NoiseHistory = zeros(o.MaxFrame,7); % time, orientation, cpd, phase, direction, speed, contrast
                
-               o.NoiseHistory = zeros(o.MaxFrame,4); % time, orientation, cpd, phase
-               
-               % select spatial frequencies
-               if (P.spfnum > 1) && (P.spfmax > P.spfmin)
-                   o.spatfreqs = exp( log(P.spfmin):(log(P.spfmax)-log(P.spfmin))/(P.spfnum-1):log(P.spfmax));
-               else
-                   o.spatfreqs = ones(1,P.spfnum) * P.spfmax;
-               end
-               
-               % select possible directions
-               o.spatoris = (0:(P.noiseorinum-1))*360/P.noiseorinum;
-               if (isfield(P,'orioffset'))
-                   o.spatoris = o.spatoris + P.orioffset;
-               end
-               o.noiseNum = P.noiseorinum * P.spfnum;
+               % position
+               x = P.GratCtrX*S.pixPerDeg + S.centerPix(1);
+               y = -P.GratCtrY*S.pixPerDeg + S.centerPix(2);
                
                % noise object is created here
-               o.hNoise = stimuli.gratingFFnoise(o.winPtr, 'pixPerDeg', S.pixPerDeg);
-               o.hNoise.numOrientations = P.noiseorinum;
-               o.hNoise.orientations = o.spatoris;
-               o.hNoise.spatialFrequencies = o.spatfreqs;
-               o.hNoise.randomizePhase = P.noiseRandomizePhase;
-               o.hNoise.updateEveryNFrames = ceil(S.frameRate / P.noiseFrameRate);
+               o.hNoise = stimuli.grating_drifting(o.winPtr, ...
+                    'numDirections', P.numDir, ...
+                    'minSF', P.GratSFmin, ...
+                    'numOctaves', P.GratNumOct, ...
+                    'pixPerDeg', S.pixPerDeg, ...
+                    'frameRate', S.frameRate, ...
+                    'speeds', P.GratSpeed, ...
+                    'position', [x y], ...
+                    'screenRect', S.screenRect, ...
+                    'diameter', P.GratDiameter, ...
+                    'durationOn', P.GratDurOn, ...
+                    'durationOff', P.GratDurOff, ...
+                    'isiJitter', P.GratISIjit, ...
+                    'contrasts', P.GratCon, ...
+                    'randomizePhase', P.RandPhase);
+                
+               o.hNoise.beforeTrial();
                o.hNoise.updateTextures(); % create the procedural texture
-               o.hNoise.contrast = P.noiseContrast;
         
                
        end
@@ -363,7 +363,7 @@ classdef PR_ForageProceduralNoise < protocols.protocol
                     o.hNoise.probBlank = 1-o.P.probNoise;
                 end
                 
-                if isprop(o.hNoise, 'contrast')
+                if isprop(o.hNoise, 'contrast') && isfield(o.P, 'noiseContrast')
                     o.hNoise.contrast = o.P.noiseContrast;
                 end
                 
@@ -468,6 +468,24 @@ classdef PR_ForageProceduralNoise < protocols.protocol
                      o.FrameCount = o.FrameCount + 1;
                      % NOTE: store screen time in "continue_run_trial" after flip
                      o.NoiseHistory(o.FrameCount,2:end) = [o.hNoise.x(1:o.noiseNum) o.hNoise.y(1:o.noiseNum)];  % xposition of first gabor
+                 
+                 case 6 % drifting gratings
+                     
+                     o.hNoise.afterFrame(); % update parameters
+                     o.hNoise.beforeFrame(); % draw
+                     
+                     %**********
+                     o.FrameCount = o.FrameCount + 1;
+                     % NOTE: store screen time in "continue_run_trial" after flip
+                     o.NoiseHistory(o.FrameCount,2) = o.hNoise.orientation;  % store orientation
+                     o.NoiseHistory(o.FrameCount,3) = o.hNoise.cpd;  % store spatialfrequency
+                     o.NoiseHistory(o.FrameCount,4) = o.hNoise.phase;
+                     o.NoiseHistory(o.FrameCount,5) = o.hNoise.orientation-90;
+                     o.NoiseHistory(o.FrameCount,6) = o.hNoise.speed;
+                     o.NoiseHistory(o.FrameCount,7) = o.hNoise.contrast;
+                     
+                     % time, orientation, cpd, phase, direction, speed, contrast
+                     
              end
             %****************
          end
