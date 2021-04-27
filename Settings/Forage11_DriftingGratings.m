@@ -110,110 +110,16 @@ P.showEye = 0;
 S.showEye = 'Show the gaze indicator? (0 or 1):';
 
 %***** FORAGE CAN ACCEPT DIFFERENT BACKGROUND TYPES *****
-P.noisetype = 6;
+P.noisetype = 6; % this corresponds to what PR_ForageProceduralNoise does
 S.noisetype = 'Cannot change during protocol';
 
 switch P.noisetype
-    case 1 % Hartley type noise
-        %****** Hartley type spf and orientation stim
-        % not perfect, in radial space than ori/freq domain
-        P.orioffset = 0;
-        S.orioffset = 'Offset start Ori (degs):';
-        P.noiseorinum = 8;
-        S.noiseorinum = 'Noise orientations:';
-        P.spfnum = 4;
-        S.spfnum = 'Number of spatial freqs to test';
-        P.spfmin = 2;  % will be [0.5 1 2 4 8 16]
-        S.spfmin = 'Minimum spat freq (cyc/deg):';
-        P.spfmax = 16;   % use log spacing
-        S.spfmax = 'Minimum spat freq (cyc/deg):';
-        %********* parameters for noise stimulus following gaze
-        P.probNoise = 0.10;  % fraction of frames with orientation instead of blank
-        S.probNoise = 'Fraction frames no blank: ';
-        P.noiseContrast = .25;
-        S.noiseContrast = 'Contrast of the noise (0-1):';
-        
-        P.noiseradius = Inf; %4.0;  % diameter of target is dva
-        S.noiseradius = 'Size of Face(dva):';
-        P.noiserange = 127;
-        S.noiserange = 'Luminance range of grating (1-127):';
-        P.dontclear = 0;
-        P.noiseFrameRate = 60;
-        S.noiseFrameRate = 'frame rate of the noise background:';
-        
-    case 2
-        %****** in this version fixation noise is spatial noise
-        P.snoisewidth = 25.0;  % radius of noise field around origin
-        S.snoisewidth = 'Spatial noise width (degs, +/- origin):';
-        P.snoiseheight = 15.0;  % radius of noise field around origin
-        S.snoiseheight = 'Spatial noise height (degs, +/- origin):';
-        P.snoisenum = 8;   % number of white/black ovals to draw
-        S.snoisenum = 'Number of noise ovals:';
-        P.snoisediam = 1.0; %2.0; % diameter in dva of noise oval
-        S.snoisediam = 'Diameter of noise ovals (dva): ';
-        P.range = 64; %127;
-        S.range = 'Luminance range of grating (1-127):';
-        
-    case 3
-        %****** in this version it is CSD, whole field white background
-        %********* parameters for noise stimulus following gaze
-        P.noisedur = 40;  % number of frames to hold on stim
-        S.noisedur = 'Frames on of stim: ';
-        P.noiseoff = 80;  % number of frames to hold on stim
-        S.noiseoff = 'Frames off of stim: ';
-        P.noiserange = 127;
-        S.noiserange = 'Luminance range of flash (1-127):';
-        %*************
-        
-    case 4 % Garborium noise (based off "ProceduralGarboriumDemo")
-        P.spfmin = 2;  % will be [0.5 1 2 4 8 16]
-        S.spfmin = 'Minimum spat freq (cyc/deg):';
-        
-        P.noiseCenterX = 0;
-        S.noiseCenterX = 'Center of the noise patch (d.v.a):';
-        
-        P.noiseCenterY = 0;
-        S.noiseCenterY = 'Center of the noise patch (d.v.a):';
-        
-        P.noiseRadius = 20;
-        S.noiseRadius = 'width of the noise patch (d.v.a):';
-        
-        P.numGabors = 800;
-        S.numGabors = 'Number of Gabors:';
-        
-        P.spfrange = 15;   % use log spacing
-        S.spfrange = 'Range of spat freqs (cyc/deg):';
-        
-        P.noiseFrameRate = 60;
-        S.noiseFrameRate = 'frame rate of the noise background:';
-        
-        P.noiseContrast = 2.0;
-        S.noiseContrast = 'Contrast of the noise (0-1):';
-        
-        P.minScale = .1;
-        S.minScale = 'minimum width (stdev) of gabors (d.v.a):';
-        
-        P.scaleRange = .15;
-        S.scaleRange = 'range of stdevs (d.v.a):';
-        
-    case 5 % spatial noise dots (using DrawDots)
-        P.numDots = 1500;
-        S.numDots = 'number of dots to show on each frame:';
-        
-        P.dotSize = .05;
-        S.dotSize = 'individual dot size (d.v.a):';
-        
-        P.noiseContrast = 1.0;
-        S.noiseContrast = 'contrast of the dot noise:';
-        
-        P.noiseFrameRate = 60;
-        S.noiseFrameRate = 'frame rate of the noise background:';
         
     case 6 % drifting gratings
         P.numDir = 16;
         S.numDir = 'Number of directions to draw from:';
         
-        P.GratSFmin = .5;  % will be [0.5 1 2 4 8 16]
+        P.GratSFmin = .5;  % will be [0.5 1 2 4 8]
         S.GratSFmin = 'Minimum spat freq (cyc/deg):';
         
         P.GratNumOct = 5;   % use log spacing
@@ -231,7 +137,7 @@ switch P.noisetype
         P.GratDiameter = inf;
         S.GratDiameter = 'Grating Diameter (d.v.a., inf = full):';
         
-        P.GratDurOn = 50;
+        P.GratDurOn = 100;
         S.GratDurOn = 'Grating on duration (frames):';
         
         P.GratDurOff = 40;

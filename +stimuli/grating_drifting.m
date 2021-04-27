@@ -5,18 +5,31 @@ classdef grating_drifting < stimuli.stimulus
     % Sample code:
     % Paste in this code snippet to see how to use, and demonstrate the
     % seed reconstruction
-    % o = stimuli.gratingFFnoise(A.window, 'pixPerDeg', S.pixPerDeg, ...
-    %   'numDirections', 16, ...
-    %   'minSF', 0.5, ...
-    %   'numOctaves', 5, ...
-    %   'randomizePhase', true, ...
-    %   'probBlank', 0.5);
-    % o.updateTextures();
-    % o.updateEveryNFrames = 3; % only update every N frames
+    %     grat = stimuli.grating_drifting(winPtr, ...
+    %         'numDirections', 16, ...
+    %         'minSF', 1, ...
+    %         'numOctaves', 3, ...
+    %         'pixPerDeg', S.pixPerDeg, ...
+    %         'speeds', 1, ...
+    %         'position', [500 250], ...
+    %         'screenRect', S.screenRect, ...
+    %         'diameter', 10, ...
+    %         'durationOn', 50, ...
+    %         'durationOff', 40, ...
+    %         'isiJitter', 10, ...
+    %         'contrasts', 0.25, ...
+    %         'randomizePhase', true);
+    %     
+    %     grat.beforeTrial()
+    %     grat.updateTextures()
     %
-    % o.afterFrame();
-    % o.beforeFrame();
-    % Screen('Flip', A.window);
+    %     t0 = GetSecs;
+    %     while GetSecs < t0 +5 % runs 5 seconds of grating stimulus
+    %         grat.afterFrame()
+    %         grat.beforeFrame()
+    %         Screen('Flip', winPtr, 0);
+    %     end
+
     
     properties
         winPtr % PTB window pointer
@@ -83,6 +96,15 @@ classdef grating_drifting < stimuli.stimulus
             
             ip.parse(varargin{:});
             
+            % create procedural grating object
+            obj.tex = stimuli.grating_procedural(obj.winPtr);
+  
+            obj.tex.range = 127; % TODO: bit depth shouldn't be hard coded
+            obj.tex.square = false;
+            obj.tex.gauss = true;
+            obj.tex.bkgd = 127;
+
+            
             args = ip.Results;
             props = fieldnames(args);
             for iField = 1:numel(props)
@@ -90,27 +112,44 @@ classdef grating_drifting < stimuli.stimulus
             end
             
             if isempty(obj.pixPerDeg)
-                warning('gabornoise: I need the pixPerDeg to be accurate')
+                warning('grating_drifting: I need the pixPerDeg to be accurate')
                 obj.pixPerDeg = 37.5048;
             end
             
             if isempty(obj.frameRate)
-                warning('gabornoise: I need the frameRate to be accurate')
+                warning('grating_drifting: I need the frameRate to be accurate')
                 obj.frameRate = 60;
             end
             
+            % match the two gratings (some parameters automatically match
+            % -- should we do this for all?)
+            obj.tex.screenRect = obj.screenRect;
+            obj.tex.radius = round((obj.diameter/2)*obj.pixPerDeg);
+            obj.tex.pixperdeg = obj.pixPerDeg;
+                        
             obj.frameUpdate = 0;
             
             % initialize direction and spatial frequency space
             obj.directions = 0:(360/obj.numDirections):(360-(360/obj.numDirections));
             obj.spatialFrequencies = obj.minSF * 2.^(0:obj.numOctaves-1);
             obj.phase = 0;
+            obj.contrast = 0; % initialize to off
         end
         
         function beforeTrial(obj)
             obj.setRandomSeed();
             obj.frameUpdate = 0;
-            obj.stimValue=0;
+            obj.contrast = 0;
+            obj.phase = 0; 
+        end
+        
+        function reset(obj)
+            % resets object to the last seed with the proper state to
+            % reproduce
+            obj.rng.reset();
+            obj.frameUpdate = 0;
+            obj.contrast = 0;
+            obj.phase = 0; 
         end
         
         function beforeFrame(obj)
@@ -126,16 +165,15 @@ classdef grating_drifting < stimuli.stimulus
             if obj.frameUpdate==0
                 
                 % if grating was just "on" enter "off" mode
-                if obj.stimValue==1 % grating is on, turn it off
+                if obj.contrast > 0 % grating is on, turn it off
                     
 %                     obj.cpd = 0; % grating is blank (CPD = 0)
                     jitter = round(rand(obj.rng)*obj.isiJitter);
                     obj.frameUpdate = -(obj.durationOff + jitter); % new frame update is a negative number to indicate time off
                     obj.stimValue = 0; % turn stimulus off
-                    
                     obj.contrast = 0;
                     
-                elseif obj.stimValue==0 % stimulus was just off
+                elseif obj.contrast == 0 % stimulus was just off
                     
                     obj.stimValue = 1; % turn stimulus off
                     
@@ -144,35 +182,25 @@ classdef grating_drifting < stimuli.stimulus
                     
                     % orientation
                     obj.orientation = randsample(obj.rng, obj.directions, 1)+90; % orientation is 90° from direction
-                    
-%                     if numel(obj.speeds)==1
-%                         obj.dphase = obj.speeds*obj.cpd*360;
-%                     else
                     obj.speed = randsample(obj.rng, obj.speeds, 1);
                     obj.dphase = obj.speed/obj.frameRate*obj.cpd*360;
-%                     end
                     
                     % phase
                     if obj.randomizePhase % randomize initial phase of grating
                         obj.phase = rand(obj.rng,1)*180; % phase
+                    else
+                        obj.phase = 0;
                     end
                     
                     obj.frameUpdate = obj.durationOn;
                     
-
                     obj.contrast = randsample(obj.rng, obj.contrasts, 1);
 
                 end
-                
-                obj.tex.cpd = obj.cpd;
-                obj.tex.orientation = obj.orientation;
-                
-                
-                obj.tex.transparent = obj.contrast;
+
             end
             
             obj.phase = obj.phase - obj.dphase;
-            obj.tex.phase = obj.phase;
             
             if obj.frameUpdate < 0
                 obj.frameUpdate = obj.frameUpdate + 1;
@@ -184,24 +212,6 @@ classdef grating_drifting < stimuli.stimulus
         
         function updateTextures(obj, varargin)
             % update grating texture
-            obj.tex = stimuli.grating_procedural(obj.winPtr);
-            
-            % match the two gratings
-            obj.tex.screenRect = obj.screenRect;
-            obj.tex.radius = round((obj.diameter/2)*obj.pixPerDeg);
-            
-            obj.tex.phase = 0; % black
-            obj.tex.orientation = 0; % cpd will be zero => all one color
-            obj.tex.cpd = 0; % when cpd is zero, you get a Gauss
-            
-            obj.tex.position = obj.position;
-            obj.tex.range = 127; % bit depth shouldn't be hard coded
-            obj.tex.square = false;
-            obj.tex.gauss = true;
-            obj.tex.bkgd = 127;
-            obj.tex.transparent = obj.contrast;
-            obj.tex.pixperdeg = obj.pixPerDeg;
-            
             obj.tex.updateTextures();
         end
         
@@ -209,8 +219,7 @@ classdef grating_drifting < stimuli.stimulus
           
         function CloseUp(obj)
             if ~isempty(obj.tex)
-%                 Screen('Close',obj.tex);
-                obj.tex = [];
+                obj.tex.CloseUp();
             end
         end
         
@@ -226,6 +235,75 @@ classdef grating_drifting < stimuli.stimulus
             
         end
         
+        
+        % --- GET / SET methods
+        % we use get/set methods for properties that are shared by the
+        % procedural grating texture and the drifting grating object
+        
+        % Phase
+        function set.phase(obj, x)
+            obj.phase = x;
+            if ~isempty(obj.tex)
+                obj.tex.phase = x;
+            end
+        end
+        
+        function x = get.phase(obj)
+            if ~isempty(obj.tex)
+                x = obj.tex.phase;
+            else
+                x = obj.phase;
+            end
+        end
+        
+        % Orientation
+        function set.orientation(obj, x)
+            obj.orientation = x;
+            if ~isempty(obj.tex) %#ok<*MCSUP>
+                obj.tex.orientation = x;
+            end
+        end
+        
+        function x = get.orientation(obj)
+            if ~isempty(obj.tex)
+                x = obj.tex.orientation;
+            else
+                x = obj.orientation;
+            end
+        end
+        
+        % Contrast
+        function set.contrast(obj, x)
+            obj.contrast = x;
+            if ~isempty(obj.tex) %#ok<*MCSUP>
+                obj.tex.transparent = x;
+            end
+        end
+        
+        function x = get.contrast(obj)
+            if ~isempty(obj.tex)
+                x = obj.tex.transparent;
+            else
+                x = obj.contrast;
+            end
+        end
+        
+        % Position
+        function set.position(obj, x)
+            obj.position = x;
+            if ~isempty(obj.tex) %#ok<*MCSUP>
+                obj.tex.position = x;
+            end
+        end
+        
+        function x = get.position(obj)
+            if ~isempty(obj.tex)
+                x = obj.tex.position;
+            else
+                x = obj.position;
+            end
+        end
+
         
     end
 end

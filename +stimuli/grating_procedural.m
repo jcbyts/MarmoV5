@@ -102,7 +102,8 @@ classdef grating_procedural < stimuli.stimulus
     
     function updateTextures(o)  
        %****** clear previous texture if updaing
-       o.CloseUp(); 
+%        o.CloseUp(); 
+
        %******** Make Gabor Texture for later use   
        if isinf(o.radius)
            if isempty(o.screenRect)

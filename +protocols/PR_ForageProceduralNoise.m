@@ -246,9 +246,7 @@ classdef PR_ForageProceduralNoise < protocols.protocol
                     'contrasts', P.GratCon, ...
                     'randomizePhase', P.RandPhase);
                 
-               o.hNoise.beforeTrial();
                o.hNoise.updateTextures(); % create the procedural texture
-        
                
        end
        %**********************************************************
