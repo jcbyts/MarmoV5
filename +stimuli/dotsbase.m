@@ -47,7 +47,7 @@ classdef (Abstract) dotsbase < stimuli.stimulus
         dotType = 1
     end
     
-    properties (Access = {?stimuli.stimulus})
+    properties (Access = public) %{?stimuli.stimulus}
         winPtr % ptb window
         winRect % ptbwindow size
         winCtr % center of window
@@ -168,6 +168,10 @@ classdef (Abstract) dotsbase < stimuli.stimulus
                 % (re-)place dots randomly within the aperture
                 obj.initDots(idx);
             end
+        end
+        
+        function updateTextures(~, varargin)
+            % dummy for similarity to other modules 
         end
         
         function drawDots(obj)
