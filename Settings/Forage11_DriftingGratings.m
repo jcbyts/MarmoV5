@@ -119,7 +119,7 @@ switch P.noisetype
         P.numDir = 16;
         S.numDir = 'Number of directions to draw from:';
         
-        P.GratSFmin = .5;  % will be [0.5 1 2 4 8]
+        P.GratSFmin = .25;  % will be [0.25 0.5 1 2 4]
         S.GratSFmin = 'Minimum spat freq (cyc/deg):';
         
         P.GratNumOct = 5;   % use log spacing
