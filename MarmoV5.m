@@ -226,6 +226,15 @@ if isfield(handles.S, 'treadmill') && isfield(handles.S.treadmill, 'type')
         otherwise
             handles.treadmill = marmoview.treadmill_dummy();
     end
+    
+    % add the other parameters
+    fields = {'scaleFactor', 'rewardMode', 'rewardDist'};
+    for f = 1:numel(fields)
+        if isfield(handles.S.treadmill, fields{f})
+            handles.treadmill.(fields{f}) = handles.S.treadmill.(fields{f});
+        end
+    end
+    
 else
     handles.treadmill = marmoview.treadmill_dummy();
 end
