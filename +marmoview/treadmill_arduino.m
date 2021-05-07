@@ -29,7 +29,7 @@ classdef treadmill_arduino < matlab.mixin.Copyable
     end
     
     methods
-        function self = treadmill_arduino(~,varargin) % h is the handle for the marmoview gui
+        function self = treadmill_arduino(varargin) % h is the handle for the marmoview gui
             
             % initialise input parser
             ip = inputParser;
