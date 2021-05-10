@@ -207,6 +207,38 @@ else % dump to the old version
     end
 end
 
+% treadmill.type = 'arduino';
+% treadmill.port = 666;
+% treadmill.channelA = 'D3';
+% treadmill.channelB = 'D2';
+
+
+if isfield(handles.S, 'treadmill') && isfield(handles.S.treadmill, 'type')
+    switch handles.S.treadmill.type
+        case 'arduino'
+            handles.treadmill =  marmoview.treadmill_arduino('port', handles.S.treadmill.port, ...
+                'board', 'Uno', ...
+                'name', 'Libraries', ...
+                'value', 'rotaryEncoder', ...
+                'channelA', handles.S.treadmill.channelA, ...
+                'channelB', handles.S.treadmill.channelB);
+            
+        otherwise
+            handles.treadmill = marmoview.treadmill_dummy();
+    end
+    
+    % add the other parameters
+    fields = {'scaleFactor', 'rewardMode', 'rewardDist'};
+    for f = 1:numel(fields)
+        if isfield(handles.S.treadmill, fields{f})
+            handles.treadmill.(fields{f}) = handles.S.treadmill.(fields{f});
+        end
+    end
+    
+else
+    handles.treadmill = marmoview.treadmill_dummy();
+end
+
 %********************************************************
 
 %********* add the task controller for storing eye movements, flipping
@@ -291,7 +323,7 @@ else
     handles.settingsFile = 'none';
 end
 % If file exists, then we can get the protocol initialized
-if exist(handles.settingsFile,'file');
+if exist(handles.settingsFile,'file')
     if (strcmp(handles.outputSubject,'none'))
        set(handles.Initialize,'Enable','off');
        tstring = 'Please select SUBJECT NAME >>>';
@@ -394,7 +426,7 @@ end
 
 % FOR EYELINK, you cannot setup until you have screen pointer and each
 % edf file is created per opening the screen
-if handles.S.eyelink,
+if handles.S.eyelink
     if handles.S.EyeDump
                eyeFile = sprintf('%s_%s_%s_%s', ...
                               handles.outputPrefix, ...
@@ -782,6 +814,9 @@ while handles.runTask && A.j <= A.finish
     [ex,ey] = handles.eyetrack.getgaze();
     pupil = handles.eyetrack.getpupil();
     
+    % treadmill reset
+    handles.treadmill.reset();
+    
     %******* This is where to perform TimeStamp Syncing (start of trial)
     STARTCLOCK = handles.FC.prep_run_trial([ex,ey],pupil);
     STARTCLOCKTIME = GetSecs;
@@ -823,6 +858,9 @@ while handles.runTask && A.j <= A.finish
        %**********************************
 
        drop = PR.state_and_screen_update(currentTime,x,y);
+       
+       % treadmill
+       drop = handles.treadmill.afterFrame(currentTime, drop);
        
        %******* One idea, only deliver drop if there is alot of time
        %******* before the next screen flush (since drop command takes time)
@@ -952,6 +990,9 @@ while handles.runTask && A.j <= A.finish
     D.rewardtimes = rewardtimes;    % log the time of juice pulses
     D.juiceButtonCount = handles.A.juiceCounter; % SUPPLEMENTARY JUICE DURING THE TRIAL
     D.juiceVolume = A.juiceVolume; % THE VOLUME OF JUICE PULSES DURING THE TRIAL
+    D.treadmill = copy(handles.treadmill); % is this the best way?
+    D.treadmill.locationSpace(D.treadmill.frameCounter:end,:) = [];
+    
     %***************
     % SAVE THE DATA
     % here is a place to think as well ... what is the best way to save D?

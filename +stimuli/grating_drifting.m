@@ -303,6 +303,22 @@ classdef grating_drifting < stimuli.stimulus
                 x = obj.position;
             end
         end
+        
+        % spatial frequency
+        function set.cpd(obj, x)
+            obj.cpd = x;
+            if ~isempty(obj.tex) %#ok<*MCSUP>
+                obj.tex.cpd = x;
+            end
+        end
+        
+        function x = get.cpd(obj)
+            if ~isempty(obj.tex)
+                x = obj.tex.cpd;
+            else
+                x = obj.cpd;
+            end
+        end
 
         
     end

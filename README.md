@@ -22,3 +22,5 @@ This will open the Marmoview GUI. Enter the subject name and hit enter. Then use
 
 Make sure this runs. Then contact Jake.
 
+### Debugging tricks
+If MarmoV5 crashes, close the screen with `sca` and close the GUI with `close all force`. This will get you back to the starting point.

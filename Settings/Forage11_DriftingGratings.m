@@ -118,7 +118,7 @@ switch P.noisetype
     case 6 % drifting gratings
         P.numDir = 12;
         S.numDir = 'Number of directions to draw from:';
-        
+
         P.GratSFmin = 1;  % will be [0.5 1 2 4 8]
         S.GratSFmin = 'Minimum spat freq (cyc/deg):';
         
