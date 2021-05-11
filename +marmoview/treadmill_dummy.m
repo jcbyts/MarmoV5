@@ -84,7 +84,12 @@ classdef treadmill_dummy < matlab.mixin.Copyable
             self.locationSpace(:) = nan;
         end
         
-    end % private methods
+        function close(~)
+            % dummy for compatibility with real treadmill objects
+            
+        end
+        
+    end 
     
     methods (Static)
        
