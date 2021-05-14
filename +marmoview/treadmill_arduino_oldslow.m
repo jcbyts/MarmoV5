@@ -1,6 +1,6 @@
 % wrapper class for treadmill
 % 4/28/2021 - Jake Yates
-classdef treadmill_arduino < matlab.mixin.Copyable
+classdef treadmill_arduino_oldslow < matlab.mixin.Copyable
     %******* basically is just a wrapper for a bunch of calls to the
     % arduino toolbox. based on code snippet from huklabBasics
     %     https://github.com/HukLab/huklabBasics/blob/584b5d277ba120b2e33e4f05c0657cacde67e1fa/%2Btreadmill/pmTread.m
@@ -29,7 +29,7 @@ classdef treadmill_arduino < matlab.mixin.Copyable
     end
     
     methods
-        function self = treadmill_arduino(varargin) % h is the handle for the marmoview gui
+        function self = treadmill_arduino_oldslow(varargin) % h is the handle for the marmoview gui
             
             % initialise input parser
             ip = inputParser;
