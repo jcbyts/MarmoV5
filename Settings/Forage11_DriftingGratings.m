@@ -116,16 +116,16 @@ S.noisetype = 'Cannot change during protocol';
 switch P.noisetype
         
     case 6 % drifting gratings
-        P.numDir = 16;
+        P.numDir = 12;
         S.numDir = 'Number of directions to draw from:';
-        
-        P.GratSFmin = .25;  % will be [0.25 0.5 1 2 4]
+
+        P.GratSFmin = 1;  % will be [0.5 1 2 4 8]
         S.GratSFmin = 'Minimum spat freq (cyc/deg):';
         
-        P.GratNumOct = 5;   % use log spacing
+        P.GratNumOct = 1;   % use log spacing
         S.GratNumOct = 'Num Spat Freq Octaves:';
     
-        P.GratSpeed = 5;
+        P.GratSpeed = 2;
         S.GratSpeed = 'Grating speed(s) (deg/sec):';
 
         P.GratCtrX = 0;
@@ -146,7 +146,7 @@ switch P.noisetype
         P.GratISIjit = 10;
         S.GratISIjit = 'ISI jitter amount (frames, added to Off duration:';
         
-        P.GratCon = 0.25;
+        P.GratCon = 0.5;
         S.GratCon = 'Grating contrast:';
         
         P.RandPhase = true;

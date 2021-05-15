@@ -1,39 +1,39 @@
-function varargout = MarmoV5(varargin)
-% MARMOV5 M-file for MarmoV5.fig
+function varargout = MarmoV5linux(varargin)
+% MARMOV5LINUX M-file for MarmoV5linux.fig
 %
-%      THIS IS MARMOV5 VERSION 1B, THIS CORRESPONDS TO THE VERSION TEXT
-%      IN THE MarmoV5.fig FILE
+%      THIS IS MARMOV5LINUX VERSION 1B, THIS CORRESPONDS TO THE VERSION TEXT
+%      IN THE MarmoV5linux.fig FILE
 %
-%      MARMOV5, by itself, creates a new MARMOV5 or raises the existing
+%      MARMOV5LINUX, by itself, creates a new MARMOV5LINUX or raises the existing
 %      singleton*.
 %
-%      H = MARMOV5 returns the handle to a new MARMOV5 or the handle to
+%      H = MARMOV5LINUX returns the handle to a new MARMOV5LINUX or the handle to
 %      the existing singleton*.
 %
-%      MARMOV5('CALLBACK',hObject,eventData,handles,...) calls the local
-%      function named CALLBACK in MARMOV5.M with the given input arguments.
+%      MARMOV5LINUX('CALLBACK',hObject,eventData,handles,...) calls the local
+%      function named CALLBACK in MARMOV5LINUX.M with the given input arguments.
 %
-%      MARMOV5('Property','Value',...) creates a new MARMOV5 or raises the
+%      MARMOV5LINUX('Property','Value',...) creates a new MARMOV5LINUX or raises the
 %      existing singleton*.  Starting from the left, property value pairs are
-%      applied to the GUI before MarmoV5_OpeningFcn gets called.  An
+%      applied to the GUI before MarmoV5linux_OpeningFcn gets called.  An
 %      unrecognized property name or invalid value makes property application
-%      stop.  All inputs are passed to MarmoV5_OpeningFcn via varargin.
+%      stop.  All inputs are passed to MarmoV5linux_OpeningFcn via varargin.
 %
 %      *See GUI Options on GUIDE's Tools menu.  Choose "GUI allows only one
 %      instance to run (singleton)".
 %
 % See also: GUIDE, GUIDATA, GUIHANDLES
 
-% Edit the above text to modify the response to help MarmoV5
+% Edit the above text to modify the response to help MarmoV5linux
 
-% Last Modified by GUIDE v2.5 23-Sep-2019 17:01:59
+% Last Modified by GUIDE v2.5 27-Apr-2021 13:44:03
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
 gui_State = struct('gui_Name',       mfilename, ...
                    'gui_Singleton',  gui_Singleton, ...
-                   'gui_OpeningFcn', @MarmoV5_OpeningFcn, ...
-                   'gui_OutputFcn',  @MarmoV5_OutputFcn, ...
+                   'gui_OpeningFcn', @MarmoV5linux_OpeningFcn, ...
+                   'gui_OutputFcn',  @MarmoV5linux_OutputFcn, ...
                    'gui_LayoutFcn',  [] , ...
                    'gui_Callback',   []);
 if nargin && ischar(varargin{1})
@@ -48,15 +48,15 @@ end
 % End initialization code - DO NOT EDIT
 
 
-% --- Executes just before MarmoV5 is made visible.
-function MarmoV5_OpeningFcn(hObject, eventdata, handles, varargin)
+% --- Executes just before MarmoV5linux is made visible.
+function MarmoV5linux_OpeningFcn(hObject, eventdata, handles, varargin)
 % This function has no output args, see OutputFcn.
 % hObject    handle to figure
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-% varargin   command line arguments to MarmoV5 (see VARARGIN)
+% varargin   command line arguments to MarmoV5linux (see VARARGIN)
 
-% Choose default command line output for MarmoV5
+% Choose default command line output for MarmoV5linux
 handles.output = hObject;
 
 %%%%% IMPORTANT GROUNDWORK FOR THE GUI IS PLACED HERE %%%%%%%%%%%%%%%%%%%%%
@@ -68,7 +68,7 @@ handles.taskPath = [fullfile(pwd) filesep];
 handles.settingsPath = fullfile(pwd, ['Settings' filesep]);
 % Output directory, all data will be saved here!
 handles.outputPath = fullfile(pwd, ['Output' filesep]);
-% Support data directory, data to support MarmoV5 or its protocols can be
+% Support data directory, data to support MarmoV5linux or its protocols can be
 % kept here unintrusively (e.g. eye calibration values or marmoset images)
 handles.supportPath = fullfile(pwd, ['SupportData' filesep]);
 %****** start with no settings file
@@ -97,7 +97,7 @@ end
 
 handles.eyeTraceRadius = 15;
 % This C structure is never changed until a protocol is cleared or
-% MarmoV5 is exited, until then, it may be reset to the C values using
+% MarmoV5linux is exited, until then, it may be reset to the C values using
 % the ResetCalib callback.
 
 % CREATE THE STRUCTURES USED BY ALL PROTOCOLS
@@ -112,7 +112,7 @@ handles.FC = marmoview.FrameControl();   % create generic task control
 
 % LOAD RIG SETTINGS TO S, THIS IS RELOADED FOR EACH PROTOCOL, SO IT SHOULD
 % BE LOCATED IN A DIRECTORY IN MATLAB'S PATH, I SUGGEST THE
-% 'marmov5\SupportFunctions' DIRECTORY
+% 'marmov5linux\SupportFunctions' DIRECTORY
 handles.outputSubject = 'none';
 S = MarmoViewRigSettings;
 S.subject = handles.outputSubject;
@@ -207,34 +207,6 @@ else % dump to the old version
     end
 end
 
-% treadmill.type = 'arduino';
-% treadmill.port = 666;
-% treadmill.channelA = 'D3';
-% treadmill.channelB = 'D2';
-
-
-if isfield(handles.S, 'treadmill') && isfield(handles.S.treadmill, 'type')
-    switch handles.S.treadmill.type
-        case 'arduino'
-            handles.treadmill =  marmoview.treadmill_arduino('port', handles.S.treadmill.port, ...
-                'baud', handles.S.treadmill.BaudRate);
-            
-        otherwise
-            handles.treadmill = marmoview.treadmill_dummy();
-    end
-    
-    % add the other parameters
-    fields = {'scaleFactor', 'rewardMode', 'rewardDist'};
-    for f = 1:numel(fields)
-        if isfield(handles.S.treadmill, fields{f})
-            handles.treadmill.(fields{f}) = handles.S.treadmill.(fields{f});
-        end
-    end
-    
-else
-    handles.treadmill = marmoview.treadmill_dummy();
-end
-
 %********************************************************
 
 %********* add the task controller for storing eye movements, flipping
@@ -293,7 +265,7 @@ UpdateEyeText(handles);
 guidata(hObject, handles);
 
 % --- Outputs from this function are returned to the command line.
-function varargout = MarmoV5_OutputFcn(hObject, eventdata, handles)  %#ok<*INUSL>
+function varargout = MarmoV5linux_OutputFcn(hObject, eventdata, handles)  %#ok<*INUSL>
 % varargout  cell array for returning output args (see VARARGOUT);
 % hObject    handle to figure
 % eventdata  reserved - to be defined in a future version of MATLAB
@@ -319,7 +291,7 @@ else
     handles.settingsFile = 'none';
 end
 % If file exists, then we can get the protocol initialized
-if exist(handles.settingsFile,'file')
+if exist(handles.settingsFile,'file');
     if (strcmp(handles.outputSubject,'none'))
        set(handles.Initialize,'Enable','off');
        tstring = 'Please select SUBJECT NAME >>>';
@@ -422,7 +394,7 @@ end
 
 % FOR EYELINK, you cannot setup until you have screen pointer and each
 % edf file is created per opening the screen
-if handles.S.eyelink
+if handles.S.eyelink,
     if handles.S.EyeDump
                eyeFile = sprintf('%s_%s_%s_%s', ...
                               handles.outputPrefix, ...
@@ -618,7 +590,7 @@ set(handles.ProtocolTitle,'String','No protocol is loaded.');
 ChangeLight(handles.TaskLight,[.5 .5 .5]);
 
 %****** RE-ENABLE THE SUBJECT ENTRY, in case want to change subject and
-%****** continue the program without closing MarmoV5 (should be rare)
+%****** continue the program without closing MarmoV5linux (should be rare)
 set(handles.OutputPanel,'Visible','On');
 set(handles.OutputPrefixEdit,'Enable','Off');
 set(handles.OutputSubjectEdit,'Enable','On');   %user can edit this!
@@ -810,9 +782,6 @@ while handles.runTask && A.j <= A.finish
     [ex,ey] = handles.eyetrack.getgaze();
     pupil = handles.eyetrack.getpupil();
     
-    % treadmill reset
-    handles.treadmill.reset();
-    
     %******* This is where to perform TimeStamp Syncing (start of trial)
     STARTCLOCK = handles.FC.prep_run_trial([ex,ey],pupil);
     STARTCLOCKTIME = GetSecs;
@@ -854,9 +823,6 @@ while handles.runTask && A.j <= A.finish
        %**********************************
 
        drop = PR.state_and_screen_update(currentTime,x,y);
-       
-       % treadmill
-       drop = handles.treadmill.afterFrame(currentTime, drop);
        
        %******* One idea, only deliver drop if there is alot of time
        %******* before the next screen flush (since drop command takes time)
@@ -986,9 +952,6 @@ while handles.runTask && A.j <= A.finish
     D.rewardtimes = rewardtimes;    % log the time of juice pulses
     D.juiceButtonCount = handles.A.juiceCounter; % SUPPLEMENTARY JUICE DURING THE TRIAL
     D.juiceVolume = A.juiceVolume; % THE VOLUME OF JUICE PULSES DURING THE TRIAL
-    D.treadmill = copy(handles.treadmill); % is this the best way?
-    D.treadmill.locationSpace(D.treadmill.frameCounter:end,:) = [];
-    
     %***************
     % SAVE THE DATA
     % here is a place to think as well ... what is the best way to save D?

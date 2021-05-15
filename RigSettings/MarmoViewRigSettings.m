@@ -19,8 +19,9 @@ function S = MarmoViewRigSettings
 % 
 % RigName = 'propixx';
 % RigName = 'propixx240';
-RigName = 'test240';
-RigName = 'laptop';
+% RigName = 'test240';
+% RigName = 'laptop';
+RigName = 'treadmill';
 
 switch RigName
     case 'Rig3'
@@ -134,6 +135,30 @@ switch RigName
         S.bgColour = 127; %127; %186;  % use 127 if gamma corrected
         S.gamma = 1;
         S.screenDistance = 79;              % Distance of eye to screen (cm)
+        S.pixPerDeg = PixPerDeg(S.screenDistance,S.screenWidth,S.screenRect(3));
+        
+    case 'treadmill'
+        S.newera = true;         % use Newera juice pump
+        S.pumpCom = '/dev/ttyUSB0';
+        S.eyetracker = 'none'; % hardcoded value for any eyetracker?;
+        S.arrington = true;      % use Arrington eye tracker
+        S.DummyEye = false;       % use mouse instead of eye tracker
+        S.solenoid = false;      % use solenoid juice delivery
+        S.DummyScreen = false;   % don't use a Dummy Display
+        S.EyeDump = true;        % store all eye position data
+        S.DataPixx = true;
+        
+        % setup screen
+        S.monitor = 'PROPIXX';         % Monitor used for display window
+        S.screenNumber = 1;                 % Designates the display for task stimuli
+        S.frameRate = 120; % 120;           % Frame rate of screen in Hz
+        S.screenRect = [0 0 1920 1080];     % Screen dimensions in pixels
+        S.screenWidth = 100;                 % Width of screen (cm)
+        S.centerPix =  [960 540];           % Pixels of center of the screen
+        S.guiLocation = [200 100 900 700];
+        S.bgColour = 127; %127; %186;  % use 127 if gamma corrected
+        S.gamma = 1;
+        S.screenDistance = 60;              % Distance of eye to screen (cm)
         S.pixPerDeg = PixPerDeg(S.screenDistance,S.screenWidth,S.screenRect(3));
 
     otherwise % laptop development
