@@ -140,27 +140,34 @@ switch RigName
     case 'treadmill'
         S.newera = true;         % use Newera juice pump
         S.pumpCom = '/dev/ttyUSB0';
-        S.eyetracker = 'none'; % hardcoded value for any eyetracker?;
+        S.eyetracker = 'eyelink'; % hardcoded value for any eyetracker?;
+        S.eyelink = true;
         S.arrington = true;      % use Arrington eye tracker
         S.DummyEye = false;       % use mouse instead of eye tracker
         S.solenoid = false;      % use solenoid juice delivery
         S.DummyScreen = false;   % don't use a Dummy Display
         S.EyeDump = true;        % store all eye position data
         S.DataPixx = true;
+        S.treadmill.type = 'arduino';
+        S.treadmill.BaudRate = 115200;
+        S.treadmill.port = '/dev/ttyACM0';
+        S.treadmill.scaleFactor = (94.25/5000); % circimference of wheel over ticks per rev
+        S.treadmill.rewardMode = 'dist';
+        S.treadmill.rewardDist = 94.25;
         
         % setup screen
-        S.monitor = 'PROPIXX';         % Monitor used for display window
+        S.monitor = 'BenQ-XL2411Z';         % Monitor used for display window
         S.screenNumber = 1;                 % Designates the display for task stimuli
         S.frameRate = 120; % 120;           % Frame rate of screen in Hz
         S.screenRect = [0 0 1920 1080];     % Screen dimensions in pixels
-        S.screenWidth = 100;                 % Width of screen (cm)
+        S.screenWidth = 54;                 % Width of screen (cm)
         S.centerPix =  [960 540];           % Pixels of center of the screen
         S.guiLocation = [200 100 900 700];
         S.bgColour = 127; %127; %186;  % use 127 if gamma corrected
-        S.gamma = 1;
-        S.screenDistance = 60;              % Distance of eye to screen (cm)
+        S.gamma = 2.2;
+        S.screenDistance = 36;              % Distance of eye to screen (cm)
         S.pixPerDeg = PixPerDeg(S.screenDistance,S.screenWidth,S.screenRect(3));
-
+        
     otherwise % laptop development
         S.newera = false;
         S.solenoid = false;
