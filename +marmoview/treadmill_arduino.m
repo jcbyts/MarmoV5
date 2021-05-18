@@ -28,19 +28,9 @@ classdef treadmill_arduino < matlab.mixin.Copyable
             
             % initialise input parser
             ip = inputParser;
-<<<<<<< HEAD
-            ip.addParameter('port','/dev/ttyACM0');
-            ip.addParameter('board', 'Uno')
-            ip.addParameter('name', 'Libraries')
-            ip.addParameter('value', 'rotaryEncoder')
-            ip.addParameter('channelA', 'D3')
-            ip.addParameter('channelB', 'D2')
-            ip.addParameter('scaleFactor', 2)
-=======
             ip.addParameter('port',[]);
             ip.addParameter('baud', 115200)
             ip.addParameter('scaleFactor', 1)
->>>>>>> 755eeaf22be48b5af162b3bfe61114b7c41cb709
             ip.addParameter('rewardMode', 'dist')
             ip.addParameter('maxFrames', 5e3)
             ip.addParameter('rewardDist', inf)
@@ -64,18 +54,10 @@ classdef treadmill_arduino < matlab.mixin.Copyable
             self.nextReward = self.rewardDist;
         end
         
-<<<<<<< HEAD
-        function reset(self)
-            resetCount(self.encoder);
-            self.frameCounter = 1;
-            self.locationSpace(:) = nan;
-        end            
-=======
         
     end % methods
     
     methods (Access = public)
->>>>>>> 755eeaf22be48b5af162b3bfe61114b7c41cb709
         
         function out = afterFrame(self, currentTime, rewardState)
             
@@ -105,11 +87,6 @@ classdef treadmill_arduino < matlab.mixin.Copyable
             
             out = self.locationSpace(self.frameCounter,5);
             self.frameCounter = self.frameCounter + 1;
-<<<<<<< HEAD
-        end        
-        
-    end % end methods
-=======
         end 
         
         function [count, timestamp] = readCount(self)
@@ -142,7 +119,6 @@ classdef treadmill_arduino < matlab.mixin.Copyable
             end
         end
     end % private methods
->>>>>>> 755eeaf22be48b5af162b3bfe61114b7c41cb709
     
     methods (Static)
        

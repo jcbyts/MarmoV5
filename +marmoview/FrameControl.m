@@ -100,7 +100,7 @@ classdef FrameControl < handle
         o.dy = C.dy;
         %**************
         o.frameRate = S.frameRate;
-        o.FMAX = ceil(20*o.frameRate); % max trial is 20 seconds, regardless of framerate
+        o.FMAX = ceil(60*o.frameRate); % max trial is 20 seconds, regardless of framerate
         o.centerPix = S.centerPix;
         o.pixPerDeg = S.pixPerDeg;
         
