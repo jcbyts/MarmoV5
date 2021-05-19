@@ -224,7 +224,7 @@ if isfield(handles.S, 'treadmill') && isfield(handles.S.treadmill, 'type')
     end
     
     % add the other parameters
-    fields = {'scaleFactor', 'rewardMode', 'rewardDist'};
+    fields = {'scaleFactor', 'rewardMode', 'rewardDist', 'rewardProb'};
     for f = 1:numel(fields)
         if isfield(handles.S.treadmill, fields{f})
             handles.treadmill.(fields{f}) = handles.S.treadmill.(fields{f});
