@@ -82,12 +82,18 @@ classdef treadmill_arduino < matlab.mixin.Copyable
                 
                 case 'dist'
                     if self.locationSpace(self.frameCounter, 4) > self.nextReward   
-                        tmp = double(rand < self.rewardProb);
-                        self.locationSpace(self.frameCounter,5) = self.locationSpace(self.frameCounter,5) + tmp; % add one drop
+%                         tmp = double(rand < self.rewardProb);
+                        self.locationSpace(self.frameCounter,5) = self.locationSpace(self.frameCounter,5) + 1; % add one drop
                         self.nextReward = self.nextReward + self.rewardDist;
                     end  
-                case 'time'
-                    warning('treadmill_arduino: time reward not implemented')
+                case 'distProb'
+                    if self.locationSpace(self.frameCounter, 4) > self.nextReward
+                        tmp = double(rand < self.rewardProb);
+                        self.locationSpace(self.frameCounter,5) = self.locationSpace(self.frameCounter,5) + tmp; % add one drop
+                        if tmp == 1
+                            self.nextReward = self.nextReward + self.rewardDist;
+                        end
+                    end
             end
             
             out = self.locationSpace(self.frameCounter,5);

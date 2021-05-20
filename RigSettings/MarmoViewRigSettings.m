@@ -153,7 +153,7 @@ switch RigName
         S.treadmill.port = '/dev/ttyACM0';
         S.treadmill.scaleFactor = (94.25/5000); % circimference of wheel over ticks per rev
         S.treadmill.rewardMode = 'dist';
-        S.treadmill.rewardDist = 94.25;
+        S.treadmill.rewardDist = 94.25/2;
         
         % setup screen
         S.monitor = 'BenQ-XL2411Z';         % Monitor used for display window

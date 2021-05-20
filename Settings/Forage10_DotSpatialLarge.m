@@ -72,7 +72,7 @@ S.faceTime = 'Duration of Face Flash (s):';
 %************** Probe properties
 P.proberadius = 2.0; %1.0  % radius of target is dva
 S.proberadius = 'Size of Target(dva):';
-P.probecon = 0.50; 
+P.probecon = 0.0; 
 S.probecon = 'Transparency of Probe (1-none, 0-gone):';
 P.proberange = 64; %48; %a bit brighter
 S.proberange = 'Luminance range of grating (1-127):';
