@@ -223,11 +223,15 @@ if isfield(handles.S, 'treadmill') && isfield(handles.S.treadmill, 'type')
             handles.treadmill = marmoview.treadmill_dummy();
     end
     
-    % add the other parameters
+    % add the treadmill parameters
     fields = {'scaleFactor', 'rewardMode', 'rewardDist', 'rewardProb'};
     for f = 1:numel(fields)
         if isfield(handles.S.treadmill, fields{f})
             handles.treadmill.(fields{f}) = handles.S.treadmill.(fields{f});
+            pName = ['tread' fields{f}];
+            handles.P.(pName) = handles.S.treadmill.(fields{f});
+            handles.S.(pName) = sprintf('Treadmill parameter %s', fields{f});
+            handles.S.customTreadmillParams = true;
         end
     end
     
@@ -362,6 +366,19 @@ eval(cmd);
 handles.S.subject = handles.outputSubject;
 cd(handles.taskPath);
 
+% add the treadmill parameters
+if isfield(handles.S, 'treadmill')
+    fields = {'scaleFactor', 'rewardMode', 'rewardDist', 'rewardProb'};
+    for f = 1:numel(fields)
+        if isfield(handles.S.treadmill, fields{f})
+            handles.treadmill.(fields{f}) = handles.S.treadmill.(fields{f});
+            pName = ['tread' fields{f}];
+            handles.P.(pName) = handles.S.treadmill.(fields{f});
+            handles.S.(pName) = sprintf('Treadmill parameter %s', fields{f});
+        end
+    end
+end
+
 % MOVE THE GUI OFF OF THE VISUAL STIMULUS SCREEN TO THE CONSOLE SCREEN
 % THIS IS CHANGED IN PROTOCOL SETTINGS AND IS NOT A NECESSARY SETTING
 if isfield(handles.S,'guiLocation')
@@ -465,6 +482,8 @@ for i = 1:size(handles.pNames,1)
     tName = sprintf('%s = %2g',pName,handles.P.(pName));
     handles.pList{i,1} = tName;
 end
+
+% add parameters to GUI
 set(handles.Parameters,'String',handles.pList);
 % For the highlighted parameter, provide a description and editable value
 set(handles.Parameters,'Value',1);
@@ -526,6 +545,8 @@ function ClearSettings_Callback(hObject, eventdata, handles)
 set(handles.RunTrial,'Enable','Off');
 set(handles.FlipFrame,'Enable','Off');
 set(handles.ClearSettings,'Enable','Off');
+set(handles.ChooseSettings,'Enable','On');
+set(handles.Initialize,'Enable','On');
 set(handles.OutputPanel,'Visible','Off');
 set(handles.ParameterPanel,'Visible','Off');
 set(handles.EyeTrackerPanel,'Visible','Off');
@@ -658,6 +679,8 @@ set(handles.Background_Image,'Enable','Off');
 set(handles.Calib_Screen,'Enable','Off');
 set(handles.CloseGui,'Enable','Off');
 set(handles.ClearSettings,'Enable','Off')
+set(handles.ChooseSettings,'Enable','Off');
+set(handles.Initialize,'Enable','Off');
 set(handles.OutputPrefixEdit,'Enable','Off');
 % set(handles.OutputSubjectEdit,'Enable','Off');
 set(handles.OutputDateEdit,'Enable','Off');
@@ -1076,7 +1099,7 @@ handles.stopTask = false;
 
 % UPDATE THE PARAMETERS LIST IN CASE OF ANY CHANGES MADE AFTER RUNNING THE
 % END TRIAL COMMAND
-for i = 1:size(handles.pNames,1);
+for i = 1:size(handles.pNames,1)
     pName = handles.pNames{i};
     tName = sprintf('%s = %2g',pName,handles.P.(pName));
     handles.pList{i,1} = tName;
@@ -1101,8 +1124,8 @@ set(handles.OutputSuffixEdit,'Enable','Off');
 set(handles.Parameters,'Enable','On');
 set(handles.TrialMaxEdit,'Enable','On');
 set(handles.JuiceVolumeEdit,'Enable','On');
-set(handles.ChooseSettings,'Enable','On');
-set(handles.Initialize,'Enable','On');
+set(handles.ChooseSettings,'Enable','Off');
+set(handles.Initialize,'Enable','Off');
 set(handles.ParameterEdit,'Enable','On');
 %********* Optional Turn Offs *****************
 %****** These might remain on for calib eye
@@ -1197,6 +1220,12 @@ if ~isnan(pValue)
         tName = sprintf('%s = %2g',pName,handles.P.(pName));
         handles.pList{get(handles.Parameters,'Value')} = tName;
         set(handles.Parameters,'String',handles.pList);
+    end
+    
+    % handle treadmill parameters
+    if any(strfind(pName, 'tread'))
+        tName = pName(6:end);
+        handles.treadmill.(tName) = handles.P.(pName);
     end
 else
     % Revert the parameter text to the previous value
