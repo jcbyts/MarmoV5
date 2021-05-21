@@ -11,6 +11,7 @@ classdef treadmill_dummy < matlab.mixin.Copyable
         locationSpace double
         maxFrames double
         rewardDist double
+        rewardProb double
     end
     
     properties (SetAccess = private, GetAccess = public)
@@ -27,6 +28,7 @@ classdef treadmill_dummy < matlab.mixin.Copyable
             ip.addParameter('rewardMode', 'dist')
             ip.addParameter('maxFrames', 5e3)
             ip.addParameter('rewardDist', inf)
+            ip.addParameter('rewardProb', 0)
             ip.parse(varargin{:});
             
             args = ip.Results;
