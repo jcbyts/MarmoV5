@@ -14,6 +14,7 @@ classdef treadmill_arduino < matlab.mixin.Copyable
         locationSpace double
         maxFrames double
         rewardDist
+        rewardProb
     end
     
     properties (SetAccess = private, GetAccess = public)
@@ -30,10 +31,11 @@ classdef treadmill_arduino < matlab.mixin.Copyable
             ip = inputParser;
             ip.addParameter('port',[]);
             ip.addParameter('baud', 115200)
-            ip.addParameter('scaleFactor', 1)
+            ip.addParameter('scaleFactor', [])
             ip.addParameter('rewardMode', 'dist')
             ip.addParameter('maxFrames', 5e3)
-            ip.addParameter('rewardDist', inf)
+            ip.addParameter('rewardDist', 94.25)
+            ip.addParameter('rewardProb', 1)
             ip.parse(varargin{:});
             
             args = ip.Results;
@@ -69,7 +71,9 @@ classdef treadmill_arduino < matlab.mixin.Copyable
             self.locationSpace(self.frameCounter, 2) = timestamp;
             if ~isnan(count)
                 self.locationSpace(self.frameCounter,3:4) = count * [1 self.scaleFactor];
-            else % bad count, use previous sample
+            elseif isnan(count) && self.frameCounter == 1 % bad count on frame 1
+                self.locationSpace(self.frameCounter,3:4) = 0;
+            else % bad count not on frame 1, use previous sample
                 self.locationSpace(self.frameCounter,3:4) = self.locationSpace(self.frameCounter-1,3:4);
             end
             
@@ -77,12 +81,19 @@ classdef treadmill_arduino < matlab.mixin.Copyable
             switch self.rewardMode
                 
                 case 'dist'
-                    if self.locationSpace(self.frameCounter, 4) > self.nextReward && self.locationSpace(self.frameCounter-1, 4) < self.nextReward   
+                    if self.locationSpace(self.frameCounter, 4) > self.nextReward   
+%                         tmp = double(rand < self.rewardProb);
                         self.locationSpace(self.frameCounter,5) = self.locationSpace(self.frameCounter,5) + 1; % add one drop
                         self.nextReward = self.nextReward + self.rewardDist;
                     end  
-                case 'time'
-                    warning('treadmill_arduino: time reward not implemented')
+                case 'distProb'
+                    if self.locationSpace(self.frameCounter, 4) > self.nextReward
+                        tmp = double(rand < self.rewardProb);
+                        self.locationSpace(self.frameCounter,5) = self.locationSpace(self.frameCounter,5) + tmp; % add one drop
+                        if tmp == 1
+                            self.nextReward = self.nextReward + self.rewardDist;
+                        end
+                    end
             end
             
             out = self.locationSpace(self.frameCounter,5);
@@ -94,7 +105,7 @@ classdef treadmill_arduino < matlab.mixin.Copyable
             msg = IOPort('Read', self.arduinoUno);
             a = regexp(char(msg), 'time:(?<time>\d+),count:(?<count>\d+),', 'names');
             if isempty(a)
-                disp('message was empty')
+%                 disp('message was empty')
                 count = nan;
                 timestamp = nan;
             else
