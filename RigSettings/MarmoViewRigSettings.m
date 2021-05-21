@@ -21,7 +21,7 @@ function S = MarmoViewRigSettings
 % RigName = 'propixx240';
 % RigName = 'test240';
 % RigName = 'laptop';
-RigName = 'treadmill';
+RigName = 'laptop';
 
 switch RigName
     case 'Rig3'
@@ -179,6 +179,8 @@ switch RigName
         S.gamma = 1;
         S.screenDistance = 87;              % Distance of eye to screen (cm)
         S.pixPerDeg = PixPerDeg(S.screenDistance,S.screenWidth,S.screenRect(3));
+        S.treadmill.type = 'none';
+        S.treadmill.rewardDist = 5;
 end
         
 S.TimeSensitive = [];  % default, allow GUI updating in run func states
