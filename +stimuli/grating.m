@@ -13,19 +13,20 @@ classdef grating < stimuli.stimulus
   
   % 14-08-2018 - Jude Mitchell
   
-  properties (Access = public)
-    position double = [0.0, 0.0]; % [x,y] (pixels)
-    radius double = 50; % (pixels)
-    orientation double = 0;  % horizontal
-    cpd double = 2; % cycles per degree
-    cpd2 double = NaN; % default not used, else composite stim
-    phase double = 0;  % (radians)
-    square logical = false;  
-    bkgd double = 127;  
-    range double = 127;
-    gauss logical = true;  %gaussian aperture
-    transparent double = 0.5;  % from 0 to 1, how transparent
-    pixperdeg double = 0;  % set non-zero to use for CPD computation
+  properties (Access = public),
+    position@double = [0.0, 0.0]; % [x,y] (pixels)
+    radius@double = 50; % (pixels)
+    orientation@double = 0;  % horizontal
+    cpd@double = 2; % cycles per degree
+    cpd2@double = NaN; % default not used, else composite stim
+    phase@double = 0;  % (radians)
+    square@logical = false;  
+    ring@logical = false;
+    bkgd@double = 127;  
+    range@double = 127;
+    gauss@logical = true;  %gaussian aperture
+    transparent@double = 0.5;  % from 0 to 1, how transparent
+    pixperdeg@double = 0;  % set non-zero to use for CPD computation
     screenRect = [];   % if radius Inf, then fill whole area
   end
         
@@ -52,13 +53,14 @@ classdef grating < stimuli.stimulus
       p = inputParser;
       p.StructExpand = true;
       
-      p.addParameter('position',o.position, @isfloat); % [x,y] (pixels)
+      p.addParameter('position',o.position,@isfloat); % [x,y] (pixels)
       p.addParameter('radius',o.radius,@isfloat);
       p.addParameter('orientation',o.orientation,@isfloat);
       p.addParameter('cpd',o.cpd,@isfloat);
       p.addParameter('cpd2',o.cpd2,@isfloat);
       p.addParameter('phase',o.phase,@isfloat);
       p.addParameter('square',o.square,@islogical);
+      p.addParameter('ring',o.square,@islogical);
       p.addParameter('gauss',o.gauss,@islogical);
       p.addParameter('bkgd',o.bkgd,@isfloat);
       p.addParameter('range',o.range,@isfloat);
@@ -80,6 +82,7 @@ classdef grating < stimuli.stimulus
       o.cpd2 = args.cpd2;
       o.phase = args.phase;
       o.square = args.square;
+      o.ring = args.ring;
       o.gauss = args.gauss;
       o.bkgd = args.bkgd;
       o.range = args.range;
@@ -163,12 +166,18 @@ classdef grating < stimuli.stimulus
           else
              g1 = s1 .* (e1 > 0.01);
           end
+          %***** aperture bounding ring?
+          if (o.ring)
+             z = find( (e1 >= 0.01) & (e1 <= 0.015) );
+             g1(z) = -0.5;
+             t1(z) = 255;
+          end
        else
           if (o.transparent)
               g1 = s1;
               t1 = (o.transparent * 255) * ones(size(X));
           end
-       end
+       end   
        % Convert the gabor (g1) to uint8
        g1 = uint8(o.bkgd + g1 *o.range);
        % then define transparency for g-blending
