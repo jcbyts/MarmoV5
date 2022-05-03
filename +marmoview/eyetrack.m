@@ -11,7 +11,7 @@ classdef eyetrack < handle
 
   % dependent properties, calculated on the fly...
   properties (SetAccess = public, GetAccess = public)
-    EyeDump@logical;
+    EyeDump logical
   end
     
     methods
