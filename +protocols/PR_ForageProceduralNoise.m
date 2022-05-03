@@ -127,7 +127,7 @@ classdef PR_ForageProceduralNoise < protocols.protocol
            %***************************************************************
            case 1 % "Hartley" background
                
-               o.NoiseHistory = zeros(o.MaxFrame,3);
+               o.NoiseHistory = nan(o.MaxFrame,3);
                
                % select spatial frequencies
                if (P.spfnum > 1) && (P.spfmax > P.spfmin)
@@ -157,7 +157,7 @@ classdef PR_ForageProceduralNoise < protocols.protocol
            %***************************************************************
            case 2 % use Spatial reverse correlation background
                o.noiseNum = P.snoisenum * 2;
-               o.NoiseHistory = zeros(o.MaxFrame,(1+(o.noiseNum * 2)));  % store time, then x,y positions
+               o.NoiseHistory = nan(o.MaxFrame,(1+(o.noiseNum * 2)));  % store time, then x,y positions
                o.hNoise = cell(1,o.noiseNum);
                
                for k = 1:o.noiseNum
@@ -185,13 +185,13 @@ classdef PR_ForageProceduralNoise < protocols.protocol
                % CSD will be similar to hartley, but all white (SF=0)
                % and a different on duration of stimulus
                
-               o.NoiseHistory = zeros(o.MaxFrame,2);
+               o.NoiseHistory = nan(o.MaxFrame,2);
                o.noiseNum = 1;
                o.hNoise = [];
            
            %***************************************************************
            case 4 % Garborium noise
-               o.NoiseHistory = zeros(o.MaxFrame,3);
+               o.NoiseHistory = nan(o.MaxFrame,3);
                
                % noise object is created here
                o.hNoise = stimuli.gabornoise(o.winPtr, 'pixPerDeg', S.pixPerDeg, 'numGabors', P.numGabors);
@@ -211,7 +211,7 @@ classdef PR_ForageProceduralNoise < protocols.protocol
                
            case 5 % dot spatial noise
                o.noiseNum = min(P.numDots, 100); % only store up to 500 dots
-               o.NoiseHistory = zeros(o.MaxFrame,(1+(o.noiseNum * 2))); 
+               o.NoiseHistory = nan(o.MaxFrame,(1+(o.noiseNum * 2))); 
                % noise object is created here
                o.hNoise = stimuli.dotspatialnoise(o.winPtr, 'numDots', P.numDots, ...
                    'sigma', P.noiseApertureSigma*S.pixPerDeg);
@@ -223,7 +223,7 @@ classdef PR_ForageProceduralNoise < protocols.protocol
            %***************************************************************
            case 6 % Drifting grating background
         
-               o.NoiseHistory = zeros(o.MaxFrame,7); % time, orientation, cpd, phase, direction, speed, contrast
+               o.NoiseHistory = nan(o.MaxFrame,7); % time, orientation, cpd, phase, direction, speed, contrast
                
                % position
                x = P.GratCtrX*S.pixPerDeg + S.centerPix(1);
