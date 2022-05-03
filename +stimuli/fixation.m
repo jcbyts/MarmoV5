@@ -1,4 +1,4 @@
-classdef fixation < handle
+classdef fixation < stimuli.stimulus
   % Matlab class for drawing fixation target(s) using the psych. toolbox.
   %
   % The fixation target consists of a central circular target and a
@@ -21,11 +21,12 @@ classdef fixation < handle
     cColour double = zeros([1,3]); % clut index or [r,g,b]
     sColour double = ones([1,3]);
     position double = [0.0, 0.0]; % [x,y] (pixels)
-  end
-        
-  properties (Access = private)
     winPtr; % ptb window
   end
+        
+%   properties (Access = private)
+%     
+%   end
   
   methods (Access = public)
     function o = fixation(winPtr,varargin) % marmoview's initCmd?

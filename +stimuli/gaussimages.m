@@ -20,7 +20,7 @@ classdef gaussimages < stimuli.stimulus % inherit stimulus to have tracking / ra
     transparency double = 0.5
   end
         
-  properties (Access = private)
+  properties (Access = public)
     winPtr % ptb window
   end
   
