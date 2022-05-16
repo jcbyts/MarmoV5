@@ -193,10 +193,10 @@ switch P.noisetype
         P.noiseCenterY = 0;
         S.noiseCenterY = 'Center of the noise patch (d.v.a):';
         
-        P.noiseRadius = 20;
+        P.noiseRadius = 5;
         S.noiseRadius = 'width of the noise patch (d.v.a):';
         
-        P.numGabors = 800;
+        P.numGabors = 2*P.noiseRadius^2;
         S.numGabors = 'Number of Gabors:';
         
         P.spfrange = 15;   % use log spacing
