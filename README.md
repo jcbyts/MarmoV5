@@ -24,3 +24,8 @@ Make sure this runs. Then contact Jake.
 
 ### Debugging tricks
 If MarmoV5 crashes, close the screen with `sca` and close the GUI with `close all force`. This will get you back to the starting point.
+
+
+### Aknowledgements
+Marmoview has been developed by several people over the years and is based off the synchronization schema developed for [PLDAPS](https://www.frontiersin.org/articles/10.3389/fninf.2012.00001/full)
+Jacob Yates, Sean Cloherty, Sam Nummela, Jude Mitchell
