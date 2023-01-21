@@ -14,25 +14,25 @@ classdef dgrating < handle
   % 14-08-2018 - Jude Mitchell
   
   properties (Access = public),
-    position@double = [0.0, 0.0]; % [x,y] (pixels)
-    radius@double = 50; % (pixels)
-    orientation@double = 0;  % horizontal
-    cpd@double = 2; % cycles per degree
-    cpd2@double = NaN; % default not used, else composite stim
-    phase@double = 0;  % (radians)
-    square@logical = false;  
-    ring@logical = false;
-    bkgd@double = 127;  
-    range@double = 127;
-    gauss@logical = true;  %gaussian aperture
-    driftSpeed@double = 15;  % speed of drifting grating
-    framerate@double = 120;  % monitor frame rate
-    transparent@double = 0.5;  % from 0 to 1, how transparent
-    pixperdeg@double = 0;  % set non-zero to use for CPD computation
+    position double = [0.0, 0.0]; % [x,y] (pixels)
+    radius double = 50; % (pixels)
+    orientation double = 0;  % horizontal
+    cpd double = 2; % cycles per degree
+    cpd2 double = NaN; % default not used, else composite stim
+    phase double = 0;  % (radians)
+    square logical = false;  
+    ring logical = false;
+    bkgd double = 127;  
+    range double = 127;
+    gauss logical = true;  %gaussian aperture
+    driftSpeed double = 15;  % speed of drifting grating
+    framerate double = 120;  % monitor frame rate
+    transparent double = 0.5;  % from 0 to 1, how transparent
+    pixperdeg double = 0;  % set non-zero to use for CPD computation
     screenRect = [];   % if radius Inf, then fill whole area
-    phaCounter@double = 1;    % phase Counter
-    phaN@double = 16;          % number of phases
-    pattern@double = 0; 
+    phaCounter double = 1;    % phase Counter
+    phaN double = 16;          % number of phases
+    pattern double = 0; 
   end
         
   properties (Access = private)

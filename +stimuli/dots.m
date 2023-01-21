@@ -77,8 +77,8 @@ classdef dots < stimuli.stimulus
       p = inputParser;
 %       p.KeepUnmatched = true;
       p.StructExpand = true;
-      p.addParameter('size',10.0,@double); % pixels?
-      p.addParameter('speed',0.2,@double); % deg./s
+      p.addParameter('size',10.0, double); % pixels?
+      p.addParameter('speed',0.2, double); % deg./s
       p.addParameter('direction',0.0,@(x) isscalar(x) && isreal(x)); % deg.
       p.addParameter('numDots',200,@(x) ceil(x));
 
@@ -92,14 +92,14 @@ classdef dots < stimuli.stimulus
       p.addParameter('bandwdth',20.0,@(x) isscalar(x) && isreal(x)); % bandwidth (deg.)
 
       
-      p.addParameter('lifetime',Inf,@double);
+      p.addParameter('lifetime',Inf, double);
 
-%       p.addParamValue('minRadius',0.0,@double); % deg.?
-      p.addParameter('maxRadius',10.0,@double);
+%       p.addParamValue('minRadius',0.0, double); % deg.?
+      p.addParameter('maxRadius',10.0, double);
 
       p.addParameter('position',[0.0,0.0],@(x) isvector(x) && isreal(x)); % [x,y] (pixels)
       
-      p.addParameter('colour',[1,0,0],@double);
+      p.addParameter('colour',[1,0,0], double);
       p.addParameter('visible',true,@islogical);
       p.addParameter('gaussian',false,@islogical);
       

@@ -28,14 +28,14 @@ classdef newera < marmoview.liquid
     port; % port for serial communications ('COM1','COM2', etc.)
     baud;
     
-    address@double; % pump address (0-99)
+    address double; % pump address (0-99)
   end % properties
 
   % dependent properties, calculated on the fly...
   properties (Dependent, SetAccess = public, GetAccess = public)
-    diameter@double; % diameter of the syringe (mm)
-    volume@double;   % dispensing volume (mL)
-    rate@double;     % dispensing rate (mL per minute)
+    diameter double; % diameter of the syringe (mm)
+    volume double;   % dispensing volume (mL)
+    rate double;     % dispensing rate (mL per minute)
   end
 
   methods % set/get dependent properties

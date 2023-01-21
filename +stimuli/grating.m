@@ -13,20 +13,20 @@ classdef grating < stimuli.stimulus
   
   % 14-08-2018 - Jude Mitchell
   
-  properties (Access = public),
-    position@double = [0.0, 0.0]; % [x,y] (pixels)
-    radius@double = 50; % (pixels)
-    orientation@double = 0;  % horizontal
-    cpd@double = 2; % cycles per degree
-    cpd2@double = NaN; % default not used, else composite stim
-    phase@double = 0;  % (radians)
-    square@logical = false;  
-    ring@logical = false;
-    bkgd@double = 127;  
-    range@double = 127;
-    gauss@logical = true;  %gaussian aperture
-    transparent@double = 0.5;  % from 0 to 1, how transparent
-    pixperdeg@double = 0;  % set non-zero to use for CPD computation
+  properties (Access = public)
+    position double = [0.0, 0.0]; % [x,y] (pixels)
+    radius double = 50; % (pixels)
+    orientation double = 0;  % horizontal
+    cpd double = 2; % cycles per degree
+    cpd2 double = NaN; % default not used, else composite stim
+    phase double = 0;  % (radians)
+    square logical = false;  
+    ring logical = false;
+    bkgd double = 127;  
+    range double = 127;
+    gauss logical = true;  %gaussian aperture
+    transparent double = 0.5;  % from 0 to 1, how transparent
+    pixperdeg double = 0;  % set non-zero to use for CPD computation
     screenRect = [];   % if radius Inf, then fill whole area
   end
         
@@ -53,18 +53,18 @@ classdef grating < stimuli.stimulus
       p = inputParser;
       p.StructExpand = true;
       
-      p.addParameter('position',o.position,@isfloat); % [x,y] (pixels)
-      p.addParameter('radius',o.radius,@isfloat);
-      p.addParameter('orientation',o.orientation,@isfloat);
-      p.addParameter('cpd',o.cpd,@isfloat);
-      p.addParameter('cpd2',o.cpd2,@isfloat);
-      p.addParameter('phase',o.phase,@isfloat);
-      p.addParameter('square',o.square,@islogical);
-      p.addParameter('ring',o.square,@islogical);
-      p.addParameter('gauss',o.gauss,@islogical);
-      p.addParameter('bkgd',o.bkgd,@isfloat);
-      p.addParameter('range',o.range,@isfloat);
-      p.addParameter('pixperdeg',o.pixperdeg,@isdouble);
+      p.addParameter('position',o.position, isfloat); % [x,y] (pixels)
+      p.addParameter('radius',o.radius, isfloat);
+      p.addParameter('orientation',o.orientation, isfloat);
+      p.addParameter('cpd',o.cpd, isfloat);
+      p.addParameter('cpd2',o.cpd2, isfloat);
+      p.addParameter('phase',o.phase, isfloat);
+      p.addParameter('square',o.square, islogical);
+      p.addParameter('ring',o.square, islogical);
+      p.addParameter('gauss',o.gauss, islogical);
+      p.addParameter('bkgd',o.bkgd, isfloat);
+      p.addParameter('range',o.range, isfloat);
+      p.addParameter('pixperdeg',o.pixperdeg, isdouble);
                   
       try
         p.parse(args{:});

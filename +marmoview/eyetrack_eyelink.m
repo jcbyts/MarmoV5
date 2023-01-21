@@ -8,7 +8,7 @@ classdef eyetrack_eyelink < handle
   
 
   properties (SetAccess = public, GetAccess = public)
-    EyeDump@logical;
+    EyeDump logical;
     eyeIdx = 1;   % LEFT EYE, Default
     screen = 0;
     tracker_info = [];

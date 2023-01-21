@@ -68,16 +68,16 @@ classdef (Abstract) dotsbase < stimuli.stimulus
             ip = inputParser;
             ip.KeepUnmatched = true;
             ip.StructExpand = true;
-            ip.addParameter('size',10.0,@double); % pixels?
-            ip.addParameter('speed',0.2,@double); % deg./s
+            ip.addParameter('size',10.0, double); % pixels?
+            ip.addParameter('speed',0.2, double); % deg./s
             ip.addParameter('direction',0.0,@(x) isscalar(x) && isreal(x)); % deg.
             ip.addParameter('numDots',50,@(x) ceil(x));
-            ip.addParameter('lifetime',Inf,@double);
-            ip.addParameter('maxRadius',10.0,@double); % deg.
+            ip.addParameter('lifetime',Inf, double);
+            ip.addParameter('maxRadius',10.0, double); % deg.
             
             ip.addParameter('position',[0.0,0.0],@(x) isvector(x) && isreal(x)); % [x,y] (pixels)
             
-            ip.addParameter('color',[0,0,0],@double);
+            ip.addParameter('color',[0,0,0], double);
             ip.addParameter('visible',true,@islogical)
             
             try

@@ -5,32 +5,32 @@ classdef PR_Acuity < handle
   %
   
   properties (Access = public), 
-       Iti@double = 1;            % default Iti duration
-       startTime@double = 0;      % trial start time
-       fixStart@double = 0;       % fix acquired time
-       itiStart@double = 0;       % start of ITI interval
-       fixDur@double = 0;         % fixation duration
-       stimStart@double = 0;      % start of Gabor probe stimulus
-       responseStart@double = 0;  % start of choice period
-       responseEnd@double = 0;    % end of response period
-       showFix@logical = true;    % trial start with fixation
-       flashCounter@double = 0;   % counts frames, used for fade in point cue?
-       rewardCount@double = 0;    % counter for reward drops
-       RunFixBreakSound@double = 0;       % variable to initiate fix break sound (only once)
-       NeverBreakSoundTwice@double = 0;   % other variable for fix break sound
+       Iti double = 1;            % default Iti duration
+       startTime double = 0;      % trial start time
+       fixStart double = 0;       % fix acquired time
+       itiStart double = 0;       % start of ITI interval
+       fixDur double = 0;         % fixation duration
+       stimStart double = 0;      % start of Gabor probe stimulus
+       responseStart double = 0;  % start of choice period
+       responseEnd double = 0;    % end of response period
+       showFix logical = true;    % trial start with fixation
+       flashCounter double = 0;   % counts frames, used for fade in point cue?
+       rewardCount double = 0;    % counter for reward drops
+       RunFixBreakSound double = 0;       % variable to initiate fix break sound (only once)
+       NeverBreakSoundTwice double = 0;   % other variable for fix break sound
   end
       
   properties (Access = private)
     winPtr; % ptb window
-    state@double = 0;      % state counter
-    error@double = 0;      % error state in trial
+    state double = 0;      % state counter
+    error double = 0;      % error state in trial
     %*********
     S;      % copy of Settings struct (loaded per trial start)
     P;      % copy of Params struct (loaded per trial)
     trialsList;  % list of trial types to run in experiment
     trialIndexer = [];  % object to run trial order
     %********* stimulus structs for use
-    stimTheta@double = 0;  % direction of choice
+    stimTheta double = 0;  % direction of choice
     hFix;              % object for a fixation point
     hProbe = [];       % object for Gabor stimuli
     hChoice = [];      % object for Choice Gabor stimuli

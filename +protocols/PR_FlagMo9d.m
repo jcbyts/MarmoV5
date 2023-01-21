@@ -5,26 +5,26 @@ classdef PR_FlagMo9d < handle
   %
  
   properties (Access = public), 
-       Iti@double = 1;            % default Iti duration
-       startTime@double = 0;      % trial start time
-       fixStart@double = 0;       % fix acquired time
-       itiStart@double = 0;       % start of ITI interval
-       fixDur@double = 0;         % fixation duration
-       fixOffset@double = 0;      % time of fix offset
-       stimStart@double = 0;      % stimulus onset 
-       stimOnset@double = 0;      % jitter timing of target onset
-       stimTime@double = 0;       % mark when stim did onset (state move)
-       stimChange@double = 0;     % stimulus change in sac flight
-       stimOffset@double = 0;     % mark frame time of stim offset
-       responseStart@double = 0;  % response period start time
-       responseEnd@double = 0;    % time entering response period
-       dotflip@double = 0;        % integer to know dots turn off
-       DropStim@double = 0;       % if 1, trial where dots disappear on saccade
-       rewardCount@double = 0;    % counter for reward drops
-       RunFixBreakSound@double = 0;       % variable to initiate fix break sound (only once)
-       NeverBreakSoundTwice@double = 0;   % other variable for fix break sound
-       flashCounter@double = 0;   % for flashing fix at start of trial
-       showFix@logical = true;    % for flashing fix point to start trial
+       Iti double = 1;            % default Iti duration
+       startTime double = 0;      % trial start time
+       fixStart double = 0;       % fix acquired time
+       itiStart double = 0;       % start of ITI interval
+       fixDur double = 0;         % fixation duration
+       fixOffset double = 0;      % time of fix offset
+       stimStart double = 0;      % stimulus onset 
+       stimOnset double = 0;      % jitter timing of target onset
+       stimTime double = 0;       % mark when stim did onset (state move)
+       stimChange double = 0;     % stimulus change in sac flight
+       stimOffset double = 0;     % mark frame time of stim offset
+       responseStart double = 0;  % response period start time
+       responseEnd double = 0;    % time entering response period
+       dotflip double = 0;        % integer to know dots turn off
+       DropStim double = 0;       % if 1, trial where dots disappear on saccade
+       rewardCount double = 0;    % counter for reward drops
+       RunFixBreakSound double = 0;       % variable to initiate fix break sound (only once)
+       NeverBreakSoundTwice double = 0;   % other variable for fix break sound
+       flashCounter double = 0;   % for flashing fix at start of trial
+       showFix logical = true;    % for flashing fix point to start trial
        dotbandW = 0;              % store the bandW selected per trial
        trialCount = 0;            % count error 0 or 4 trials (block design swaps)
        SpatialConfig = 1;         % config 1 (use normal, 2 - flip up down)
@@ -33,8 +33,8 @@ classdef PR_FlagMo9d < handle
       
   properties (Access = private)
     winPtr; % ptb window
-    state@double = 0;      % state counter
-    error@double = 0;      % error state in trial
+    state double = 0;      % state counter
+    error double = 0;      % error state in trial
    %*********
     S;              % copy of Settings struct (loaded per trial start)
     P;              % copy of Params struct (loaded per trial)

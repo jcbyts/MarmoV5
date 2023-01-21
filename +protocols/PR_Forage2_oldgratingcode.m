@@ -5,18 +5,18 @@ classdef PR_Forage2 < handle
   %
  
   properties (Access = public), 
-       Iti@double = 1;             % default Iti duration
-       startTime@double = 0;       % trial start time
-       itiStart@double = 0;        % start of iti interval
-       rewardCount@double = 0;     % counter for reward drops
-       rewardGap@double = 0;       % gap for next target onset
-       rewardTime@double = 0;      % store time of last reward
+       Iti double = 1;             % default Iti duration
+       startTime double = 0;       % trial start time
+       itiStart double = 0;        % start of iti interval
+       rewardCount double = 0;     % counter for reward drops
+       rewardGap double = 0;       % gap for next target onset
+       rewardTime double = 0;      % store time of last reward
   end
       
   properties (Access = private)
     winPtr; % ptb window
-    state@double = 0;      % state counter
-    error@double = 0;      % error state in trial
+    state double = 0;      % state counter
+    error double = 0;      % error state in trial
     %*********
     S;              % copy of Settings struct (loaded per trial start)
     P;              % copy of Params struct (loaded per trial)

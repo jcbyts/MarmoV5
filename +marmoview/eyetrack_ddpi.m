@@ -6,7 +6,7 @@ classdef eyetrack_ddpi < handle
     % the mex toolbox written by Ruei-Jr Wu
     
     properties (SetAccess = public, GetAccess = public)
-        EyeDump@logical; % backwards compatibility with Arrington
+        EyeDump logical; % backwards compatibility with Arrington
         width
         height
         downsamplingRate

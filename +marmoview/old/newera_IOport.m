@@ -28,7 +28,7 @@ classdef newera_IOport < marmoview.liquid
     port; % port for serial communications ('COM1','COM2', etc.)
     baud;
     
-    address@double; % pump address (0-99)
+    address double; % pump address (0-99)
     
     triggerMode
     alarmMode
@@ -38,9 +38,9 @@ classdef newera_IOport < marmoview.liquid
 
   % dependent properties, calculated on the fly...
   properties (SetAccess = public, GetAccess = public)
-    diameter@double; % diameter of the syringe (mm)
-    volume@double;   % dispensing volume (mL)
-    rate@double;     % dispensing rate (mL per minute)
+    diameter double; % diameter of the syringe (mm)
+    volume double;   % dispensing volume (mL)
+    rate double;     % dispensing rate (mL per minute)
   end
   
   properties (SetAccess = private, GetAccess = private)
