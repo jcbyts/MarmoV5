@@ -228,8 +228,8 @@ classdef gabornoise < stimuli.stimulus
             % Multiply/Modulate base color and alpha with calculated sine/gauss
             % values, add some constant color/alpha Offset, assign as final fragment
             % output color:
-            I = reshape(sum((ev .* sv),2), size(xx))*127;
-            
+            I = reshape(sum((ev .* sv .* obj.mypars(4,ix)),2), size(xx))*127;
+            I = max(min(I, 127), -127);
         end
         
         

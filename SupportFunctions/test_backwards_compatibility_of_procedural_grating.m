@@ -66,6 +66,7 @@ gratpro.phase = gratpro.phase - 30;
 gratpro.drawGrating();
 
 % 
+
 rect = CenterRectOnPointd([0 0 gratpro.pixperdeg gratpro.pixperdeg]*P.snoisediam, gratpro.position(1), gratpro.position(2));
 % rect([2 4]) = rect([2 4]) + gratpro.pixperdeg*3;
 % Screen('FillRect', winPtr, 0, rect);

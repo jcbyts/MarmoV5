@@ -145,10 +145,14 @@ classdef gaussimages < stimuli.stimulus % inherit stimulus to have tracking / ra
        end
     end
     
-    function varargout = getImage(o, rect, binsize)
+    function varargout = getImage(o, rect, binsize, screenSize)
         
         if o.winPtr~=0
             warning('gaussimages: getImage: only works if you constructed the object with winPtr=0')
+        end
+
+        if nargin < 4
+            screenSize = [1280 720];
         end
         
         if nargin < 3
@@ -170,13 +174,13 @@ classdef gaussimages < stimuli.stimulus % inherit stimulus to have tracking / ra
         end
         
         texrect = kron([1,1],o.position) + kron(o.radius,[-1, -1, +1, +1]);
-        I = imresize(I, [texrect(4)-texrect(2) texrect(3)-texrect(1)]);
-        alpha = imresize(alpha, [texrect(4)-texrect(2) texrect(3)-texrect(1)]);
+        I = imresize(I, [texrect(4)-texrect(2) texrect(3)-texrect(1)], 'bilinear');
+        alpha = imresize(alpha, [texrect(4)-texrect(2) texrect(3)-texrect(1)], 'bilinear');
         
         % -- try to be a little quicker
-        Iscreen = o.bkgd * ones(1080,1920); % bad that screensize is hardcoded
+        Iscreen = o.bkgd * ones(screenSize(2),screenSize(1)); % bad that screensize is hardcoded
         Iscreen(texrect(2):texrect(4)-1, texrect(1):texrect(3)-1) = mean(I(:,:,1:3),3);
-        Ascreen = zeros(1080,1920);
+        Ascreen = zeros(screenSize(2),screenSize(1));
         Ascreen(texrect(2):texrect(4)-1, texrect(1):texrect(3)-1) = alpha;
         
         tmprect = rect;

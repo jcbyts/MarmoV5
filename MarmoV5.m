@@ -19,7 +19,7 @@ function varargout = MarmoV5(varargin)
 %      unrecognized property name or invalid value makes property application
 %      stop.  All inputs are passed to MarmoV5_OpeningFcn via varargin.
 %
-%      *See GUI Options on GUIDE's Tools menu.  Choose "GUI allows only one
+%      *See GUI Options on GUIDE's Tools menu.    Choose "GUI allows only one
 %      instance to run (singleton)".
 %
 % See also: GUIDE, GUIDATA, GUIHANDLES
@@ -183,6 +183,7 @@ handles.A.juiceCounter = 0;
 if isfield(handles.S, 'eyetracker') && ischar(handles.S.eyetracker)
     switch handles.S.eyetracker
         case 'arrington'
+            marmoview.(handles.S.eyetracker)()
             handles.eyetrack = marmoview.eyetrack_arrington(hObject,'EyeDump',S.EyeDump);
         case 'ddpi'
             handles.eyetrack = marmoview.eyetrack_ddpi(hObject,'EyeDump',S.EyeDump);
